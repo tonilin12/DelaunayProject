@@ -1,0 +1,146 @@
+@startuml
+
+class Face {
+  +HalfEdge Edge
+  +Face(Vertex v1, Vertex v2, Vertex v3)
+  +Face(HalfEdge edge1, HalfEdge edge2, HalfEdge edge3)
+  +Face(List<Vertex> vertices)
+  +Face(List<HalfEdge> edges)
+  +IEnumerable<T> ProcessEdges<T>(Func<HalfEdge, T> func)
+  +List<HalfEdge> GetEdges()
+  +List<Vertex> GetVertices()
+  +List<Face> GetNeighborFaces()
+  +HalfEdge GetOppositeTwinEdge(Vertex p)
+  +Vertex GetOppositeVertex(HalfEdge halfEdge)
+  +string ToString()
+}
+
+class HalfEdge {
+  +Vertex Origin
+  +HalfEdge Twin { get; set; }
+  +HalfEdge Next { get; set; }
+  +Face Face { get; set; }
+  +Vertex Dest => get
+  +HalfEdge Prev { get; set; }
+  +bool IsConstrained { get; set; }
+  +HalfEdge(Vertex origin)
+  +string ToString()
+  +static (HalfEdge, HalfEdge) CreateHalfEdgePair(Vertex from, Vertex to)
+  +void Destroy()
+}
+
+class Vertex {
+  +Vector2 Position
+  +HalfEdge OutgoingHalfEdge
+  +Vertex(Vector2 position)
+  +Vertex ShallowCopy()
+  +bool Equals(Vertex other)
+  +override int GetHashCode()
+  +override string ToString()
+}
+
+class BaseTriangulationClass {
+  +HashSet<Face> getTriangulation(List<Vertex> points, Face supertriangle)
+  -Face InsertPoint(Vertex p, HashSet<Face> triangles, Face currentFace)
+  -void LegalizeEdges(Stack<Face> stack, Vertex p, HashSet<Face> triangles)
+}
+
+class FlipHelper {
+  +void FlipEdge(ref HalfEdge edge)
+  -void UpdateOutgoingForFace(Face face)
+}
+
+class TriangleSplitter {
+  +List<Face> SplitTriangle(Face triangle, Vertex newVertex)
+  +List<Face> SplitTriangleWithEdge(HalfEdge edge, Vertex newVertex)
+}
+
+class TriangulationPreprocessor {
+  +void PrepareData(ref List<Vertex> vertices, ref List<(Vertex, Vertex)> edgeTuples, out Face superTriangle)
+}
+
+class PointEdgeLocator {
+  {static} +HalfEdge FindHalfEdgeInFace(Face currentFace, Vertex a, Vertex b)
+  {static} +(float, float, float) CalculateOrientedAreas(HalfEdge startEdge, Vertex point)
+  {static} +bool IsPointInside(HalfEdge startEdge, Vertex point)
+  {static} +HalfEdge GetEdgeOnWhichPointIsOn(HalfEdge startEdge, Vertex point)
+  {static} +HalfEdge GetNextHalfEdge(HalfEdge startEdge, Vertex point)
+  {static} +(bool, bool, HalfEdge) GetPointOrientation(HalfEdge startEdge, Vertex point)
+  {static} +(HalfEdge, bool, List<HalfEdge>) LocatePointInMesh(HalfEdge startEdge, Vertex point)
+  {static} +(Face, bool, List<HalfEdge>) LocatePointInMesh(Face startFace, Vertex point)
+  {static} +(HalfEdge, List<HalfEdge>) FindHalfEdgeWithEdge(Face face0, Vertex a, Vertex b)
+}
+
+class HalfEdgeOperations {
+  {static} +HalfEdge findSharedEdgeFor2Face(Face face1, Face face2)
+  {static} +List<Vertex> GetQuadrilateral(HalfEdge sharedEdge)
+  {static} +List<HalfEdge> findIntersectingEdges(HashSet<Face> triangles, Vertex a, Vertex b)
+}
+
+class TriangulationOperation {
+  {static} +List<Face> SplitTriangle(Face triangle, Vertex newVertex)
+  {static} +List<Face> SplitTriangleWithEdge(HalfEdge edge, Vertex newVertex)
+  {static} +void PrepareData(ref List<Vertex> vertices, ref List<(Vertex, Vertex)> edgeTuples, out Face superTriangle)
+  {static} +void FlipEdge(ref HalfEdge edge)
+  {static} +bool InCircle(Face triangle, Vertex p)
+  {static} +HashSet<Face> GetTriangulation(List<Vertex> points, Face supertriangle)
+}
+
+class GeometryUtils {
+  {static} +bool ArePositionsEqual(Vector2 a, Vector2 b)
+  {static} +bool ArePositionsEqual(Vertex a, Vertex b)
+  {static} +int OrientedArea(Vector2 a, Vector2 b, Vector2 c)
+  {static} +int OrientedArea(Vertex a, Vertex b, Vertex c)
+  {static} +bool InCircle(Vector2 a, Vector2 b, Vector2 c, Vector2 p)
+  {static} +bool CheckIfConvexQuadrilateral(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+  {static} +bool CheckIfConvexQuadrilateral(Vertex v1, Vertex v2, Vertex v3, Vertex v4)
+  {static} +bool AreSegmentsCrossing(Vector2 s1, Vector2 e1, Vector2 s2, Vector2 e2)
+  {static} +bool IsOnSegment(Vector2 s, Vector2 e, Vector2 p)
+  {static} +bool AreEdgesEqual((Vertex, Vertex) edge1, (Vertex, Vertex) edge2)
+  {static} +float Cross(Vector2 a, Vector2 b)
+}
+
+' Relationships
+Face "1" *-- "3..*" HalfEdge : contains
+HalfEdge "1" --> "1" Vertex : Origin
+HalfEdge "1" --> "1" Face : belongs to
+HalfEdge "1" --> "1" HalfEdge : Twin
+HalfEdge "1" --> "1" HalfEdge : Next
+HalfEdge "1" --> "1" HalfEdge : Prev
+Vertex "1" --> "0..1" HalfEdge : OutgoingHalfEdge
+BaseTriangulationClass --> Face : uses
+BaseTriangulationClass --> Vertex : uses
+FlipHelper --> HalfEdge : manipulates
+FlipHelper --> Face : manipulates
+TriangleSplitter --> Face : creates
+TriangleSplitter --> HalfEdge : creates
+TriangulationPreprocessor --> Vertex : processes
+TriangulationPreprocessor --> Face : creates
+PointEdgeLocator --> Face : operates on
+PointEdgeLocator --> HalfEdge : operates on
+PointEdgeLocator --> Vertex : operates on
+HalfEdgeOperations --> Face : processes
+HalfEdgeOperations --> HalfEdge : processes
+TriangulationOperation ..> TriangleSplitter : uses
+TriangulationOperation ..> TriangulationPreprocessor : uses
+TriangulationOperation ..> FlipHelper : uses
+TriangulationOperation ..> BaseTriangulationClass : uses
+GeometryUtils ..> Vertex : utility for
+GeometryUtils ..> Vector2 : utility for
+
+note top of HalfEdge
+  Dest is computed property
+  CreateHalfEdgePair is static factory
+end note
+
+note top of Vertex
+  Implements IEquatable<Vertex>
+  Uses epsilon comparison
+end note
+
+note top of PointEdgeLocator
+  All methods are static
+  Used for point location in mesh
+end note
+
+@enduml
