@@ -1,93 +1,129 @@
+using System;
+
+/// <summary>
+/// Represents a half-edge in a half-edge data structure.
+/// </summary>
 public class HalfEdge
 {
     /// <summary>
-    /// The vertex where this half-edge originates
+    /// The vertex where this half-edge originates.
     /// </summary>
     public Vertex Origin { get; set; }
 
     /// <summary>
-    /// Twin half-edge on the adjacent face
+    /// Twin half-edge on the adjacent face.
     /// </summary>
     public HalfEdge Twin { get; set; }
 
     /// <summary>
-    /// Next half-edge in the current face (counter-clockwise order)
+    /// Next half-edge in the current face (counter-clockwise order).
     /// </summary>
     public HalfEdge Next { get; set; }
 
     /// <summary>
-    /// The face this half-edge borders
+    /// Previous half-edge in the current face (clockwise order).
+    /// Can be explicitly set, or for triangles it can be calculated as Next.Next.
+    /// </summary>
+    public HalfEdge Prev
+    {
+        get
+        {
+            // If Prev is explicitly set, return it
+            if (_prev != null)
+                return _prev;
+
+            // Otherwise, for triangular faces, Prev = Next.Next (safe if Next and Next.Next are non-null)
+            if (Next?.Next != null)
+                return Next.Next;
+
+            return null;
+        }
+        set
+        {
+            _prev = value;
+        }
+    }
+    private HalfEdge _prev;
+
+    /// <summary>
+    /// The face this half-edge borders.
     /// </summary>
     public Face Face { get; set; }
 
     /// <summary>
-    /// Destination vertex (calculated via twin relationship)
+    /// Destination vertex (calculated from the Next half-edge).
     /// </summary>
-    public Vertex Dest => this.Next.Origin;
+    public Vertex Dest => Next?.Origin;
 
     /// <summary>
-    /// Previous half-edge in the current face (clockwise order)
+    /// Whether this half-edge is constrained.
     /// </summary>
-    public HalfEdge Prev {get;set;}  // Defines Prev as this.Next.Next
-
     public bool IsConstrained { get; set; }
 
+    /// <summary>
+    /// Constructor: creates a half-edge originating from a vertex.
+    /// </summary>
     public HalfEdge(Vertex origin)
     {
-        Origin = origin;
-        IsConstrained = false; // By default, the edge is not constrained
+        Origin = origin ?? throw new ArgumentNullException(nameof(origin));
+        IsConstrained = false;
     }
 
+    /// <summary>
+    /// Returns a string representation: "Origin -> Destination".
+    /// </summary>
     public override string ToString()
     {
-        string destStr = (Next != null && Next.Origin != null) ? Next.Origin.ToString() : "null";
+        string destStr = Dest != null ? Dest.ToString() : "null";
         return $"{Origin} -> {destStr}";
     }
 
-
-    public static (HalfEdge, HalfEdge) 
-    CreateHalfEdgePair(Vertex from, Vertex to)
+    /// <summary>
+    /// Creates a pair of twin half-edges connecting 'from' to 'to'.
+    /// </summary>
+    public static (HalfEdge edge, HalfEdge twin) CreateHalfEdgePair(Vertex from, Vertex to)
     {
+        if (from == null) throw new ArgumentNullException(nameof(from));
+        if (to == null) throw new ArgumentNullException(nameof(to));
+
         var edge = new HalfEdge(from);
         var twin = new HalfEdge(to);
+
         edge.Twin = twin;
         twin.Twin = edge;
+
         return (edge, twin);
     }
 
-
-        /// <summary>
-    /// Destroys this half-edge and cleans up its associated elements.
+    /// <summary>
+    /// Destroys this half-edge safely and cleans up references.
     /// </summary>
     public void Destroy()
     {
+        // Break twin relationship
         if (Twin != null)
         {
-            // Break the twin relationship
             Twin.Twin = null;
             Twin = null;
         }
 
+        // Break Next/Prev relationships
         if (Next != null)
         {
-            // Remove the reference from the next half-edge's previous pointer
-            Next.Prev = null;
+            if (Next._prev == this) Next._prev = null;
             Next = null;
         }
 
-        if (Prev != null)
+        if (_prev != null)
         {
-            // Remove the reference from the previous half-edge's next pointer
-            Prev.Next = null;
-            Prev = null;
+            if (_prev.Next == this) _prev.Next = null;
+            _prev = null;
         }
 
-        if (Face != null)
-        {
-            Face = null;
-        }
+        // Remove face reference
+        Face = null;
 
-        // Optionally, nullify the origin if you want to free the vertex's reference as well
+        // Remove origin reference (optional)
         Origin = null;
     }
 }

@@ -5,11 +5,9 @@ using System.Linq;
 public static class TriangulationOperation
 {
     private static readonly TriangleSplitter _triangleSplitter = new TriangleSplitter();
-    private static readonly TriangulationPreprocessor _triangulationPreprocessor = new TriangulationPreprocessor();
+    private static readonly SuperTriangleGenerator _supertriangleGenerator
+        = new SuperTriangleGenerator();
     private static readonly FlipHelper _flipHelper = new FlipHelper();
-
-    private static readonly BaseTriangulationClass 
-    _baseTriangulationClass = new BaseTriangulationClass();
 
 
 
@@ -34,18 +32,14 @@ public static class TriangulationOperation
     /// <summary>
     /// Prepares vertices and edge constraints for triangulation, including adding supertriangle and sorting.
     /// </summary>
-    /// <param name="vertices">List of vertices for triangulation.</param>
-    /// <param name="edgeTuples">List of edge constraints as vertex pairs.</param>
-    /// <param name="superTriangle">Output parameter for the enclosing supertriangle face.</param>
-    public static void PrepareData(
+    public static void getSuperTriangle(
         ref List<Vertex> vertices,
-        ref List<(Vertex, Vertex)> edgeTuples,  // Use value tuples instead of Tuple
         out Face superTriangle
     )
     {
         // Call the PrepareData function from TriangulationPreprocessor
-        _triangulationPreprocessor
-            .PrepareData(ref vertices, ref edgeTuples, out superTriangle);
+        _supertriangleGenerator
+            .getSuperTriangle(ref vertices, out superTriangle);
     }
 
 
@@ -67,10 +61,7 @@ public static class TriangulationOperation
         return GeometryUtils.InCircle(a,b,c,p.Position);
     }
 
-    public static HashSet<Face> GetTriangulation(List<Vertex> points, Face supertriangle)
-    {
-        return _baseTriangulationClass.getTriangulation(points, supertriangle);
-    }
+
 
 
 }

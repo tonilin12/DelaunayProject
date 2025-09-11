@@ -25,9 +25,12 @@ public static class PointEdgeLocator
         if (edges.Count != 3)
             throw new InvalidOperationException("Face is not triangular.");
 
-        float a1 = GeometryUtils.OrientedArea(edges[0].Origin.Position, edges[1].Origin.Position, point.Position);
-        float a2 = GeometryUtils.OrientedArea(edges[1].Origin.Position, edges[2].Origin.Position, point.Position);
-        float a3 = GeometryUtils.OrientedArea(edges[2].Origin.Position, edges[0].Origin.Position, point.Position);
+        float a1 = GeometryUtils
+            .OrientedArea(edges[0].Origin.Position, edges[1].Origin.Position, point.Position);
+        float a2 = GeometryUtils
+            .OrientedArea(edges[1].Origin.Position, edges[2].Origin.Position, point.Position);
+        float a3 = GeometryUtils
+            .OrientedArea(edges[2].Origin.Position, edges[0].Origin.Position, point.Position);
 
         return (a1, a2, a3);
     }
@@ -78,7 +81,8 @@ public static class PointEdgeLocator
         return (isInside, pointEdge != null, nextEdge);
     }
 
-    public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges) LocatePointInMesh(HalfEdge startEdge, Vertex point)
+    public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges) 
+    LocatePointInMesh(HalfEdge startEdge, Vertex point)
     {
         HalfEdge currentEdge = startEdge;
         List<HalfEdge> traversedEdges = new List<HalfEdge>();
@@ -118,7 +122,8 @@ public static class PointEdgeLocator
         return (data.destinationEdge?.Face, data.isOnEdge, data.traversedEdges);
     }
 
-    public static (HalfEdge searchedEdge, List<HalfEdge> traversedEdges) FindHalfEdgeWithEdge(Face face0, Vertex a, Vertex b)
+    public static (HalfEdge searchedEdge, List<HalfEdge> traversedEdges)
+    FindHalfEdgeWithEdge(Face face0, Vertex a, Vertex b)
     {
         Vector2 mid = (a.Position + b.Position) / 2;
         var midVertex = new Vertex(mid);

@@ -1,11 +1,24 @@
-using System;
-using System.Numerics;
 
+using System;
+using System.Globalization;
+using System.Numerics;
+using System.Collections.Generic; // for HashSet
+
+
+
+using System;
+
+/// <summary>
+/// Represents a vertex in 2D space with an optional outgoing half-edge.
+/// Implements approximate equality for floating-point positions.
+/// </summary>
 public class Vertex : IEquatable<Vertex>
 {
     public Vector2 Position { get; set; }
     public HalfEdge OutgoingHalfEdge { get; set; }
-    private const float Epsilon = 0.0001f; // Precision threshold
+
+    // Make Tolerance public so tests can access it
+    public const float Tolerance = 1e-5f;
 
     public Vertex(Vector2 position)
     {
@@ -13,36 +26,31 @@ public class Vertex : IEquatable<Vertex>
         OutgoingHalfEdge = null;
     }
 
-    // Clone method to create a new instance with the same Position
-    public Vertex ShallowCopy()
+    public bool Equals(Vertex other)
     {
-        return new Vertex(Position);
+        if (other == null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        return Math.Abs(Position.X - other.Position.X) <= Tolerance &&
+               Math.Abs(Position.Y - other.Position.Y) <= Tolerance;
     }
 
-    // Override Equals to compare Position with tolerance
     public override bool Equals(object obj)
     {
         return Equals(obj as Vertex);
     }
 
-    // Implements IEquatable<Vertex> with floating point precision tolerance
-    public bool Equals(Vertex other)
-    {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-
-        // Use GeometryUtils method for approximate equality
-        return GeometryUtils.ArePositionsEqual(this.Position, other.Position);
-    }
-
-    // Override GetHashCode to use Position's hash code
     public override int GetHashCode()
     {
-        return Position.GetHashCode();
+        int xHash = (int)Math.Round(Position.X / Tolerance);
+        int yHash = (int)Math.Round(Position.Y / Tolerance);
+
+        return (xHash * 397) ^ yHash;
     }
 
     public override string ToString()
     {
-        return $"Vertex({Position.X:F2}, {Position.Y:F2})";
+        return string.Format(CultureInfo.InvariantCulture,
+            "Vertex({0:F2}, {1:F2})", Position.X, Position.Y);
     }
 }

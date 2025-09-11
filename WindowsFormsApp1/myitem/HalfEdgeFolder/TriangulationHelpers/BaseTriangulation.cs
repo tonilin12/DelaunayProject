@@ -1,39 +1,78 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-public class BaseTriangulationClass
+public class BaseTriangulation
 {
-    public HashSet<Face> getTriangulation(List<Vertex> points, Face supertriangle)
+    private readonly List<Vertex> _points;
+    private readonly Face _supertriangle;
+    private int _currentIndex;
+    private Face _currentFace;
+    private readonly HashSet<Face> _triangles;
+
+    public BaseTriangulation(List<Vertex> points, Face supertriangle)
     {
-        var triangles = new HashSet<Face> { supertriangle };
-        Face currentFace = supertriangle;
+        _points = points ?? throw new ArgumentNullException(nameof(points));
+        _supertriangle = supertriangle ?? throw new ArgumentNullException(nameof(supertriangle));
 
-        foreach (var p in points)
+        _triangles = new HashSet<Face> { _supertriangle };
+        _currentFace = _supertriangle;
+        _currentIndex = 0;
+    }
+
+    /// <summary>
+    /// Whether there are more points left to insert.
+    /// </summary>
+    public bool HasMoreSteps => _currentIndex < _points.Count;
+
+    /// <summary>
+    /// Step the triangulation by one point and return a snapshot of current triangles.
+    /// </summary>
+    public HashSet<Face> StepNext()
+    {
+        if (!HasMoreSteps)
+            return new HashSet<Face>(_triangles);
+
+        var p = _points[_currentIndex++];
+        _currentFace = InsertPoint(p, _triangles, _currentFace);
+
+        return new HashSet<Face>(_triangles); // snapshot
+    }
+
+    /// <summary>
+    /// Step the triangulation by multiple points and return a snapshot.
+    /// </summary>
+    public HashSet<Face> Step(int count)
+    {
+        for (int i = 0; i < count && HasMoreSteps; i++)
         {
-            currentFace = InsertPoint(p, triangles, currentFace);
+            StepNext();
         }
+        return new HashSet<Face>(_triangles);
+    }
 
-        return triangles;
+    /// <summary>
+    /// Return the current snapshot without advancing.
+    /// </summary>
+    public HashSet<Face> GetCurrentSnapshot()
+    {
+        return new HashSet<Face>(_triangles);
     }
 
     private Face InsertPoint(Vertex p, HashSet<Face> triangles, Face currentFace)
     {
         try
         {
-            // Find the containing face
+            // Find containing face
             var findpointData = PointEdgeLocator.LocatePointInMesh(currentFace.Edge, p);
             var isOnEdge = findpointData.isOnEdge;
+            var searched_edge = findpointData.destinationEdge;
+            var t0 = searched_edge.Face;
 
-            var t0 = findpointData.destinationEdge.Face;
+            List<Face> newTriangles;
 
-            var searched_edge=findpointData.destinationEdge;
-            List<Face>newTriangles;
             if (isOnEdge)
             {
-                newTriangles=TriangulationOperation
-                            .SplitTriangleWithEdge(searched_edge,p);
-
+                newTriangles = TriangulationOperation.SplitTriangleWithEdge(searched_edge, p);
                 triangles.Remove(searched_edge.Face);
                 triangles.Remove(searched_edge.Twin.Face);
             }
@@ -41,20 +80,15 @@ public class BaseTriangulationClass
             {
                 newTriangles = TriangulationOperation.SplitTriangle(t0, p);
                 triangles.Remove(t0);
-            }            
-
-            // Add new triangles to the HashSet one by one
-            foreach (var newTriangle in newTriangles)
-            {
-                triangles.Add(newTriangle);  // Add each new triangle to the set
             }
 
-       
+            foreach (var newTriangle in newTriangles)
+                triangles.Add(newTriangle);
 
             // Legalize edges
             LegalizeEdges(new Stack<Face>(newTriangles), p, triangles);
 
-            return newTriangles[0];  // Return the first new triangle for the next search
+            return newTriangles[0];
         }
         catch (Exception e)
         {
@@ -76,19 +110,11 @@ public class BaseTriangulationClass
             var opposite_twin = triangle.GetOppositeTwinEdge(p);
             if (opposite_twin != null && TriangulationOperation.InCircle(opposite_twin.Face, p))
             {
-                // Flip edge and update triangle relationships
                 TriangulationOperation.FlipEdge(ref opposite_twin);
 
-                // Add flipped triangles back to stack for further checking
                 stack.Push(triangle);
                 stack.Push(opposite_twin.Face);
             }
         }
-    }
-
-    private static void HandleEdgeCase(Vertex p, HashSet<Face> triangles, Face edgeFace)
-    {
-        // Implementation for edge cases (e.g., edge splitting)
-        Console.WriteLine("Edge case handling not implemented");
     }
 }

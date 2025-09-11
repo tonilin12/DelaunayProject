@@ -113,22 +113,6 @@ public class Face
         return ProcessEdges(e => e.Origin).ToList();
     }
 
-    public List<Face> GetNeighborFaces()
-    {
-        return ProcessEdges(edge =>
-        {
-            var condition=
-                edge.Twin != null && edge.Twin.Face != null
-                && edge.Twin.Face != this;
-                
-            if (condition)
-            {
-                return edge.Twin.Face;
-            }
-            return null;
-        }).Where(face => face != null).ToList(); // Convert to List
-    }
-
     public HalfEdge GetOppositeTwinEdge(Vertex p)
     {
         return ProcessEdges(edge =>
@@ -142,18 +126,6 @@ public class Face
         }).FirstOrDefault(face => face != null); // Return the first valid face or null
     }
 
-    public Vertex GetOppositeVertex(HalfEdge halfEdge)
-    {
-        if (halfEdge == null)
-            throw new ArgumentNullException(nameof(halfEdge));
-        
-        // Check if the half-edge is part of this face
-        if (halfEdge.Face != this)
-            throw new ArgumentException("The given half-edge does not belong to this face.", nameof(halfEdge));
-
-        // Return the opposite vertex
-        return halfEdge.Next.Next.Origin;
-    }
 
     public override string ToString()
     {
