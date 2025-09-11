@@ -54,14 +54,4 @@ public static class TriangulationOperation
         _flipHelper.FlipEdge(ref edge);
     }
 
-    public static bool InCircle(Face triangle,Vertex p)
-    {
-        var vertices = triangle.GetVertices().Select(x=>x.Position).ToList();
-        var (a, b, c) = (vertices[0], vertices[1], vertices[2]);
-        return GeometryUtils.InCircle(a,b,c,p.Position);
-    }
-
-
-
-
 }

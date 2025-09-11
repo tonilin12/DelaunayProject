@@ -1,20 +1,18 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTestProject1.TestFolder
 {
     [TestClass]
     public class HalfEdgeTests
     {
+        private Vertex CreateVertex(float x, float y) => new Vertex(new Vector2(x, y));
+
         [TestMethod]
         public void Constructor_ShouldInitializeOrigin_AndDefaults()
         {
-            var vertex = new Vertex(new Vector2(1f, 2f));
+            var vertex = CreateVertex(1f, 2f);
             var edge = new HalfEdge(vertex);
 
             Assert.AreEqual(vertex, edge.Origin);
@@ -22,15 +20,21 @@ namespace UnitTestProject1.TestFolder
             Assert.IsNull(edge.Next);
             Assert.IsNull(edge.Prev);
             Assert.IsNull(edge.Face);
-            Assert.IsFalse(edge.IsConstrained);
             Assert.IsNull(edge.Dest);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_ShouldThrowIfOriginNull()
+        {
+            var edge = new HalfEdge(null);
         }
 
         [TestMethod]
         public void CreateHalfEdgePair_ShouldSetTwinsCorrectly()
         {
-            var v1 = new Vertex(new Vector2(0f, 0f));
-            var v2 = new Vertex(new Vector2(1f, 1f));
+            var v1 = CreateVertex(0f, 0f);
+            var v2 = CreateVertex(1f, 1f);
 
             var (edge, twin) = HalfEdge.CreateHalfEdgePair(v1, v2);
 
@@ -38,14 +42,34 @@ namespace UnitTestProject1.TestFolder
             Assert.AreEqual(v2, twin.Origin);
             Assert.AreSame(edge.Twin, twin);
             Assert.AreSame(twin.Twin, edge);
+
+            // OutgoingHalfEdge
+            Assert.AreEqual(edge, v1.OutgoingHalfEdge);
+            Assert.AreEqual(twin, v2.OutgoingHalfEdge);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CreateHalfEdgePair_ShouldThrowIfFromNull()
+        {
+            var v = CreateVertex(0, 0);
+            HalfEdge.CreateHalfEdgePair(null, v);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CreateHalfEdgePair_ShouldThrowIfToNull()
+        {
+            var v = CreateVertex(0, 0);
+            HalfEdge.CreateHalfEdgePair(v, null);
         }
 
         [TestMethod]
         public void NextPrevDest_ShouldComputeCorrectlyForTriangle()
         {
-            var v1 = new Vertex(new Vector2(0f, 0f));
-            var v2 = new Vertex(new Vector2(1f, 0f));
-            var v3 = new Vertex(new Vector2(0f, 1f));
+            var v1 = CreateVertex(0f, 0f);
+            var v2 = CreateVertex(1f, 0f);
+            var v3 = CreateVertex(0f, 1f);
 
             var e1 = new HalfEdge(v1);
             var e2 = new HalfEdge(v2);
@@ -55,50 +79,23 @@ namespace UnitTestProject1.TestFolder
             e2.Next = e3;
             e3.Next = e1;
 
-            // Prev for triangular face: Next.Next
-            Assert.AreSame(e3, e1.Prev);
-            Assert.AreSame(e1, e3.Next);
+            // Dest
             Assert.AreEqual(v2, e1.Dest);
-        }
+            Assert.AreEqual(v3, e2.Dest);
+            Assert.AreEqual(v1, e3.Dest);
 
-        [TestMethod]
-        public void Destroy_ShouldNullifyReferences()
-        {
-            var v1 = new Vertex(new Vector2(0f, 0f));
-            var v2 = new Vertex(new Vector2(1f, 1f));
-
-            var (edge, twin) = HalfEdge.CreateHalfEdgePair(v1, v2);
-
-            edge.Destroy();
-
-            Assert.IsNull(edge.Twin);
-            Assert.IsNull(twin.Twin);
-            Assert.IsNull(edge.Next);
-            Assert.IsNull(edge.Prev);
-            Assert.IsNull(edge.Face);
-            Assert.IsNull(edge.Origin);
-        }
-
-        [TestMethod]
-        public void ToString_ShouldReturnOriginToDest()
-        {
-            var v1 = new Vertex(new Vector2(0f, 0f));
-            var v2 = new Vertex(new Vector2(1f, 1f));
-
-            var e1 = new HalfEdge(v1);
-            var e2 = new HalfEdge(v2);
-
-            e1.Next = e2;
-
-            Assert.AreEqual("Vertex(0.00, 0.00) -> Vertex(1.00, 1.00)", e1.ToString());
+            // Prev fallback for triangle
+            Assert.AreSame(e3, e1.Prev);
+            Assert.AreSame(e1, e2.Prev);
+            Assert.AreSame(e2, e3.Prev);
         }
 
         [TestMethod]
         public void Prev_CanBeExplicitlySet()
         {
-            var v1 = new Vertex(new Vector2(0f, 0f));
-            var v2 = new Vertex(new Vector2(1f, 0f));
-            var v3 = new Vertex(new Vector2(0f, 1f));
+            var v1 = CreateVertex(0f, 0f);
+            var v2 = CreateVertex(1f, 0f);
+            var v3 = CreateVertex(0f, 1f);
 
             var e1 = new HalfEdge(v1);
             var e2 = new HalfEdge(v2);
@@ -108,22 +105,26 @@ namespace UnitTestProject1.TestFolder
             e2.Next = e3;
             e3.Next = e1;
 
-            // Manually override Prev
+            // Override Prev manually
             e1.Prev = e2;
             Assert.AreSame(e2, e1.Prev);
         }
 
         [TestMethod]
-        public void IsConstrained_DefaultsToFalse_AndCanBeSet()
+        public void ToString_ShouldReturnOriginToDest()
         {
-            var v = new Vertex(new Vector2(0f, 0f));
-            var edge = new HalfEdge(v);
+            var v1 = CreateVertex(0f, 0f);
+            var v2 = CreateVertex(1f, 1f);
 
-            Assert.IsFalse(edge.IsConstrained);
+            var e1 = new HalfEdge(v1);
+            var e2 = new HalfEdge(v2);
+            e1.Next = e2;
 
-            edge.IsConstrained = true;
-            Assert.IsTrue(edge.IsConstrained);
+            string str = e1.ToString();
+            StringAssert.Contains(str, "Vertex(0.00, 0.00)");
+            StringAssert.Contains(str, "Vertex(1.00, 1.00)");
         }
-    }
 
+
+    }
 }

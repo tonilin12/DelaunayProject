@@ -55,10 +55,6 @@ public class HalfEdge
     /// </summary>
     public Vertex Dest => Next?.Origin;
 
-    /// <summary>
-    /// Whether this half-edge is constrained.
-    /// </summary>
-    public bool IsConstrained { get; set; }
 
     /// <summary>
     /// Constructor: creates a half-edge originating from a vertex.
@@ -66,7 +62,7 @@ public class HalfEdge
     public HalfEdge(Vertex origin)
     {
         Origin = origin ?? throw new ArgumentNullException(nameof(origin));
-        IsConstrained = false;
+        origin.OutgoingHalfEdge = this;
     }
 
     /// <summary>
@@ -81,12 +77,14 @@ public class HalfEdge
     /// <summary>
     /// Creates a pair of twin half-edges connecting 'from' to 'to'.
     /// </summary>
-    public static (HalfEdge edge, HalfEdge twin) CreateHalfEdgePair(Vertex from, Vertex to)
+    public static (HalfEdge edge, HalfEdge twin)
+     CreateHalfEdgePair(Vertex from, Vertex to)
     {
         if (from == null) throw new ArgumentNullException(nameof(from));
         if (to == null) throw new ArgumentNullException(nameof(to));
 
         var edge = new HalfEdge(from);
+
         var twin = new HalfEdge(to);
 
         edge.Twin = twin;
@@ -95,9 +93,12 @@ public class HalfEdge
         return (edge, twin);
     }
 
+
     /// <summary>
     /// Destroys this half-edge safely and cleans up references.
     /// </summary>
+    /// 
+    /*
     public void Destroy()
     {
         // Break twin relationship
@@ -125,5 +126,5 @@ public class HalfEdge
 
         // Remove origin reference (optional)
         Origin = null;
-    }
+    }*/
 }
