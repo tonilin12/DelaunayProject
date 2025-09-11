@@ -20,25 +20,25 @@ public class BaseTriangulation
     /// Returns the 3x3 in-circle determinant for triangle ABC and point P.
     /// Positive → inside, 0 → on the circle, negative → outside.
     /// </summary>
-    public static float InCircle(Vector2 a, Vector2 b, Vector2 c, Vector2 p)
+
+
+    public static double InCircle(Vector2 a, Vector2 b, Vector2 c, Vector2 p)
     {
-        // Translate coordinates relative to p
-        float ux = a.X - p.X;
-        float uy = a.Y - p.Y;
-        float uz = ux * ux + uy * uy;  // renamed from u2
+        double ux = a.X - p.X;
+        double uy = a.Y - p.Y;
+        double uz = ux * ux + uy * uy;
 
-        float vx = b.X - p.X;
-        float vy = b.Y - p.Y;
-        float vz = vx * vx + vy * vy;  // renamed from v2
+        double vx = b.X - p.X;
+        double vy = b.Y - p.Y;
+        double vz = vx * vx + vy * vy;
 
-        float wx = c.X - p.X;
-        float wy = c.Y - p.Y;
-        float wz = wx * wx + wy * wy;  // renamed from w2
+        double wx = c.X - p.X;
+        double wy = c.Y - p.Y;
+        double wz = wx * wx + wy * wy;
 
-        // 3x3 determinant expansion
-        float det = ux * (vy * wz - vz * wy)
-                  - uy * (vx * wz - vz * wx)
-                  + uz * (vx * wy - vy * wx);
+        double det = ux * (vy * wz - vz * wy)
+                   - uy * (vx * wz - vz * wx)
+                   + uz * (vx * wy - vy * wx);
 
         return det;
     }

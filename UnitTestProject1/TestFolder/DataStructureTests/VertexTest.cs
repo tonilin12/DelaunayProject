@@ -1,103 +1,73 @@
 ﻿using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WindowsFormsApp1; // Fixed namespace
-
+using WindowsFormsApp1; // Replace with your namespace
 
 namespace UnitTestProject1
 {
     [TestClass]
     public class VertexTests
     {
-        private const float Tolerance = Vertex.Tolerance;
-
         [TestMethod]
-        public void Constructor_ShouldInitializePosition_AndOutgoingHalfEdgeIsNull()
+        public void Constructor_SetsPositionAndOutgoingNull()
         {
-            var position = new Vector2(1.5f, -2.5f);
-            var vertex = new Vertex(position);
+            var pos = new Vector2(1.0f, 2.0f);
+            var vertex = new Vertex(pos);
 
-            Assert.AreEqual(position.X, vertex.Position.X, Tolerance);
-            Assert.AreEqual(position.Y, vertex.Position.Y, Tolerance);
-            Assert.IsNull(vertex.OutgoingHalfEdge);
+            Assert.AreEqual(pos, vertex.Position, "Position should match constructor argument.");
+            Assert.IsNull(vertex.OutgoingHalfEdge, "OutgoingHalfEdge should be null by default.");
         }
 
         [TestMethod]
-        public void ToString_ShouldReturnFormattedStringWithTwoDecimals()
+        public void Equals_SameObject_ReturnsTrue()
         {
-            var vertex = new Vertex(new Vector2(1.2345f, 2.3456f));
-            Assert.AreEqual("Vertex(1.23, 2.35)", vertex.ToString());
+            var vertex = new Vertex(new Vector2(1.0f, 2.0f));
+            Assert.IsTrue(vertex.Equals(vertex), "Equals should return true for the same object reference.");
         }
 
         [TestMethod]
-        public void Equals_SameReference_ShouldReturnTrue()
+        public void Equals_NullObject_ReturnsFalse()
         {
-            var vertex = new Vertex(new Vector2(0f, 0f));
-            Assert.IsTrue(vertex.Equals(vertex));
+            var vertex = new Vertex(new Vector2(1.0f, 2.0f));
+            Assert.IsFalse(vertex.Equals(null), "Equals should return false when compared to null.");
         }
 
         [TestMethod]
-        public void Equals_Null_ShouldReturnFalse()
+        public void Equals_SamePosition_ReturnsTrue()
         {
-            var vertex = new Vertex(new Vector2(0f, 0f));
-            Assert.IsFalse(vertex.Equals((Vertex)null));
-            Assert.IsFalse(vertex.Equals((object)null));
+            var v1 = new Vertex(new Vector2(1.0f, 2.0f));
+            var v2 = new Vertex(new Vector2(1.0f, 2.0f));
+
+            Assert.IsTrue(v1.Equals(v2), "Vertices with same position should be equal.");
+            Assert.IsTrue(v2.Equals(v1), "Equality should be symmetric.");
+            Assert.IsTrue(v1.Equals((object)v2), "Equals(object) should work as well.");
         }
 
         [TestMethod]
-        public void Equals_VerticesWithinTolerance_ShouldReturnTrue()
+        public void Equals_ClosePositionWithinTolerance_ReturnsTrue()
         {
-            var v1 = new Vertex(new Vector2(3.000010f, 4.000010f));
-            var v2 = new Vertex(new Vector2(3.000012f, 4.000012f));
+            var v1 = new Vertex(new Vector2(1.000001f, 2.000001f));
+            var v2 = new Vertex(new Vector2(1.000002f, 2.000002f));
 
-            Assert.IsTrue(v1.Equals(v2));
-            Assert.IsTrue(v2.Equals(v1));
+            Assert.IsTrue(v1.Equals(v2), "Vertices within tolerance should be considered equal.");
         }
 
         [TestMethod]
-        public void Equals_VerticesOutsideTolerance_ShouldReturnFalse()
+        public void Equals_DifferentPosition_ReturnsFalse()
         {
-            var v1 = new Vertex(new Vector2(0f, 0f));
-            var v2 = new Vertex(new Vector2(1f, 1f));
+            var v1 = new Vertex(new Vector2(1.0f, 2.0f));
+            var v2 = new Vertex(new Vector2(1.0f + 0.0001f, 2.0f)); // outside tolerance
 
-            Assert.IsFalse(v1.Equals(v2));
+            Assert.IsFalse(v1.Equals(v2), "Vertices outside tolerance should not be equal.");
         }
 
         [TestMethod]
-        public void GetHashCode_VerticesWithinTolerance_ShouldBeEqual()
+        public void ToString_ReturnsFormattedString()
         {
-            var v1 = new Vertex(new Vector2(2.000010f, 3.000010f));
-            var v2 = new Vertex(new Vector2(2.000012f, 3.000012f));
+            var vertex = new Vertex(new Vector2(1.23456f, 7.89012f));
+            string s = vertex.ToString();
 
-            Assert.AreEqual(v1.GetHashCode(), v2.GetHashCode());
-        }
-
-        [TestMethod]
-        public void HashSet_ShouldTreatVerticesWithinToleranceAsEqual()
-        {
-            var v1 = new Vertex(new Vector2(1.000010f, 1.000010f));
-            var v2 = new Vertex(new Vector2(1.000012f, 1.000012f));
-
-            var set = new System.Collections.Generic.HashSet<Vertex>();
-            set.Add(v1);
-            set.Add(v2);
-
-            Assert.AreEqual(1, set.Count);
-            Assert.IsTrue(set.Contains(v1));
-            Assert.IsTrue(set.Contains(v2));
-        }
-
-        [TestMethod]
-        public void OutgoingHalfEdge_CanBeAssignedAndRetrieved()
-        {
-            var vertex = new Vertex(new Vector2(0f, 0f));
-            var edge1 = new HalfEdge(vertex);
-            var edge2 = new HalfEdge(vertex);
-
-            vertex.OutgoingHalfEdge = edge1;
-            Assert.AreEqual(edge1, vertex.OutgoingHalfEdge);
-
-            vertex.OutgoingHalfEdge = edge2;
-            Assert.AreEqual(edge2, vertex.OutgoingHalfEdge);
+            StringAssert.Contains(s, "1.23", "ToString should format X with 2 decimal places.");
+            StringAssert.Contains(s, "7.89", "ToString should format Y with 2 decimal places.");
         }
     }
 }

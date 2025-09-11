@@ -34,7 +34,7 @@ public static class PointEdgeLocator
         if (a == null) throw new ArgumentNullException(nameof(a));
         if (b == null) throw new ArgumentNullException(nameof(b));
 
-        foreach (var edge in face.ProcessEdges(e => e))
+        foreach (var edge in face.EnumerateEdges(e => e))
         {
             if (edge == null) continue;
             bool forward = edge.Origin.Equals(a) && edge.Dest.Equals(b);

@@ -6,7 +6,6 @@ using System.Collections.Generic; // for HashSet
 
 
 
-using System;
 
 /// <summary>
 /// Represents a vertex in 2D space with an optional outgoing half-edge.
@@ -17,7 +16,7 @@ public class Vertex : IEquatable<Vertex>
     public Vector2 Position { get; set; }
     public HalfEdge OutgoingHalfEdge { get; set; }
 
-    // Make Tolerance public so tests can access it
+    // Tolerance stays in float, but we use double for comparisons
     public const float Tolerance = 1e-5f;
 
     public Vertex(Vector2 position)
@@ -31,8 +30,11 @@ public class Vertex : IEquatable<Vertex>
         if (other == null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return Math.Abs(Position.X - other.Position.X) <= Tolerance &&
-               Math.Abs(Position.Y - other.Position.Y) <= Tolerance;
+        // Cast to double for higher precision comparison
+        double dx = (double)Position.X - other.Position.X;
+        double dy = (double)Position.Y - other.Position.Y;
+
+        return Math.Abs(dx) <= Tolerance && Math.Abs(dy) <= Tolerance;
     }
 
     public override bool Equals(object obj)
@@ -40,12 +42,21 @@ public class Vertex : IEquatable<Vertex>
         return Equals(obj as Vertex);
     }
 
-    public override int GetHashCode()
-    {
-        int xHash = (int)Math.Round(Position.X / Tolerance);
-        int yHash = (int)Math.Round(Position.Y / Tolerance);
 
-        return (xHash * 397) ^ yHash;
+    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func)
+    {
+        if (OutgoingHalfEdge == null)
+            yield break;
+
+        HalfEdge start = OutgoingHalfEdge;
+        HalfEdge current = start;
+
+        do
+        {
+            yield return func(current);
+            current = current.Twin?.Next;
+        }
+        while (current != null && current != start);
     }
 
     public override string ToString()

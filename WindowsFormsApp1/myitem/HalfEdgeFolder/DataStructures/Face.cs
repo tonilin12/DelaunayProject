@@ -9,123 +9,118 @@ public class Face
     /// </summary>
     public HalfEdge Edge { get; set; }
 
-
-
     /// <summary>
-    /// Constructor from three vertices (creates and links half-edges automatically).
+    /// Generic utility: creates and links a cycle of half-edges for this face.
+    /// Handles both Next and Prev assignments.
     /// </summary>
-    public Face(Vertex v1, Vertex v2, Vertex v3)
+    public static IEnumerable<HalfEdge>
+        MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
     {
-        // Create three half-edges using the given vertices as origins.
-        HalfEdge edge1 = new HalfEdge(v1);
-        HalfEdge edge2 = new HalfEdge(v2);
-        HalfEdge edge3 = new HalfEdge(v3);
+        if (items == null)
+            throw new ArgumentException("Input items cannot be null");
 
-        SetupEdges( new List<HalfEdge>(){edge1, edge2, edge3});
-    }
+        var edges = new List<HalfEdge>();
 
-    /// <summary>
-    /// Constructor from three existing half-edges.
-    /// </summary>
-    public Face(HalfEdge edge1, HalfEdge edge2, HalfEdge edge3)
-    {
-        SetupEdges(new List<HalfEdge>(){edge1, edge2, edge3});
-    }
-
-    /// <summary>
-    /// Constructor from a list of vertices for an arbitrary polygon.
-    /// </summary>
-    public Face(List<Vertex> vertices)
-    {
-        if (vertices == null || vertices.Count < 3)
-            throw new ArgumentException("At least three vertices are required to form a face.");
-
-        // Create a half-edge for each vertex.
-        var edges = vertices.Select(v => new HalfEdge(v)).ToList();
-        SetupEdges(edges);
-    }
-
-    public Face(List<HalfEdge> edges)
-    {
-        if (edges == null || edges.Count < 3)
-            throw new ArgumentException("At least three half-edges are required to form a face.");
-
-        SetupEdges(edges);
-    }
-
-    private void SetupEdges(List<HalfEdge> edges)
-    {
-        if (edges == null || edges.Count < 3)
-            throw new ArgumentException("At least three edges are required to form a face.");
-
-        // Link edges in a cycle using Next.
-        for (int i = 0; i < edges.Count; i++)
+        foreach (var item in items)
         {
-            HalfEdge currentEdge = edges[i];
-            HalfEdge nextEdge = edges[(i + 1) % edges.Count];  // Wrap around to the first edge after the last.
-            
-            currentEdge.Next = nextEdge;
-            nextEdge.Prev = currentEdge;
+            var e = toHalfEdge(item);
 
-            // Set the face for each edge.
-            currentEdge.Face = this;
+            // Assign face
+            e.Face = face;
 
-            // Ensure that each vertex has an outgoing half-edge assigned.
-            if (currentEdge.Origin.OutgoingHalfEdge == null)
-                currentEdge.Origin.OutgoingHalfEdge = currentEdge;
+
+            edges.Add(e);
         }
 
-        // Assign a representative edge for the face.
-        Edge = edges[0];  // You can choose any edge as the representative; typically the first one is fine.
+        // Properly link Next and Prev
+        for (int i = 0; i < edges.Count; i++)
+        {
+            var current = edges[i];
+            var next = edges[(i + 1) % edges.Count];
+
+            current.Next = next;
+            next.Prev = current;
+        }
+
+        return edges;
     }
 
-    public IEnumerable<T> ProcessEdges<T>(Func<HalfEdge, T> func)
+    /// <summary>
+    /// Constructor from vertices (creates new half-edges).
+    /// </summary>
+    public Face(params Vertex[] vertices)
     {
-        if (Edge == null)
-            yield break;
+        if (vertices.Length < 3)
+            throw new ArgumentException("At least 3 vertices required");
+
+        var edges = MakeCycle(vertices, this, v => new HalfEdge(v)).ToList();
+        Edge = edges[0];
+    }
+
+    /// <summary>
+    /// Constructor from existing half-edges.
+    /// </summary>
+    public Face(params HalfEdge[] halfEdges)
+    {
+        if (halfEdges.Length < 3)
+            throw new ArgumentException("At least 3 half-edges required");
+
+        var edges = MakeCycle(halfEdges, this, e => e).ToList();
+        Edge = edges[0];
+    }
+
+
+    /// <summary>
+    /// Enumerates edges of the face with flexible step control.
+    /// </summary>
+    /// <param name="func">Function applied to each edge.</param>
+    /// <param name="steps">Number of steps to take. Use null to loop until back at start.</param>
+    /// <param name="forward">True = Next, False = Prev.</param>
+    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func, int? steps = null, bool forward = true)
+    {
+        if (Edge == null) yield break;
 
         HalfEdge start = Edge;
         HalfEdge current = start;
+        int count = 0;
+
         do
         {
             yield return func(current);
-            current = current.Next;
+            count++;
+
+            if (steps.HasValue && count >= steps.Value)
+                yield break;
+
+            current = forward ? current.Next : current.Prev;
         }
         while (current != null && current != start);
     }
-    // no return version 
-    // ProcessEdges<object>(e => { e.Origin.X += 1; return null!; });
-
-
-    /// <summary>   
-    /// Returns a list of all half-edges of this face.
-    /// </summary>
-    public List<HalfEdge> GetEdges()
-    {
-        return ProcessEdges(e => e).ToList();
-    }
 
     /// <summary>
-    /// Returns a list of all vertices of this face.
+    /// Returns all half-edges of this face.
     /// </summary>
-    public List<Vertex> GetVertices()
-    {
-        return ProcessEdges(e => e.Origin).ToList();
-    }
+    public List<HalfEdge> GetEdges() =>
+        EnumerateEdges(e => e).ToList();
 
+    /// <summary>
+    /// Returns all vertices of this face.
+    /// </summary>
+    public List<Vertex> GetVertices() =>
+        EnumerateEdges(e => e.Origin).ToList();
+
+    /// <summary>
+    /// Finds the opposite twin edge across the edge that does not touch vertex p.
+    /// </summary>
     public HalfEdge GetOppositeTwinEdge(Vertex p)
     {
-        return ProcessEdges(edge =>
+        return EnumerateEdges(edge =>
         {
-            // Check if neither the edge's origin nor the next edge's origin is the vertex p.
             if (edge.Origin != p && edge.Next.Origin != p)
-            {
-                return edge.Twin; // Return the neighboring face through the twin
-            }
-            return null; // Skip this edge
-        }).FirstOrDefault(face => face != null); // Return the first valid face or null
+                return edge.Twin;
+            return null;
+        }).FirstOrDefault(e => e != null);
     }
-
 
     public override string ToString()
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class FlipHelper
 {
@@ -26,11 +27,11 @@ public class FlipHelper
 
         // Retrieve adjacent half-edges.
         HalfEdge e0 = edge;          // Shared edge (to be flipped)
-        HalfEdge f0 = edge.Twin;       // Twin of the shared edge
-        HalfEdge e1 = e0.Next;         // Next edge in face1
-        HalfEdge e2 = e1.Next;         // Third edge in face1
-        HalfEdge f1 = f0.Next;         // Next edge in face2
-        HalfEdge f2 = f1.Next;         // Third edge in face2
+        HalfEdge f0 = edge.Twin;     // Twin of the shared edge
+        HalfEdge e1 = e0.Next;       // Next edge in face1
+        HalfEdge e2 = e1.Next;       // Third edge in face1
+        HalfEdge f1 = f0.Next;       // Next edge in face2
+        HalfEdge f2 = f1.Next;       // Third edge in face2
 
         // Get the original vertices.
         // Naming convention:
@@ -58,6 +59,17 @@ public class FlipHelper
         e2.Next = f1;
         f1.Next = f0;
 
+        // Update previous pointers for the cycles.
+        // For face1:
+        f2.Prev = e0;
+        e1.Prev = f2;
+        e0.Prev = e1;
+
+        // For face2:
+        e2.Prev = f0;
+        f1.Prev = e2;
+        f0.Prev = f1;
+
         // Update face references so that each half-edge points to the correct face.
         e0.Face = face1;
         f2.Face = face1;
@@ -73,32 +85,12 @@ public class FlipHelper
         e0.Twin = f0;
         f0.Twin = e0;
 
-        // Update previous pointers for the cycles (if your structure uses them).
-        // For face1:
-        f2.Prev = e0;
-        e1.Prev = f2;
-        e0.Prev = e1;
-
-        // For face2:
-        e2.Prev = f0;
-        f1.Prev = e2;
-        f0.Prev = f1;
-
         // Update the outgoing half-edge pointer for each vertex in the affected faces.
-        UpdateOutgoingForFace(face1);
-        UpdateOutgoingForFace(face2);
-    }
+        face1.EnumerateEdges(e => e.Origin.OutgoingHalfEdge = e).ToList();
+        face2.EnumerateEdges(e => e.Origin.OutgoingHalfEdge = e).ToList();
 
-    /// <summary>
-    /// Updates the outgoing half-edge pointer for each vertex in the given face.
-    /// This ensures that each vertex has an incident half-edge from its current face cycle.
-    /// </summary>
-    /// <param name="face">The face whose vertices will be updated.</param>
-    private void UpdateOutgoingForFace(Face face)
-    {
-        foreach (var halfEdge in face.GetEdges())
-        {
-            halfEdge.Origin.OutgoingHalfEdge = halfEdge;
-        }
+
+        // Ensure the reference points to the flipped edge.
+        edge = e0;
     }
 }

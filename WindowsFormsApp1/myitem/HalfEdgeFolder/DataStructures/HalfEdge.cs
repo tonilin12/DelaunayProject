@@ -19,30 +19,9 @@ public class HalfEdge
     /// Next half-edge in the current face (counter-clockwise order).
     /// </summary>
     public HalfEdge Next { get; set; }
+    public HalfEdge Prev { get; set; }
 
-    /// <summary>
-    /// Previous half-edge in the current face (clockwise order).
-    /// Can be explicitly set, or for triangles it can be calculated as Next.Next.
-    /// </summary>
-    public HalfEdge Prev
-    {
-        get
-        {
-            // If Prev is explicitly set, return it
-            if (_prev != null)
-                return _prev;
 
-            // Otherwise, for triangular faces, Prev = Next.Next (safe if Next and Next.Next are non-null)
-            if (Next?.Next != null)
-                return Next.Next;
-
-            return null;
-        }
-        set
-        {
-            _prev = value;
-        }
-    }
     private HalfEdge _prev;
 
     /// <summary>
