@@ -1,0 +1,96 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace UnitTestProject1.TestFolder.TriangulationOperations
+{
+    [TestClass]
+    public class VertexEnumerateTest
+
+    {
+
+
+        private Vertex vA, vB, vC;
+        private HalfEdge eAB, eBA, eBC, eCB, eCA, eAC;
+        private Face faceCW, faceCCW;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            vA = new Vertex(new Vector2(0, 0));
+            vB = new Vertex(new Vector2(1, 0));
+            vC = new Vertex(new Vector2(0, 1));
+
+            // Create half-edge pairs
+            (eAB, eBA) = HalfEdge.CreateHalfEdgePair(vA, vB);
+            (eBC, eCB) = HalfEdge.CreateHalfEdgePair(vB, vC);
+            (eCA, eAC) = HalfEdge.CreateHalfEdgePair(vC, vA);
+
+            // Construct faces
+            faceCW = new Face(eAB, eBC, eCA);
+            faceCCW = new Face(eCB, eBA, eAC);
+        }
+
+        [TestMethod]
+        public void TestFaceGetEdgesTraversal()
+        {
+
+
+            // ------------------------------
+            // Step 6: Test vertices order
+            var vertsCW = faceCW.GetVertices();
+            CollectionAssert.AreEqual(new[] { vA, vB, vC }, vertsCW, "Clockwise face vertices incorrect.");
+
+            var vertsCCW = faceCCW.GetVertices();
+            CollectionAssert.AreEqual(new[] { vC, vB, vA }, vertsCCW, "Counter-clockwise face vertices incorrect.");
+
+
+            // Step 7: Test edge traversal (GetEdges)
+            var edgesCW = faceCW.GetEdges();
+            CollectionAssert.AreEqual(new[] { eAB, eBC, eCA }, edgesCW, "GetEdges() clockwise face incorrect.");
+
+            var edgesCCW = faceCCW.GetEdges();
+            CollectionAssert.AreEqual(new[] { eCB, eBA, eAC }, edgesCCW, "GetEdges() counter-clockwise face incorrect.");
+
+
+        }
+
+        public void TestVertexEnumerable()
+        {
+
+
+            var edgesByOrigin = new Dictionary<Vertex, List<HalfEdge>>();
+
+            foreach (var face in new[] { faceCW, faceCCW })
+            {
+                face.EnumerateEdges(e =>
+                {
+                    if (!edgesByOrigin.ContainsKey(e.Origin))
+                        edgesByOrigin[e.Origin] = new List<HalfEdge>();
+                    edgesByOrigin[e.Origin].Add(e);
+
+                    return e; // The function must return T; here T = HalfEdge
+                }).ToList(); // force enumeration
+            }
+
+            // Now test Vertex.EnumerateEdges matches the dictionary
+            foreach (var vertex in new[] { vA, vB, vC })
+            {
+                var expectedEdges = edgesByOrigin[vertex];
+
+                var actualEdges = vertex.EnumerateEdges(e => e).ToList();
+
+                CollectionAssert.AreEquivalent(expectedEdges, actualEdges,
+                    $"Vertex {vertex} EnumerateEdges did not match edges from faces.");
+            }
+
+
+        }
+
+    }
+}

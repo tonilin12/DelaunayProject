@@ -155,5 +155,40 @@ namespace UnitTestProject1.TestFolder
             Assert.AreSame(e1.Twin, twinForV2, "Twin opposite v2 is incorrect");
             Assert.AreSame(e2.Twin, twinForV3, "Twin opposite v3 is incorrect");
         }
+
+        [TestMethod]
+        public void FaceToString_RoundTrip_VertexPositionsMatch()
+        {
+            // Step 1: Create vertices
+            var v1 = new Vertex(new Vector2(1.1f, 2.2f));
+            var v2 = new Vertex(new Vector2(3.3f, 4.4f));
+            var v3 = new Vertex(new Vector2(5.5f, 6.6f));
+
+            // Step 2: Create face using vertex constructor
+            var face = new Face(v1, v2, v3);
+
+            // Step 3: Convert face to string
+            string str = face.ToString(); // Expected format: "Vertex(x1, y1) → Vertex(x2, y2) → Vertex(x3, y3)"
+
+            // Step 4: Split string and extract coordinates
+            var parts = str.Replace("Vertex(", "").Replace(")", "").Split(new[] { " → " }, StringSplitOptions.None);
+            Assert.AreEqual(3, parts.Length, "ToString should produce exactly 3 vertices in output");
+
+            var parsedVertices = parts.Select(p =>
+            {
+                var coords = p.Split(',');
+                return new Vertex(new Vector2(
+                    float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture),
+                    float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture)
+                ));
+            }).ToList();
+
+            // Step 5: Assert that the parsed vertices match the original vertices
+            Assert.IsTrue(v1.PositionsEqual(parsedVertices[0]), "Vertex 1 round-trip failed");
+            Assert.IsTrue(v2.PositionsEqual(parsedVertices[1]), "Vertex 2 round-trip failed");
+            Assert.IsTrue(v3.PositionsEqual(parsedVertices[2]), "Vertex 3 round-trip failed");
+        
+        }
+
     }
 }
