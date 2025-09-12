@@ -1,67 +1,84 @@
-
 using System;
 using System.Globalization;
 using System.Numerics;
-using System.Collections.Generic; // for HashSet
-
-
-
+using System.Collections.Generic;
 
 /// <summary>
 /// Represents a vertex in 2D space with an optional outgoing half-edge.
-/// Implements approximate equality for floating-point positions.
+/// Safe reference equality by default, with explicit approximate comparison helper.
 /// </summary>
-public class Vertex : IEquatable<Vertex>
+public class Vertex
 {
+    /// <summary>
+    /// Position of the vertex in 2D space.
+    /// </summary>
     public Vector2 Position { get; set; }
+
+    /// <summary>
+    /// Optional outgoing half-edge from this vertex.
+    /// </summary>
     public HalfEdge OutgoingHalfEdge { get; set; }
 
-    // Tolerance stays in float, but we use double for comparisons
+    /// <summary>
+    /// Default tolerance for approximate comparisons.
+    /// </summary>
     public const float Tolerance = 1e-5f;
 
+    /// <summary>
+    /// Constructs a vertex at the given position.
+    /// </summary>
     public Vertex(Vector2 position)
     {
         Position = position;
         OutgoingHalfEdge = null;
     }
 
-    public bool Equals(Vertex other)
-    {
-        if (other == null) return false;
-        if (ReferenceEquals(this, other)) return true;
-
-        // Cast to double for higher precision comparison
-        double dx = (double)Position.X - other.Position.X;
-        double dy = (double)Position.Y - other.Position.Y;
-
-        return Math.Abs(dx) <= Tolerance && Math.Abs(dy) <= Tolerance;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return Equals(obj as Vertex);
-    }
-
-
-    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func)
+    /// <summary>
+    /// Enumerates half-edges originating from this vertex with flexible traversal options.
+    /// </summary>
+    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func, int? maxSteps = null, bool forward = true)
     {
         if (OutgoingHalfEdge == null)
             yield break;
 
         HalfEdge start = OutgoingHalfEdge;
         HalfEdge current = start;
+        int steps = 0;
 
         do
         {
             yield return func(current);
-            current = current.Twin?.Next;
-        }
-        while (current != null && current != start);
+            steps++;
+
+            if (maxSteps.HasValue && steps >= maxSteps.Value)
+                yield break;
+
+            current = forward
+                ? current.Twin?.Next
+                : current.Prev?.Twin;
+        } while (current != null && current != start);
     }
 
+    /// <summary>
+    /// Returns a string representation of the vertex.
+    /// </summary>
     public override string ToString()
     {
         return string.Format(CultureInfo.InvariantCulture,
-            "Vertex({0:F2}, {1:F2})", Position.X, Position.Y);
+            "Vertex({0:F6}, {1:F6})", Position.X, Position.Y);
+    }
+
+    /// <summary>
+    /// Checks if this vertex is approximately equal to another vertex using Euclidean distance.
+    /// Float-only version.
+    /// </summary>
+    public bool PositionsEqual(Vertex other, float tolerance = Tolerance)
+    {
+        if (other == null) return false;
+
+        float dx = Position.X - other.Position.X;
+        float dy = Position.Y - other.Position.Y;
+
+        return dx * dx + dy * dy <= tolerance * tolerance;
     }
 }
