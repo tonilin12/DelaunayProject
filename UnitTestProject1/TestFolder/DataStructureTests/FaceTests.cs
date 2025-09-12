@@ -136,7 +136,7 @@ namespace UnitTestProject1.TestFolder
             CollectionAssert.AreEqual(inputVertices, outputVertices,
                 "GetVertices should return the same vertices as were passed to the constructor.");
         }
-    }
+    
 
     
         [TestMethod]
