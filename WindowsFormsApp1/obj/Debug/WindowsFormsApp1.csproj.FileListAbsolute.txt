@@ -53,3 +53,5 @@ C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\bin\Debug\System.Runti
 C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\bin\Debug\xunit.abstractions.xml
 C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\bin\Debug\xunit.core.xml
+C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\bin\Debug\Microsoft.Bcl.HashCode.dll
+C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\bin\Debug\Microsoft.Bcl.HashCode.xml

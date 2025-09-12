@@ -22,7 +22,6 @@ public class HalfEdge
     public HalfEdge Prev { get; set; }
 
 
-    private HalfEdge _prev;
 
     /// <summary>
     /// The face this half-edge borders.

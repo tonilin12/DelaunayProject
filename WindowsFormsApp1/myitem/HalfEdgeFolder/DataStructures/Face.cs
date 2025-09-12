@@ -13,8 +13,8 @@ public class Face
     /// Generic utility: creates and links a cycle of half-edges for this face.
     /// Handles both Next and Prev assignments.
     /// </summary>
-    public static IEnumerable<HalfEdge>
-        MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
+    internal IEnumerable<HalfEdge>
+    MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
     {
         if (items == null)
             throw new ArgumentException("Input items cannot be null");
@@ -30,6 +30,25 @@ public class Face
 
 
             edges.Add(e);
+        }
+
+        // Require at least 3 vertices
+        if (edges.Count != 3)
+            throw new ArgumentException("exactly 3 vertex is allowed as input");
+
+
+        var p0 = edges[0].Origin.Position;
+        var p1 = edges[1].Origin.Position;
+        var p2 = edges[2].Origin.Position;
+
+        // Compute twice the signed area of the triangle (p0, p1, p2)
+        float area2 = (p1.X - p0.X) * (p2.Y - p0.Y) -
+                      (p1.Y - p0.Y) * (p2.X - p0.X);
+
+        // Check for collinearity
+        if (Math.Abs(area2) < 1e-6f)
+        {
+            throw new ArgumentException("Degenerate face: the three vertices are collinear.");
         }
 
         // Properly link Next and Prev
@@ -50,8 +69,6 @@ public class Face
     /// </summary>
     public Face(params Vertex[] vertices)
     {
-        if (vertices.Length < 3)
-            throw new ArgumentException("At least 3 vertices required");
 
         var edges = MakeCycle(vertices, this, v => new HalfEdge(v)).ToList();
         Edge = edges[0];
@@ -62,8 +79,6 @@ public class Face
     /// </summary>
     public Face(params HalfEdge[] halfEdges)
     {
-        if (halfEdges.Length < 3)
-            throw new ArgumentException("At least 3 half-edges required");
 
         var edges = MakeCycle(halfEdges, this, e => e).ToList();
         Edge = edges[0];
@@ -76,7 +91,9 @@ public class Face
     /// <param name="func">Function applied to each edge.</param>
     /// <param name="steps">Number of steps to take. Use null to loop until back at start.</param>
     /// <param name="forward">True = Next, False = Prev.</param>
-    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func, int? steps = null, bool forward = true)
+    public IEnumerable<T>
+     EnumerateEdges<T>
+     (Func<HalfEdge, T> func, int? steps = null, bool forward = true)
     {
         if (Edge == null) yield break;
 
@@ -110,7 +127,8 @@ public class Face
         EnumerateEdges(e => e.Origin).ToList();
 
     /// <summary>
-    /// Finds the opposite twin edge across the edge that does not touch vertex p.
+    /// Finds the opposite twin edge across
+    /// the edge that does not touch vertex p.
     /// </summary>
     public HalfEdge GetOppositeTwinEdge(Vertex p)
     {

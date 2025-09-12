@@ -23,16 +23,6 @@ public class TriangleSplitter
             originalEdges[2].Origin);
 
 
-        var newfaces = new List<Face>();
-        var len=originalVertices.Count;
-
-
-        for (int i = 0; i < len; i++)
-        {
-            int next = (i + 1) % len;
-            var face0 = new Face(newVertex, originalVertices[i], originalVertices[next]);
-            newfaces.Add(face0);
-        }
 
         // Create new half-edge pairs (twins) connecting the new vertex to each triangle vertex.
         var (dToA, aToD) = HalfEdge.CreateHalfEdgePair(newVertex, A);

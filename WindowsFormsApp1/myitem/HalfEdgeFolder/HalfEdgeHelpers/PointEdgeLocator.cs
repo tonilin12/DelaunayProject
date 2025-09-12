@@ -5,7 +5,9 @@ using System.Numerics;
 
 public static class PointEdgeLocator
 {
-    public const float MY_EPSILON = 1e-5f;
+    // Use double for epsilon
+    public const double MY_EPSILON = 1e-10;
+
     public const int MAX_ITERATIONS = 1000;
 
     /// <summary>
@@ -13,21 +15,15 @@ public static class PointEdgeLocator
     /// det = x_a*(y_b - y_c) - x_b*(y_a - y_c) + x_c*(y_a - y_b)
     /// Positive => counter-clockwise, Negative => clockwise, Zero => collinear.
     /// </summary>
-    public static float OrientedArea(Vertex a, Vertex b, Vertex c)
+    public static double OrientedArea(Vertex a, Vertex b, Vertex c)
     {
-        if (a == null) throw new ArgumentNullException(nameof(a));
-        if (b == null) throw new ArgumentNullException(nameof(b));
-        if (c == null) throw new ArgumentNullException(nameof(c));
+        double ax = a.Position.X, ay = a.Position.Y;
+        double bx = b.Position.X, by = b.Position.Y;
+        double cx = c.Position.X, cy = c.Position.Y;
 
-        return a.Position.X * (b.Position.Y - c.Position.Y)
-             - b.Position.X * (a.Position.Y - c.Position.Y)
-             + c.Position.X * (a.Position.Y - b.Position.Y);
+        return ax * (by - cy) - bx * (ay - cy) + cx * (ay - by);
     }
 
-    /// <summary>
-    /// Find a half-edge in the face whose endpoints match (a,b) in either orientation.
-    /// Uses Face.ProcessEdges to avoid temporary lists.
-    /// </summary>
     private static HalfEdge FindHalfEdgeInFace(Face face, Vertex a, Vertex b)
     {
         if (face == null) throw new ArgumentNullException(nameof(face));
@@ -37,18 +33,14 @@ public static class PointEdgeLocator
         foreach (var edge in face.EnumerateEdges(e => e))
         {
             if (edge == null) continue;
-            bool forward = edge.Origin.Equals(a) && edge.Dest.Equals(b);
-            bool reverse = edge.Origin.Equals(b) && edge.Dest.Equals(a);
+            bool forward = edge.Origin.PositionsEqual(a) && edge.Dest.PositionsEqual(b);
+            bool reverse = edge.Origin.PositionsEqual(b) && edge.Dest.PositionsEqual(a);
             if (forward || reverse) return edge;
         }
 
         return null;
     }
 
-    /// <summary>
-    /// Fill e0..e2 with the three edges of the triangular face that contains startEdge.
-    /// Throws if face is not triangular.
-    /// </summary>
     private static void GetTriangleEdges(HalfEdge startEdge, out HalfEdge e0, out HalfEdge e1, out HalfEdge e2)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
@@ -58,37 +50,29 @@ public static class PointEdgeLocator
         e1 = e0.Next ?? throw new InvalidOperationException("Malformed face: missing next edge.");
         e2 = e1.Next ?? throw new InvalidOperationException("Malformed face: missing next-next edge.");
 
-        // Verify triangular cycle
         if (e2.Next != e0)
             throw new InvalidOperationException("Face is not triangular.");
     }
 
     /// <summary>
-    /// Calculate the three oriented sub-areas for triangle (e0.origin, e1.origin, e2.origin) with the test point.
-    /// Returns (a01, a12, a20) corresponding to orientation tests used by barycentric logic.
+    /// Calculate oriented areas with double precision.
     /// </summary>
-    public static (float a01, float a12, float a20) 
-     CalculateOrientedAreas(HalfEdge startEdge, Vertex point)
+    public static (double a01, double a12, double a20)
+        CalculateOrientedAreas(HalfEdge startEdge, Vertex point)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
 
         GetTriangleEdges(startEdge, out var e0, out var e1, out var e2);
 
-        float a01 = OrientedArea(e0.Origin, e1.Origin, point);
-        float a12 = OrientedArea(e1.Origin, e2.Origin, point);
-        float a20 = OrientedArea(e2.Origin, e0.Origin, point);
+        double a01 = OrientedArea(e0.Origin, e1.Origin, point);
+        double a12 = OrientedArea(e1.Origin, e2.Origin, point);
+        double a20 = OrientedArea(e2.Origin, e0.Origin, point);
 
         return (a01, a12, a20);
     }
 
-
-    /// <summary>
-    /// If the point lies on one of the triangle edges (within epsilon), returns that half-edge (face-local).
-    /// Otherwise returns null.
-    /// </summary>
-    public static HalfEdge 
-     GetEdgeOnWhichPointIsOn(HalfEdge startEdge, Vertex point)
+    public static HalfEdge GetEdgeOnWhichPointIsOn(HalfEdge startEdge, Vertex point)
     {
         var (a1, a2, a3) = CalculateOrientedAreas(startEdge, point);
         GetTriangleEdges(startEdge, out var e0, out var e1, out var e2);
@@ -99,12 +83,8 @@ public static class PointEdgeLocator
         return null;
     }
 
-
-    /// <summary>
-    /// Compute point orientation relative to triangle: (isInsideStrict, isOnEdge, nextHalfEdgeToTraverseIfOutside).
-    /// </summary>
-    public static (bool IsInside, bool IsOnEdge, HalfEdge NextHalfEdge) 
-     GetPointOrientation(HalfEdge startEdge, Vertex point)
+    public static (bool IsInside, bool IsOnEdge, HalfEdge NextHalfEdge)
+        GetPointOrientation(HalfEdge startEdge, Vertex point)
     {
         var (a1, a2, a3) = CalculateOrientedAreas(startEdge, point);
 
@@ -119,13 +99,8 @@ public static class PointEdgeLocator
         return (isInside, isOnEdge, next);
     }
 
-    /// <summary>
-    /// Walk from startEdge to find the triangle containing the point or the edge on which it lies.
-    /// Returns (destinationEdge, isOnEdge, traversedEdges).
-    /// </summary>
-    public static (HalfEdge destinationEdge, bool isOnEdge,
-                    List<HalfEdge> traversedEdges)
-     LocatePointInMesh(HalfEdge startEdge, Vertex point)
+    public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
+        LocatePointInMesh(HalfEdge startEdge, Vertex point)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
@@ -168,25 +143,16 @@ public static class PointEdgeLocator
         throw new InvalidOperationException($"Max iterations ({MAX_ITERATIONS}) reached while searching for point.");
     }
 
-    /// <summary>
-    /// Overload: start from a face reference.
-    /// </summary>
     public static (Face destinationFace, bool isOnEdge, List<HalfEdge> traversedEdges)
-     LocatePointInMesh(Face startFace, Vertex point)
+        LocatePointInMesh(Face startFace, Vertex point)
     {
         if (startFace == null) throw new ArgumentNullException(nameof(startFace));
         var res = LocatePointInMesh(startFace.Edge, point);
         return (res.destinationEdge?.Face, res.isOnEdge, res.traversedEdges);
     }
 
-
-    /// <summary>
-    /// Find the half-edge matching the geometric segment (a,b)
-    /// by testing the midpoint location.
-    /// Returns (foundEdge, traversalPath).
-    /// </summary>
     public static (HalfEdge searchedEdge, List<HalfEdge> traversedEdges)
-    FindHalfEdgeWithEdge(Face startFace, Vertex a, Vertex b)
+        FindHalfEdgeWithEdge(Face startFace, Vertex a, Vertex b)
     {
         if (startFace == null) throw new ArgumentNullException(nameof(startFace));
         if (a == null) throw new ArgumentNullException(nameof(a));
@@ -200,7 +166,6 @@ public static class PointEdgeLocator
         if (!locate.isOnEdge || locate.destinationEdge == null)
             return (null, locate.traversedEdges);
 
-        // Search the face where the midpoint lies for the matching half-edge (either orientation)
         var found = FindHalfEdgeInFace(locate.destinationEdge.Face, a, b);
         if (found != null) return (found, locate.traversedEdges);
 

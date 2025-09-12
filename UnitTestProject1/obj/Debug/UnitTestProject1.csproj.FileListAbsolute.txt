@@ -16,3 +16,4 @@ C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\Microsoft.Vi
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\obj\Debug\UnitTest.40E657F8.Up2Date
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\obj\Debug\UnitTestProject1.dll
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\obj\Debug\UnitTestProject1.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\UnitTestProject1.dll.config

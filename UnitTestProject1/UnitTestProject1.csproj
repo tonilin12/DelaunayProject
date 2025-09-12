@@ -55,8 +55,11 @@
     <Compile Include="TestFolder\DataStructureTests\VertexTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestFolder\TriangulationOperations\SuperTriangleGeneratorTests.cs" />
+    <Compile Include="TestFolder\TriangulationOperations\TriangleSplitterTest.cs" />
+    <Compile Include="TestFolder\TriangulationOperations\VertexEnumerateTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

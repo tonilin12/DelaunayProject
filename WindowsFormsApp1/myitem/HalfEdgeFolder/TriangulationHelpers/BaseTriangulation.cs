@@ -10,6 +10,8 @@ public class BaseTriangulation
     private int _currentIndex;
     private Face _currentFace;
     private readonly HashSet<Face> _triangles;
+    public const double CIRC_EPSILON = 1e-12;
+
 
     /// <summary>
     /// Tests whether point p lies inside the circumcircle of triangle ABC.
@@ -46,9 +48,11 @@ public class BaseTriangulation
     /// <summary>
     /// Returns true if point p is inside the circumcircle of triangle ABC.
     /// </summary>
+
     public static bool IsInsideCircumcircle(Vertex a, Vertex b, Vertex c, Vertex p)
     {
-        return InCircle(a.Position, b.Position, c.Position, p.Position) > 0;
+        double det = InCircle(a.Position, b.Position, c.Position, p.Position);
+        return det > CIRC_EPSILON; // use epsilon instead of strict > 0
     }
 
     /// <summary>
