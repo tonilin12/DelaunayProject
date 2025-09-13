@@ -100,21 +100,52 @@ namespace UnitTestProject1.TestFolder
             // Create face using vertex constructor
             var face = new Face(vA, vB, vC);
 
+            List<HalfEdge> forwardEdges = null;
+            List<HalfEdge> backwardEdges = null;
+
             try
             {
                 // Enumerate edges forward
-                var forwardEdges = face.EnumerateEdges(e => e, forward: true).ToList();
-
-                // Enumerate edges backward
-                var backwardEdges = face.EnumerateEdges(e => e, forward: false).ToList();
+                forwardEdges = face.EnumerateEdges(e => e, forward: true).ToList();
             }
             catch (Exception ex)
             {
-                Assert.Fail($"EnumerateEdges threw an exception: {ex.Message}");
+                Assert.Fail($"Forward enumeration failed: {ex.Message}");
             }
 
-            // If we reach here, enumeration succeeded in both directions
-            Assert.IsTrue(true, "EnumerateEdges ran successfully in both forward and backward directions.");
+            try
+            {
+                // Enumerate edges backward
+                backwardEdges = face.EnumerateEdges(e => e, forward: false).ToList();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Backward enumeration failed: {ex.Message}");
+            }
+
+            // Basic length checks
+            Assert.IsNotNull(forwardEdges, "Forward edges should not be null");
+            Assert.IsNotNull(backwardEdges, "Backward edges should not be null");
+            Assert.AreEqual(forwardEdges.Count, backwardEdges.Count, "Forward and backward edge counts should match");
+            Assert.AreEqual(3, forwardEdges.Count, "Triangle should have exactly 3 edges");
+
+
+            Assert.AreSame(forwardEdges[0], backwardEdges[0], $@"
+            Edge reference mismatch at index {0}:
+            Forward:  {forwardEdges[0]}
+            Backward: {backwardEdges[0]}");
+
+
+            // Verify backward is exact reverse of forward by object reference
+            for (int i = 0; i < forwardEdges.Count-1; i++)
+            {
+                var fEdge = forwardEdges[i+1];
+                var bEdge = backwardEdges[backwardEdges.Count - 1 - i];
+
+                Assert.AreSame(fEdge, bEdge,
+                    $"Edge reference mismatch at index {i+1}: forward={fEdge}, backward={bEdge}");
+            }
+
         }
 
 

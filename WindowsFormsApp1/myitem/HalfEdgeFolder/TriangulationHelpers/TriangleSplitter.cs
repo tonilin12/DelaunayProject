@@ -14,7 +14,7 @@ public class TriangleSplitter
     public List<Face> SplitTriangle(Face triangle, Vertex newVertex)
     {
         // Split the triangle into three smaller triangles
-        var originalEdges = triangle.GetEdges().ToArray();
+        var originalEdges = triangle.EnumerateEdges(e=>e).ToArray();
         var originalVertices = triangle.GetVertices().ToList();
 
         // Extract triangle vertices.

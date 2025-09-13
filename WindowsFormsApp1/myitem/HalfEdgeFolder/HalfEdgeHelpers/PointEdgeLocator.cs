@@ -57,8 +57,10 @@ public static class PointEdgeLocator
     /// <summary>
     /// Calculate oriented areas with double precision.
     /// </summary>
+    
+
     public static (double a01, double a12, double a20)
-        CalculateOrientedAreas(HalfEdge startEdge, Vertex point)
+    CalculateOrientedAreas(HalfEdge startEdge, Vertex point)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
@@ -84,7 +86,7 @@ public static class PointEdgeLocator
     }
 
     public static (bool IsInside, bool IsOnEdge, HalfEdge NextHalfEdge)
-        GetPointOrientation(HalfEdge startEdge, Vertex point)
+    GetPointOrientation(HalfEdge startEdge, Vertex point)
     {
         var (a1, a2, a3) = CalculateOrientedAreas(startEdge, point);
 
@@ -100,7 +102,7 @@ public static class PointEdgeLocator
     }
 
     public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
-        LocatePointInMesh(HalfEdge startEdge, Vertex point)
+    LocatePointInMesh(HalfEdge startEdge, Vertex point)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
@@ -152,7 +154,7 @@ public static class PointEdgeLocator
     }
 
     public static (HalfEdge searchedEdge, List<HalfEdge> traversedEdges)
-        FindHalfEdgeWithEdge(Face startFace, Vertex a, Vertex b)
+    FindHalfEdgeWithEdge(Face startFace, Vertex a, Vertex b)
     {
         if (startFace == null) throw new ArgumentNullException(nameof(startFace));
         if (a == null) throw new ArgumentNullException(nameof(a));

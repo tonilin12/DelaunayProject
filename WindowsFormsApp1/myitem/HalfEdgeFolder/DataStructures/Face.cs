@@ -114,11 +114,6 @@ public class Face
         while (current != null && current != start);
     }
 
-    /// <summary>
-    /// Returns all half-edges of this face.
-    /// </summary>
-    public List<HalfEdge> GetEdges() =>
-        EnumerateEdges(e => e).ToList();
 
     /// <summary>
     /// Returns all vertices of this face.
