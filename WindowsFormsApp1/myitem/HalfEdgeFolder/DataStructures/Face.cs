@@ -13,7 +13,7 @@ public class Face
     /// Generic utility: creates and links a cycle of half-edges for this face.
     /// Handles both Next and Prev assignments.
     /// </summary>
-    internal IEnumerable<HalfEdge>
+    private IEnumerable<HalfEdge>
     MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
     {
         if (items == null)
@@ -132,12 +132,23 @@ public class Face
     /// </summary>
     public HalfEdge GetOppositeTwinEdge(Vertex p)
     {
-        return EnumerateEdges(edge =>
+        if (p == null) throw new ArgumentNullException(nameof(p));
+        if (Edge == null) return null;
+
+        foreach (var e in EnumerateEdges(h => h))
         {
-            if (edge.Origin != p && edge.Next.Origin != p)
-                return edge.Twin;
-            return null;
-        }).FirstOrDefault(e => e != null);
+            if (e == null || e.Next == null) continue;
+
+            var a = e.Origin;
+            var b = e.Next.Origin;
+
+            if (!a.PositionsEqual(p) && !b.PositionsEqual(p))
+            {
+                if (e.Twin != null) return e.Twin;
+            }
+        }
+        return null;
+
     }
 
     public override string ToString()

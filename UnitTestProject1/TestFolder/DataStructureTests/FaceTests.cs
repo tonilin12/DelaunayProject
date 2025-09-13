@@ -9,30 +9,34 @@ namespace UnitTestProject1.TestFolder
     [TestClass]
     public class FaceTests
     {
-        private Vertex v1, v2, v3, v4;
-        private HalfEdge e1, e2, e3, e4;
+        private Vertex vA, vB, vC, vD;
+        private HalfEdge eA, eB, eC, eD;
 
 
         [TestInitialize]
         public void Setup()
         {
             // Original vertices
-            var origV1 = new Vector2(0, 0);
-            var origV2 = new Vector2(1, 0);
-            var origV3 = new Vector2(0, 1);
-            var origV4 = new Vector2(1, 1);
+            // Shared middle edge
+            Vector2 pA = new Vector2(0.25f, 0f);  // left point of middle edge
+            Vector2 pB = new Vector2(0.75f, 0f);  // right point of middle edge
+
+            // One vertex above and one below, forming a convex quadrilateral
+            Vector2 pC = new Vector2(0.5f, 0.5f);   // top vertex
+            Vector2 pD = new Vector2(0.5f, -0.5f);  // bottom vertex
+
 
             // Create vertex instances for testing
-            v1 = new Vertex(origV1);
-            v2 = new Vertex(origV2);
-            v3 = new Vertex(origV3);
-            v4 = new Vertex(origV4);
+            vA = new Vertex(pA);
+            vB = new Vertex(pB);
+            vC = new Vertex(pC);
+            vD = new Vertex(pD);
 
             // Create half-edges using copies of the vertices
-            e1 = new HalfEdge(new Vertex(origV1));
-            e2 = new HalfEdge(new Vertex(origV2));
-            e3 = new HalfEdge(new Vertex(origV3));
-            e4 = new HalfEdge(new Vertex(origV4));
+            eA = new HalfEdge(new Vertex(pA));
+            eB = new HalfEdge(new Vertex(pB));
+            eC = new HalfEdge(new Vertex(pC));
+            eD = new HalfEdge(new Vertex(pD));
         }
 
         [TestMethod]
@@ -54,11 +58,38 @@ namespace UnitTestProject1.TestFolder
         public void FaceConstructor_FromVertices_EdgeAndLinks_NotNull()
         {
             // Create face using vertex constructor
-            var face = new Face(v1, v2, v3);
+            var face = new Face(vA, vB, vC);
 
             Assert.IsNotNull(face.Edge, "Face.Edge should not be null");
             Assert.IsNotNull(face.Edge.Next, "Face.Edge.Next should not be null");
             Assert.IsNotNull(face.Edge.Prev, "Face.Edge.Prev should not be null");
+        }
+
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void FaceConstructor_FromVertices_NotThree_Throws()
+        {
+            var vA = new Vertex(new Vector2(0, 0));
+            var vB = new Vertex(new Vector2(1, 0));
+            var vC = new Vertex(new Vector2(0, 1));
+            var vD = new Vertex(new Vector2(1, 1));
+
+            // Too few vertices
+            var faceA = new Face(vA, vB);
+
+            // Too many vertices
+            var faceB = new Face(vA, vB, vC, vD);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void FaceConstructor_FromVertices_NullInput_Throws()
+        {
+            Vertex[] vertices = null;
+
+            // Null input should throw ArgumentException
+            var face = new Face(vertices);
         }
 
 
@@ -67,7 +98,7 @@ namespace UnitTestProject1.TestFolder
         public void FaceConstructor_EnumerateEdges_ForwardAndBackward_RunsWithoutError()
         {
             // Create face using vertex constructor
-            var face = new Face(v1, v2, v3);
+            var face = new Face(vA, vB, vC);
 
             try
             {
@@ -91,7 +122,7 @@ namespace UnitTestProject1.TestFolder
         public void EnumerateEdges_Steps_ForwardBackward()
         {
             // Arrange: triangle face
-            var face = new Face(v1, v2, v3);
+            var face = new Face(vA, vB, vC);
             var edges = face.EnumerateEdges(e => e).ToList();
             int edgeCount = edges.Count;
 
@@ -101,7 +132,8 @@ namespace UnitTestProject1.TestFolder
             Assert.AreSame(face.Edge, forward1[0]);
 
             // Backward, 1 step
-            var backward1 = face.EnumerateEdges(e => e, steps: 1, forward: false).ToList();
+            var backward1 = face
+                         .EnumerateEdges(e => e, steps: 1, forward: false).ToList();
             Assert.AreEqual(1, backward1.Count);
             Assert.AreSame(face.Edge, backward1[0]);
 
@@ -115,10 +147,10 @@ namespace UnitTestProject1.TestFolder
 
             // Optional: check order matches expected vertices
             var forwardVertices = forwardMany.Select(e => e.Origin).ToList();
-            CollectionAssert.AreEqual(new[] { v1, v2, v3 }, forwardVertices, "Forward enumeration vertex order incorrect");
+            CollectionAssert.AreEqual(new[] { vA, vB, vC }, forwardVertices, "Forward enumeration vertex order incorrect");
 
             var backwardVertices = backwardMany.Select(e => e.Origin).ToList();
-            CollectionAssert.AreEqual(new[] { v1, v3, v2 }, backwardVertices, "Backward enumeration vertex order incorrect");
+            CollectionAssert.AreEqual(new[] { vA, vC, vB }, backwardVertices, "Backward enumeration vertex order incorrect");
         }
 
 
@@ -126,7 +158,7 @@ namespace UnitTestProject1.TestFolder
         public void FaceConstructor_GetVertices_ReturnsInputVertices()
         {
             // Arrange: create a face from known vertices
-            var inputVertices = new[] { v1, v2, v3 };
+            var inputVertices = new[] { vA, vB, vC };
             var face = new Face(inputVertices);
 
             // Act: get vertices from the face
@@ -143,29 +175,59 @@ namespace UnitTestProject1.TestFolder
         public void GetOppositeTwinEdge_FindsCorrectTwin()
         {
             // Arrange
-            var face = new Face(e1, e2, e3);
+            var face = new Face(eA, eB, eC);
 
             // Act
-            var twinForV1 = face.GetOppositeTwinEdge(v1);
-            var twinForV2 = face.GetOppositeTwinEdge(v2);
-            var twinForV3 = face.GetOppositeTwinEdge(v3);
+            var twinForvA = face.GetOppositeTwinEdge(vA);
+            var twinForvB = face.GetOppositeTwinEdge(vB);
+            var twinForvC = face.GetOppositeTwinEdge(vC);
 
             // Assert
-            Assert.AreSame(e3.Twin, twinForV1, "Twin opposite v1 is incorrect");
-            Assert.AreSame(e1.Twin, twinForV2, "Twin opposite v2 is incorrect");
-            Assert.AreSame(e2.Twin, twinForV3, "Twin opposite v3 is incorrect");
+            Assert.AreSame(eC.Twin, twinForvA, "Twin opposite vA is incorrect");
+            Assert.AreSame(eA.Twin, twinForvB, "Twin opposite vB is incorrect");
+            Assert.AreSame(eB.Twin, twinForvC, "Twin opposite vC is incorrect");
         }
+
+
+        [TestMethod]
+
+        public void SharedEdgeOfTwoFaces_HasCorrectTwinsAndVertices()
+        {
+            // Faces using vertices
+            var face1 = new Face(vA,vB,vC);
+            var face2 = new Face(vB, vA, vD);
+
+            // Link twin edges
+            face1.Edge.Twin = face2.Edge;
+            face2.Edge.Twin = face1.Edge;
+
+            var edge1 = face1.Edge;
+            var edge2 = face2.Edge;
+
+            // Check twin references
+            Assert.AreEqual(edge1.Twin, edge2, "Edge1.Twin should be Edge2");
+            Assert.AreEqual(edge2.Twin, edge1, "Edge2.Twin should be Edge1");
+
+            // Check positions using Vertex.Position
+            Assert.IsTrue(edge1.Origin.PositionsEqual(edge2.Dest), "Edge1 origin should match Edge2 destination");
+            Assert.IsTrue(edge1.Dest.PositionsEqual(edge2.Origin), "Edge1 destination should match Edge2 origin");
+
+
+        }
+
+
+
 
         [TestMethod]
         public void FaceToString_RoundTrip_VertexPositionsMatch()
         {
             // Step 1: Create vertices
-            var v1 = new Vertex(new Vector2(1.1f, 2.2f));
-            var v2 = new Vertex(new Vector2(3.3f, 4.4f));
-            var v3 = new Vertex(new Vector2(5.5f, 6.6f));
+            var vA = new Vertex(new Vector2(1.1f, 2.2f));
+            var vB = new Vertex(new Vector2(3.3f, 4.4f));
+            var vC = new Vertex(new Vector2(5.5f, 6.6f));
 
             // Step 2: Create face using vertex constructor
-            var face = new Face(v1, v2, v3);
+            var face = new Face(vA, vB, vC);
 
             // Step 3: Convert face to string
             string str = face.ToString(); // Expected format: "Vertex(x1, y1) → Vertex(x2, y2) → Vertex(x3, y3)"
@@ -184,9 +246,9 @@ namespace UnitTestProject1.TestFolder
             }).ToList();
 
             // Step 5: Assert that the parsed vertices match the original vertices
-            Assert.IsTrue(v1.PositionsEqual(parsedVertices[0]), "Vertex 1 round-trip failed");
-            Assert.IsTrue(v2.PositionsEqual(parsedVertices[1]), "Vertex 2 round-trip failed");
-            Assert.IsTrue(v3.PositionsEqual(parsedVertices[2]), "Vertex 3 round-trip failed");
+            Assert.IsTrue(vA.PositionsEqual(parsedVertices[0]), "Vertex 1 round-trip failed");
+            Assert.IsTrue(vB.PositionsEqual(parsedVertices[1]), "Vertex 2 round-trip failed");
+            Assert.IsTrue(vC.PositionsEqual(parsedVertices[2]), "Vertex 3 round-trip failed");
         
         }
 

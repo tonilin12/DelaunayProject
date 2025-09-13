@@ -23,10 +23,10 @@ public static class TriangulationOperation
         return _triangleSplitter.SplitTriangle(triangle, newVertex);
     }
 
-        public static List<Face> SplitTriangleWithEdge(HalfEdge edge, Vertex newVertex)
+        public static List<Face> SplitTriangle_VertexOnEdge(HalfEdge edge, Vertex newVertex)
     {
         // Assuming _triangleSplitter is an instance of TriangleSplitter
-        return _triangleSplitter.SplitTriangleWithEdge(edge, newVertex);
+        return _triangleSplitter.SplitTriangle_VertexOnEdge(edge, newVertex);
     }
 
     /// <summary>

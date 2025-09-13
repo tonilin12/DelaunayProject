@@ -40,7 +40,10 @@ public class HalfEdge
     public HalfEdge(Vertex origin)
     {
         Origin = origin ?? throw new ArgumentNullException(nameof(origin));
-        origin.OutgoingHalfEdge = this;
+        if (origin.OutgoingHalfEdge is null)
+        {
+            origin.OutgoingHalfEdge = this;
+        }
     }
 
     /// <summary>
@@ -70,6 +73,8 @@ public class HalfEdge
 
         return (edge, twin);
     }
+
+
 
 
     /// <summary>

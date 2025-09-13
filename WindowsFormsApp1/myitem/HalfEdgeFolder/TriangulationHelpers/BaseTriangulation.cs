@@ -131,7 +131,7 @@ public class BaseTriangulation
 
             if (isOnEdge)
             {
-                newTriangles = TriangulationOperation.SplitTriangleWithEdge(searched_edge, p);
+                newTriangles = TriangulationOperation.SplitTriangle_VertexOnEdge(searched_edge, p);
                 triangles.Remove(searched_edge.Face);
                 triangles.Remove(searched_edge.Twin.Face);
             }

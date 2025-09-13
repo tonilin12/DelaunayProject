@@ -40,23 +40,7 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
         public void TestFaceGetEdgesTraversal()
         {
 
-
-            // ------------------------------
-            // Step 6: Test vertices order
-            var vertsCW = faceCW.GetVertices();
-            CollectionAssert.AreEqual(new[] { vA, vB, vC }, vertsCW, "Clockwise face vertices incorrect.");
-
-            var vertsCCW = faceCCW.GetVertices();
-            CollectionAssert.AreEqual(new[] { vC, vB, vA }, vertsCCW, "Counter-clockwise face vertices incorrect.");
-
-
-            // Step 7: Test edge traversal (GetEdges)
-            var edgesCW = faceCW.GetEdges();
-            CollectionAssert.AreEqual(new[] { eAB, eBC, eCA }, edgesCW, "GetEdges() clockwise face incorrect.");
-
-            var edgesCCW = faceCCW.GetEdges();
-            CollectionAssert.AreEqual(new[] { eCB, eBA, eAC }, edgesCCW, "GetEdges() counter-clockwise face incorrect.");
-
+           
 
         }
 

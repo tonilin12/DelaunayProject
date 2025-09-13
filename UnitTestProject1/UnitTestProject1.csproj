@@ -54,6 +54,7 @@
     <Compile Include="TestFolder\DataStructureTests\HalfEdgeTest.cs" />
     <Compile Include="TestFolder\DataStructureTests\VertexTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestFolder\TriangulationOperations\FlipTest.cs" />
     <Compile Include="TestFolder\TriangulationOperations\SuperTriangleGeneratorTests.cs" />
     <Compile Include="TestFolder\TriangulationOperations\TriangleSplitterTest.cs" />
     <Compile Include="TestFolder\TriangulationOperations\VertexEnumerateTest.cs" />

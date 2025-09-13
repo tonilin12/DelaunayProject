@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -12,9 +13,10 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
     [TestClass]
     public class TriangleSplitterTest
     {
+        TriangleSplitter splitter = new TriangleSplitter();
 
         [TestMethod]
-        public void SplitTriangle_CreatesThreeNewFaces_WithProperVerticesAndEdges()
+        public void SplitTriangle_PointInsideFace()
         {
             // Step 1: Create original triangle
             var vA = new Vertex(new Vector2(0, 0));
@@ -22,34 +24,83 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
             var vC = new Vertex(new Vector2(0, 1));
             var face = new Face(vA, vB, vC);
 
-            var original_edges = face.GetEdges();
 
             // Step 2: Add new vertex inside the triangle
             var vD = new Vertex(new Vector2(0.3f, 0.3f));
 
-            // Step 3: Split the triangle
-            var splitter = new TriangleSplitter();
-            var newFaces = splitter.SplitTriangle(face, vD);
 
 
-            // Step 4: Enumerate all outgoing edges from vD
-            var outgoingEdges = vD.EnumerateEdges(e => e).ToList();
+            // Step 1: Create the HashSet of tuples representing expected edges
+            var expectedEdges = 
+            new HashSet<(Vertex Origin, Vertex Dest, HalfEdge Twin)>(
+                face.EnumerateEdges(e=>e).Select(e => (e.Origin, e.Dest, e.Twin))
+            );
 
 
-            // Step 6: Check that all twins are properly assigned and point back to vD
-            // Step 6: Check that all twins are properly assigned and point back to vD using lambda style
-            outgoingEdges.ForEach(e =>
+            var original_edges = new HashSet<HalfEdge>(face.EnumerateEdges(e => e));
+
+            splitter.SplitTriangle(face, vD);
+
+
+
+            vD.EnumerateEdges(e =>
             {
-                Assert.IsTrue(e.Origin.PositionsEqual(vD), "Edge origin must be the new vertex vD.");
-                Assert.IsNotNull(e.Twin, "Outgoing edge must have a twin.");
-                Assert.AreSame(e, e.Twin.Twin, "Twin's twin must point back to original edge.");
+                original_edges.Remove(e.Next); // now works based on Origin->Dest equality
+                return e;
+            }).ToList();
 
-                bool destIsOriginal = new[] { vA, vB, vC }
-                                     .Any(v => e.Dest.PositionsEqual(v));
-                Assert.IsTrue(destIsOriginal, "Outgoing edge must go to one of the original triangle vertices.");
-            });
+            Assert.AreEqual(0, original_edges.Count);
 
         }
 
+        [TestMethod]
+        public void SplitTriangle_PointOnEdge()
+        {
+
+            // Shared middle edge
+            var vA = new Vertex(new Vector2(0.25f, 0f));  // left point of middle edge
+            var vB = new Vertex(new Vector2(0.75f, 0f));  // right point of middle edge
+
+            // One vertex above and one below, forming a convex quad
+            var vC = new Vertex(new Vector2(0.5f, 0.5f));   // top vertex
+            var vD = new Vertex(new Vector2(0.5f, -0.5f));  // bottom vertex
+
+
+
+            // Faces
+            var face1 = new Face(vA, vB, vC);
+            var face2 = new Face(vB, vA, vD);
+
+            // Link twin edges
+            face1.Edge.Twin = face2.Edge;
+            face2.Edge.Twin = face1.Edge;
+
+            var edge = face1.Edge;
+
+
+            var vE = new Vertex(Vector2.Lerp(vA.Position, vB.Position, 0.5f));
+
+
+            var originalEdges = new HashSet<HalfEdge>();
+
+            originalEdges.Add(edge.Next);
+            originalEdges.Add(edge.Prev);
+            originalEdges.Add(edge.Twin.Next);
+            originalEdges.Add(edge.Twin.Prev);
+
+            splitter.SplitTriangle_VertexOnEdge(edge, vE);
+
+
+
+            vE.EnumerateEdges(e =>
+            {
+                originalEdges.Remove(e.Next); // now works based on Origin->Dest equality
+                return e;
+            }).ToList();
+
+            Assert.AreEqual(0, originalEdges.Count);
+
+
+        }
     }
 }

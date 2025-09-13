@@ -5,3 +5,10 @@
 .vs/WindowsFormsApp1/FileContentIndex/fa6f9039-963c-4715-a1f8-6ed1e05dbb31.vsidx
 packages/Microsoft.Bcl.HashCode.6.0.0/buildTransitive/net461/Microsoft.Bcl.HashCode.targets
 packages/Microsoft.Bcl.HashCode.6.0.0/buildTransitive/netcoreapp2.0/Microsoft.Bcl.HashCode.targets
+*.pdb
+*.pdb
+/UnitTestProject1/obj
+.vs/WindowsFormsApp1/CopilotIndices/17.13.431.34963/CodeChunks.db
+.vs/WindowsFormsApp1/CopilotIndices/17.13.431.34963/CodeChunks.db-shm
+.vs/WindowsFormsApp1/CopilotIndices/17.13.431.34963/CodeChunks.db
+*.vsidx
