@@ -84,9 +84,9 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
             var originalEdges = new HashSet<HalfEdge>();
 
             originalEdges.Add(edge.Next);
-            originalEdges.Add(edge.Prev);
+            originalEdges.Add(edge.Next.Next);
             originalEdges.Add(edge.Twin.Next);
-            originalEdges.Add(edge.Twin.Prev);
+            originalEdges.Add(edge.Twin.Next.Next);
 
             splitter.SplitTriangle_VertexOnEdge(edge, vE);
 

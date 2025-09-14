@@ -62,7 +62,6 @@ namespace UnitTestProject1.TestFolder
 
             Assert.IsNotNull(face.Edge, "Face.Edge should not be null");
             Assert.IsNotNull(face.Edge.Next, "Face.Edge.Next should not be null");
-            Assert.IsNotNull(face.Edge.Prev, "Face.Edge.Prev should not be null");
         }
 
 
@@ -95,94 +94,40 @@ namespace UnitTestProject1.TestFolder
 
 
         [TestMethod]
-        public void FaceConstructor_EnumerateEdges_ForwardAndBackward_RunsWithoutError()
+        public void FaceConstructor_EnumerateEdgesAndVertices_RunsWithoutError()
         {
             // Create face using vertex constructor
             var face = new Face(vA, vB, vC);
 
-            List<HalfEdge> forwardEdges = null;
-            List<HalfEdge> backwardEdges = null;
-
+            // Enumerate edges forward
+            List<HalfEdge> edges = null;
             try
             {
-                // Enumerate edges forward
-                forwardEdges = face.EnumerateEdges(e => e, forward: true).ToList();
+                edges = face.EnumerateEdges(e => e).ToList();
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Forward enumeration failed: {ex.Message}");
+                Assert.Fail($"Enumeration failed: {ex.Message}");
             }
 
-            try
+            // Check edges
+            Assert.IsNotNull(edges, "Edges should not be null");
+            Assert.AreEqual(3, edges.Count, "Triangle should have exactly 3 edges");
+
+            // Check vertices robustly
+            var expectedVertices = new[] { vA, vB, vC };
+            var actualVertices = face.GetVertices(); // assumes face.Vertices exists
+
+            Assert.AreEqual(expectedVertices.Length, actualVertices.Count, "Face should have exactly 3 vertices");
+
+            for (int i = 0; i < expectedVertices.Length; i++)
             {
-                // Enumerate edges backward
-                backwardEdges = face.EnumerateEdges(e => e, forward: false).ToList();
+                Assert.AreSame(expectedVertices[i], actualVertices[i], $"Vertex at index {i} is not the exact instance expected.");
             }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Backward enumeration failed: {ex.Message}");
-            }
-
-            // Basic length checks
-            Assert.IsNotNull(forwardEdges, "Forward edges should not be null");
-            Assert.IsNotNull(backwardEdges, "Backward edges should not be null");
-            Assert.AreEqual(forwardEdges.Count, backwardEdges.Count, "Forward and backward edge counts should match");
-            Assert.AreEqual(3, forwardEdges.Count, "Triangle should have exactly 3 edges");
-
-
-            Assert.AreSame(forwardEdges[0], backwardEdges[0], $@"
-            Edge reference mismatch at index {0}:
-            Forward:  {forwardEdges[0]}
-            Backward: {backwardEdges[0]}");
-
-
-            // Verify backward is exact reverse of forward by object reference
-            for (int i = 0; i < forwardEdges.Count-1; i++)
-            {
-                var fEdge = forwardEdges[i+1];
-                var bEdge = backwardEdges[backwardEdges.Count - 1 - i];
-
-                Assert.AreSame(fEdge, bEdge,
-                    $"Edge reference mismatch at index {i+1}: forward={fEdge}, backward={bEdge}");
-            }
-
         }
 
 
-        [TestMethod]
-        public void EnumerateEdges_Steps_ForwardBackward()
-        {
-            // Arrange: triangle face
-            var face = new Face(vA, vB, vC);
-            var edges = face.EnumerateEdges(e => e).ToList();
-            int edgeCount = edges.Count;
 
-            // Forward, 1 step
-            var forward1 = face.EnumerateEdges(e => e, steps: 1, forward: true).ToList();
-            Assert.AreEqual(1, forward1.Count);
-            Assert.AreSame(face.Edge, forward1[0]);
-
-            // Backward, 1 step
-            var backward1 = face
-                         .EnumerateEdges(e => e, steps: 1, forward: false).ToList();
-            Assert.AreEqual(1, backward1.Count);
-            Assert.AreSame(face.Edge, backward1[0]);
-
-            // Forward, more steps than edge count
-            var forwardMany = face.EnumerateEdges(e => e, steps: edgeCount + 2, forward: true).ToList();
-            Assert.AreEqual(edgeCount, forwardMany.Count, "Enumeration should stop at the start edge even if steps exceed edge count");
-
-            // Backward, more steps than edge count
-            var backwardMany = face.EnumerateEdges(e => e, steps: edgeCount + 2, forward: false).ToList();
-            Assert.AreEqual(edgeCount, backwardMany.Count, "Enumeration should stop at the start edge even if steps exceed edge count");
-
-            // Optional: check order matches expected vertices
-            var forwardVertices = forwardMany.Select(e => e.Origin).ToList();
-            CollectionAssert.AreEqual(new[] { vA, vB, vC }, forwardVertices, "Forward enumeration vertex order incorrect");
-
-            var backwardVertices = backwardMany.Select(e => e.Origin).ToList();
-            CollectionAssert.AreEqual(new[] { vA, vC, vB }, backwardVertices, "Backward enumeration vertex order incorrect");
-        }
 
 
         [TestMethod]
@@ -199,25 +144,43 @@ namespace UnitTestProject1.TestFolder
             CollectionAssert.AreEqual(inputVertices, outputVertices,
                 "GetVertices should return the same vertices as were passed to the constructor.");
         }
-    
 
-    
+
+
         [TestMethod]
-        public void GetOppositeTwinEdge_FindsCorrectTwin()
+        public void GetOppositeEdge_ReturnsCorrectEdge_DirectIteration()
         {
-            // Arrange
-            var face = new Face(eA, eB, eC);
+            // Arrange: create a face with any 3 vertices
+            var vertices = new[] { vA, vB, vC };
+            var face = new Face(vertices[0], vertices[1], vertices[2]);
 
-            // Act
-            var twinForvA = face.GetOppositeTwinEdge(vA);
-            var twinForvB = face.GetOppositeTwinEdge(vB);
-            var twinForvC = face.GetOppositeTwinEdge(vC);
+            // Act & Assert: for each vertex, find the edge opposite it
+            foreach (var vertex in vertices)
+            {
+                var oppositeEdge = face.GetOppositeEdge(vertex);
 
-            // Assert
-            Assert.AreSame(eC.Twin, twinForvA, "Twin opposite vA is incorrect");
-            Assert.AreSame(eA.Twin, twinForvB, "Twin opposite vB is incorrect");
-            Assert.AreSame(eB.Twin, twinForvC, "Twin opposite vC is incorrect");
+                // Opposite edge must not be null
+                Assert.IsNotNull(oppositeEdge, $"Opposite edge for vertex {vertex} should not be null");
+
+                // Opposite edge must not contain the vertex as origin or next.origin
+                Assert.IsFalse(oppositeEdge.Origin.PositionsEqual(vertex), $"Opposite edge origin matches vertex {vertex}");
+                Assert.IsFalse(oppositeEdge.Next.Origin.PositionsEqual(vertex), $"Opposite edge next.origin matches vertex {vertex}");
+
+                // Verify that the edge is part of the face by iterating directly
+                bool found = false;
+                foreach (var e in face.EnumerateEdges(edge => edge))
+                {
+                    if (e == oppositeEdge)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                Assert.IsTrue(found, $"Opposite edge for vertex {vertex} is not part of the face edges");
+            }
         }
+
 
 
         [TestMethod]
@@ -245,6 +208,8 @@ namespace UnitTestProject1.TestFolder
 
 
         }
+
+
 
 
 

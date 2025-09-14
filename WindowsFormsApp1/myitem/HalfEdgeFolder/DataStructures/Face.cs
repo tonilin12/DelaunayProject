@@ -22,7 +22,7 @@ public class Face
 
         var edges = new List<HalfEdge>();
 
-        foreach (var item in items)
+        foreach (var item in items.Distinct())
         {
             var e = toHalfEdge(item);
 
@@ -59,7 +59,6 @@ public class Face
             var next = edges[(i + 1) % edges.Count];
 
             current.Next = next;
-            next.Prev = current;
         }
 
         return edges;
@@ -86,31 +85,18 @@ public class Face
     }
 
 
-    /// <summary>
-    /// Enumerates edges of the face with flexible step control.
-    /// </summary>
-    /// <param name="func">Function applied to each edge.</param>
-    /// <param name="steps">Number of steps to take. Use null to loop until back at start.</param>
-    /// <param name="forward">True = Next, False = Prev.</param>
-    public IEnumerable<T>
-     EnumerateEdges<T>
-     (Func<HalfEdge, T> func, int? steps = null, bool forward = true)
+    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func)
     {
-        if (Edge == null) yield break;
+        if (Edge == null)
+            yield break;
 
         HalfEdge start = Edge;
         HalfEdge current = start;
-        int count = 0;
 
         do
         {
             yield return func(current);
-            count++;
-
-            if (steps.HasValue && count >= steps.Value)
-                yield break;
-
-            current = forward ? current.Next : current.Prev;
+            current = current.Next;
         }
         while (current != null && current != start);
     }
@@ -126,7 +112,10 @@ public class Face
     /// Finds the opposite twin edge across
     /// the edge that does not touch vertex p.
     /// </summary>
-    public HalfEdge GetOppositeTwinEdge(Vertex p)
+    /// <summary>
+    /// Finds the edge of this face that is opposite to vertex p.
+    /// </summary>
+    public HalfEdge GetOppositeEdge(Vertex p)
     {
         if (p == null) throw new ArgumentNullException(nameof(p));
         if (Edge == null) return null;
@@ -138,14 +127,25 @@ public class Face
             var a = e.Origin;
             var b = e.Next.Origin;
 
+            // The edge opposite to p is the one whose vertices do NOT include p
             if (!a.PositionsEqual(p) && !b.PositionsEqual(p))
             {
-                if (e.Twin != null) return e.Twin;
+                return e;
             }
         }
-        return null;
 
+        return null;
     }
+
+    /// <summary>
+    /// Finds the twin of the edge opposite to vertex p, if it exists.
+    /// </summary>
+    public HalfEdge GetOppositeTwinEdge(Vertex p)
+    {
+        var oppositeEdge = GetOppositeEdge(p);
+        return oppositeEdge?.Twin;
+    }
+
 
     public override string ToString()
     {

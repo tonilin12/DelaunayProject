@@ -39,7 +39,6 @@ namespace UnitTestProject1.TestFolder
             Assert.IsNull(edge.Dest, "Dest should be null if Next is null.");
         }
 
-
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_ThrowsOnNullOrigin()
@@ -56,28 +55,48 @@ namespace UnitTestProject1.TestFolder
             var pair2 = HalfEdge.CreateHalfEdgePair(v, null);
         }
 
+        [TestMethod]
+        public void CreateHalfEdgePair_SetsTwinCorrectly()
+        {
+            var v1 = new Vertex(new Vector2(0, 0));
+            var v2 = new Vertex(new Vector2(1, 0));
+
+            var (e1, e2) = HalfEdge.CreateHalfEdgePair(v1, v2);
+
+            Assert.AreEqual(e2, e1.Twin, "e1.Twin should point to e2.");
+            Assert.AreEqual(e1, e2.Twin, "e2.Twin should point to e1.");
+        }
+
+        [TestMethod]
+        public void CreateHalfEdgePair_SetsOriginsCorrectly()
+        {
+            var v1 = new Vertex(new Vector2(0, 0));
+            var v2 = new Vertex(new Vector2(1, 0));
+
+            var (e1, e2) = HalfEdge.CreateHalfEdgePair(v1, v2);
+
+            Assert.AreEqual(v1, e1.Origin, "First half-edge should have v1 as origin.");
+            Assert.AreEqual(v2, e2.Origin, "Second half-edge should have v2 as origin.");
+        }
 
         [TestMethod]
         public void ToString_ReturnsFormattedString()
         {
-            // Step 1: Create vertices
+            // Arrange
             var origin = new Vertex(new Vector2(1.234567f, 2.345678f));
             var dest = new Vertex(new Vector2(3.456789f, 4.567890f));
-
-            // Step 2: Create a half-edge and set Next to point to destination
             var edge = new HalfEdge(origin);
             edge.Next = new HalfEdge(dest);
 
-            // Step 3: Convert half-edge to string
+            // Act
             string str = edge.ToString(); // Expected: "Vertex(x1, y1) -> Vertex(x2, y2)"
 
-            // Step 4: Extract origin and destination numbers from string
+            // Parse back from string
             var parts = str.Replace("Vertex(", "").Replace(")", "").Split(new[] { " -> " }, StringSplitOptions.None);
 
             var originParts = parts[0].Split(',');
             var destParts = parts[1].Split(',');
 
-            // Step 5: Parse numbers to create new vertices
             var parsedOrigin = new Vertex(new Vector2(
                 float.Parse(originParts[0], System.Globalization.CultureInfo.InvariantCulture),
                 float.Parse(originParts[1], System.Globalization.CultureInfo.InvariantCulture)));
@@ -86,10 +105,9 @@ namespace UnitTestProject1.TestFolder
                 float.Parse(destParts[0], System.Globalization.CultureInfo.InvariantCulture),
                 float.Parse(destParts[1], System.Globalization.CultureInfo.InvariantCulture)));
 
-            // Step 6: Assert positions are approximately equal
+            // Assert
             Assert.IsTrue(origin.PositionsEqual(parsedOrigin), "Origin vertex round-trip failed.");
             Assert.IsTrue(dest.PositionsEqual(parsedDest), "Destination vertex round-trip failed.");
         }
-
     }
 }

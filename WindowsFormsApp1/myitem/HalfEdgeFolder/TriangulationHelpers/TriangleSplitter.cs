@@ -51,16 +51,16 @@ public class TriangleSplitter
             throw new ArgumentNullException(nameof(edge), "Edge cannot be null.");
         if (edge.Twin == null)
             throw new InvalidOperationException("Edge must have a twin.");
-        if (edge.Prev == null || edge.Next == null)
-            throw new InvalidOperationException("Edge must have Prev and Next defined.");
-        if (edge.Twin.Prev == null || edge.Twin.Next == null)
-            throw new InvalidOperationException("Edge.Twin must have Prev and Next defined.");
+        if (edge.Next.Next == null || edge.Next == null)
+            throw new InvalidOperationException("Edge must have Next.Next and Next defined.");
+        if (edge.Twin.Next.Next == null || edge.Twin.Next == null)
+            throw new InvalidOperationException("Edge.Twin must have Next.Next and Next defined.");
 
         // Vertices
         Vector2 A = edge.Origin.Position;
         Vector2 B = edge.Dest.Position;
-        Vector2 X = edge.Prev.Origin.Position;      // Opposite vertex in first triangle
-        Vector2 Y = edge.Twin.Prev.Origin.Position; // Opposite vertex in second triangle
+        Vector2 X = edge.Next.Next.Origin.Position;      // Opposite vertex in first triangle
+        Vector2 Y = edge.Twin.Next.Next.Origin.Position; // Opposite vertex in second triangle
 
         // Helper: signed area of a triangle (positive = CCW)
         float SignedArea(Vector2 p1, Vector2 p2, Vector2 p3)
@@ -96,18 +96,18 @@ public class TriangleSplitter
        // In the first triangle (face of 'edge'):
        // - edge goes from A to B.
        // - adjacentEdge1 = edge.Next goes from B to X.
-       // - adjacentEdge2 = edge.Prev goes from X to A.
+       // - adjacentEdge2 = edge.Next.Next goes from X to A.
        //
        // In the second triangle (face of 'edge.Twin'):
        // - edge.Twin goes from B to A.
        // - twinAdjacentEdge1 = edge.Twin.Next goes from A to Y.
-       // - twinAdjacentEdge2 = edge.Twin.Prev goes from Y to B.
+       // - twinAdjacentEdge2 = edge.Twin.Next.Next goes from Y to B.
 
        // Retrieve neighboring edges from both adjacent faces.
        var adjacentEdge1 = edge.Next;      // B -> X in triangle1
-        var adjacentEdge2 = edge.Prev;        // X -> A in triangle1
+        var adjacentEdge2 = edge.Next.Next;        // X -> A in triangle1
         var twinAdjacentEdge1 = edge.Twin.Next; // A -> Y in triangle2
-        var twinAdjacentEdge2 = edge.Twin.Prev;   // Y -> B in triangle2
+        var twinAdjacentEdge2 = edge.Twin.Next.Next;   // Y -> B in triangle2
 
 
         // Create a pair to represent the new segment from newVertex to B.

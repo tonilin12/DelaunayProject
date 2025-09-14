@@ -59,16 +59,7 @@ public class FlipHelper
         e2.Next = f1;
         f1.Next = f0;
 
-        // Update previous pointers for the cycles.
-        // For face1:
-        f2.Prev = e0;
-        e1.Prev = f2;
-        e0.Prev = e1;
-
-        // For face2:
-        e2.Prev = f0;
-        f1.Prev = e2;
-        f0.Prev = f1;
+  
 
         // Update face references so that each half-edge points to the correct face.
         e0.Face = face1;

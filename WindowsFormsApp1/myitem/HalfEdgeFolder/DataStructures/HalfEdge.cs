@@ -19,6 +19,7 @@ public class HalfEdge
     /// Next half-edge in the current face (counter-clockwise order).
     /// </summary>
     public HalfEdge Next { get; set; }
+
     public HalfEdge Prev { get; set; }
 
 

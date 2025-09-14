@@ -33,10 +33,11 @@ public class Vertex
         OutgoingHalfEdge = null;
     }
 
+
     /// <summary>
-    /// Enumerates half-edges originating from this vertex with flexible traversal options.
+    /// Enumerates half-edges originating from this vertex in CCW order.
     /// </summary>
-    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func, int? maxSteps = null, bool forward = true)
+    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> selector, int? maxSteps = null)
     {
         if (OutgoingHalfEdge == null)
             yield break;
@@ -47,15 +48,13 @@ public class Vertex
 
         do
         {
-            yield return func(current);
+            yield return selector(current);
             steps++;
 
             if (maxSteps.HasValue && steps >= maxSteps.Value)
                 yield break;
 
-            current = forward
-                ? current.Twin?.Next
-                : current.Prev?.Twin;
+            current = current.Twin?.Next;
         } while (current != null && current != start);
     }
 

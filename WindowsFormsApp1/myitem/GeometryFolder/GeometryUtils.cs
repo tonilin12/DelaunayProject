@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1.myitem.GeometryFolder
 {
-     public static class GeometryUtils
+     public static class  GeometryUtils
      {
 
         private const double EPSILON = 1e-12;
