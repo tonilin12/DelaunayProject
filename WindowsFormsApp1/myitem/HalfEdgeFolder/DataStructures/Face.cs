@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WindowsFormsApp1.myitem.GeometryFolder;
 
 public class Face
 {
@@ -46,7 +47,7 @@ public class Face
                       (p1.Y - p0.Y) * (p2.X - p0.X);
 
         // Check for collinearity
-        if (Math.Abs(area2) < 1e-6f)
+        if (GeometryUtils.TriangleOrientation(edges.ToArray())==0)
         {
             throw new ArgumentException("Degenerate face: the three vertices are collinear.");
         }

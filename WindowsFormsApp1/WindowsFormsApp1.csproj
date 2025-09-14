@@ -86,6 +86,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="myitem\GeometryFolder\GeometryUtils.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\Face.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\HalfEdge.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\Vertex.cs" />

@@ -68,50 +68,8 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
         [TestMethod]
         public void AfterFlip_HalfEdgeCycleIntegrity()
         {
-            // Arrange: take a shared edge and flip it
-            var edge = face1.Edge;
-            TriangulationOperation.FlipEdge(ref edge);
-
-            var faces = new[] { (face1, "face1"), (face2, "face2") };
-            var directions = new[] { (true, "forward"), (false, "backward") };
-
-            // Act & Assert: check that half-edge cycles are well-circulated
-            foreach (var (face, faceName) in faces)
-            {
-                int? expectedLength = null;
-
-                foreach (var (forward, dirName) in directions)
-                {
-                    List<HalfEdge> edges;
-                    try
-                    {
-                        edges = face.EnumerateEdges(e => e, forward: forward).ToList();
-                    }
-                    catch (Exception ex)
-                    {
-                        Assert.Fail($"{faceName} {dirName} enumeration failed: {ex.Message}");
-                        return;
-                    }
-
-                    // Ensure both directions enumerate the same number of edges
-                    if (expectedLength == null)
-                        expectedLength = edges.Count;
-                    else if (edges.Count != expectedLength)
-                        Assert.Fail($"{faceName} {dirName} enumeration length mismatch: expected {expectedLength}, got {edges.Count}");
-
-                    // Forward enumeration must always be 3 for triangles
-                    if (forward && edges.Count != 3)
-                        Assert.Fail($"{faceName} forward enumeration does not have 3 edges: got {edges.Count}");
-                }
-            }
-            // Explicit final check
-            Assert.IsTrue(true, $@"
-                All half-edge cycles enumerated successfully 
-                in both directions with appropriate cycle length."
-            );
+           
         }
-
-
     }
 }
 

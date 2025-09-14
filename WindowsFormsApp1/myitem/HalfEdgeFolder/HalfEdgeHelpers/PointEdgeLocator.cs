@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using static WindowsFormsApp1.myitem.GeometryFolder.GeometryUtils;
 
 public static class PointEdgeLocator
 {
@@ -10,19 +11,7 @@ public static class PointEdgeLocator
 
     public const int MAX_ITERATIONS = 1000;
 
-    /// <summary>
-    /// Signed 2D determinant for triangle (a,b,c) using expansion along x-column:
-    /// det = x_a*(y_b - y_c) - x_b*(y_a - y_c) + x_c*(y_a - y_b)
-    /// Positive => counter-clockwise, Negative => clockwise, Zero => collinear.
-    /// </summary>
-    public static double OrientedArea(Vertex a, Vertex b, Vertex c)
-    {
-        double ax = a.Position.X, ay = a.Position.Y;
-        double bx = b.Position.X, by = b.Position.Y;
-        double cx = c.Position.X, cy = c.Position.Y;
 
-        return ax * (by - cy) - bx * (ay - cy) + cx * (ay - by);
-    }
 
     private static HalfEdge FindHalfEdgeInFace(Face face, Vertex a, Vertex b)
     {
@@ -67,9 +56,9 @@ public static class PointEdgeLocator
 
         GetTriangleEdges(startEdge, out var e0, out var e1, out var e2);
 
-        double a01 = OrientedArea(e0.Origin, e1.Origin, point);
-        double a12 = OrientedArea(e1.Origin, e2.Origin, point);
-        double a20 = OrientedArea(e2.Origin, e0.Origin, point);
+        double a01 = TriangleOrientation(e0.Origin, e1.Origin, point);
+        double a12 = TriangleOrientation(e1.Origin, e2.Origin, point);
+        double a20 = TriangleOrientation(e2.Origin, e0.Origin, point);
 
         return (a01, a12, a20);
     }
