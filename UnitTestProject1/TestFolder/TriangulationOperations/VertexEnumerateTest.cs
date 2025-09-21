@@ -36,13 +36,9 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
             faceCCW = new Face(eCB, eBA, eAC);
         }
 
+
+
         [TestMethod]
-        public void TestFaceGetEdgesTraversal()
-        {
-
-           
-
-        }
 
         public void TestVertexEnumerable()
         {
@@ -52,14 +48,13 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
 
             foreach (var face in new[] { faceCW, faceCCW })
             {
-                face.EnumerateEdges(e =>
+                foreach (var e in face.GetEdges())
                 {
                     if (!edgesByOrigin.ContainsKey(e.Origin))
                         edgesByOrigin[e.Origin] = new List<HalfEdge>();
-                    edgesByOrigin[e.Origin].Add(e);
 
-                    return e; // The function must return T; here T = HalfEdge
-                }).ToList(); // force enumeration
+                    edgesByOrigin[e.Origin].Add(e);
+                }
             }
 
             // Now test Vertex.EnumerateEdges matches the dictionary

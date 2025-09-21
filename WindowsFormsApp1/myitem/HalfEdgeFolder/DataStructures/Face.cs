@@ -84,8 +84,7 @@ public class Face
         Edge = edges[0];
     }
 
-
-    public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> func)
+    private IEnumerable<HalfEdge> EnumerateEdges()
     {
         if (Edge == null)
             yield break;
@@ -95,18 +94,17 @@ public class Face
 
         do
         {
-            yield return func(current);
+            yield return current;
             current = current.Next;
         }
         while (current != null && current != start);
     }
 
+    public IEnumerable<HalfEdge> GetEdges() => EnumerateEdges();
 
-    /// <summary>
-    /// Returns all vertices of this face.
-    /// </summary>
-    public List<Vertex> GetVertices() =>
-        EnumerateEdges(e => e.Origin).ToList();
+    public IEnumerable<Vertex> GetVertices() =>
+        EnumerateEdges().Select(e => e.Origin);
+
 
     /// <summary>
     /// Finds the opposite twin edge across
@@ -120,7 +118,7 @@ public class Face
         if (p == null) throw new ArgumentNullException(nameof(p));
         if (Edge == null) return null;
 
-        foreach (var e in EnumerateEdges(h => h))
+        foreach (var e in GetEdges())
         {
             if (e == null || e.Next == null) continue;
 

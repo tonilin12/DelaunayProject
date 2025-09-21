@@ -53,7 +53,7 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
             if (triangle == null) throw new ArgumentNullException(nameof(triangle));
             if (p == null) throw new ArgumentNullException(nameof(p));
 
-            var vertices = triangle.GetVertices();
+            var vertices = triangle.GetVertices().ToList();
             if (vertices.Count != 3)
                 throw new ArgumentException("Face must be a triangle with 3 vertices.", nameof(triangle));
 

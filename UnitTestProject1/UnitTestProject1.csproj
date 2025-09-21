@@ -55,6 +55,7 @@
     <Compile Include="TestFolder\DataStructureTests\VertexTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestFolder\Else\GeometryUtilsTest.cs" />
+    <Compile Include="TestFolder\Else\PointLocatorTest.cs" />
     <Compile Include="TestFolder\TriangulationOperations\FlipTest.cs" />
     <Compile Include="TestFolder\TriangulationOperations\SuperTriangleGeneratorTests.cs" />
     <Compile Include="TestFolder\TriangulationOperations\TriangleSplitterTest.cs" />

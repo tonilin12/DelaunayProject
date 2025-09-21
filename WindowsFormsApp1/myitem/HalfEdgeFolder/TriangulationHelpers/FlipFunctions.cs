@@ -77,8 +77,11 @@ public class FlipHelper
         f0.Twin = e0;
 
         // Update the outgoing half-edge pointer for each vertex in the affected faces.
-        face1.EnumerateEdges(e => e.Origin.OutgoingHalfEdge = e).ToList();
-        face2.EnumerateEdges(e => e.Origin.OutgoingHalfEdge = e).ToList();
+        foreach (var e in face1.GetEdges())
+            e.Origin.OutgoingHalfEdge = e;
+
+        foreach (var e in face2.GetEdges())
+            e.Origin.OutgoingHalfEdge = e;
 
 
         // Ensure the reference points to the flipped edge.

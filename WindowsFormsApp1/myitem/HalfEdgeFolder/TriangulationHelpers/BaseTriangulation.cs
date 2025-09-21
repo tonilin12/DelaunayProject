@@ -11,7 +11,6 @@ public class BaseTriangulation
     private int _currentIndex;
     private Face _currentFace;
     private readonly HashSet<Face> _triangles;
-    public const double CIRC_EPSILON = 1e-12;
 
 
     /// <summary>
@@ -79,7 +78,7 @@ public class BaseTriangulation
         try
         {
             // Find containing face
-            var findpointData = PointEdgeLocator.LocatePointInMesh(currentFace.Edge, p);
+            var findpointData = PointLocator.LocatePointInMesh(currentFace, p);
             var isOnEdge = findpointData.isOnEdge;
             var searched_edge = findpointData.destinationEdge;
             var t0 = searched_edge.Face;

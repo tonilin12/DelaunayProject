@@ -14,7 +14,7 @@ public class TriangleSplitter
     public List<Face> SplitTriangle(Face triangle, Vertex newVertex)
     {
         // Split the triangle into three smaller triangles
-        var originalEdges = triangle.EnumerateEdges(e=>e).ToArray();
+        var originalEdges = triangle.GetEdges().ToArray();
         var originalVertices = triangle.GetVertices().ToList();
 
         // Extract triangle vertices.
@@ -41,55 +41,11 @@ public class TriangleSplitter
 
 
 
-    /// <summary>
-    /// Checks if two triangles sharing an edge form a valid convex quadrilateral.
-    /// Throws an exception if not.
-    /// </summary>
-    public static void EnsureQuadrilateralIsConvex(HalfEdge edge)
-    {
-        if (edge == null)
-            throw new ArgumentNullException(nameof(edge), "Edge cannot be null.");
-        if (edge.Twin == null)
-            throw new InvalidOperationException("Edge must have a twin.");
-        if (edge.Next.Next == null || edge.Next == null)
-            throw new InvalidOperationException("Edge must have Next.Next and Next defined.");
-        if (edge.Twin.Next.Next == null || edge.Twin.Next == null)
-            throw new InvalidOperationException("Edge.Twin must have Next.Next and Next defined.");
-
-        // Vertices
-        Vector2 A = edge.Origin.Position;
-        Vector2 B = edge.Dest.Position;
-        Vector2 X = edge.Next.Next.Origin.Position;      // Opposite vertex in first triangle
-        Vector2 Y = edge.Twin.Next.Next.Origin.Position; // Opposite vertex in second triangle
-
-        // Helper: signed area of a triangle (positive = CCW)
-        float SignedArea(Vector2 p1, Vector2 p2, Vector2 p3)
-        {
-            return 0.5f * ((p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X));
-        }
-
-        // Check triangles are valid and counter-clockwise
-        if (SignedArea(A, B, X) <= 0)
-            throw new InvalidOperationException("First triangle is degenerate or not CCW.");
-        if (SignedArea(B, A, Y) <= 0)
-            throw new InvalidOperationException("Second triangle is degenerate or not CCW.");
-
-        // Check that opposite vertices are on opposite sides of the shared edge AB
-        float cross1 = (B.X - A.X) * (X.Y - A.Y) - (B.Y - A.Y) * (X.X - A.X);
-        float cross2 = (B.X - A.X) * (Y.Y - A.Y) - (B.Y - A.Y) * (Y.X - A.X);
-
-        if (cross1 * cross2 >= 0)
-            throw new InvalidOperationException("The quadrilateral formed by the two triangles is not convex.");
-    }
-
 
 
     public List<Face>
     SplitTriangle_VertexOnEdge(HalfEdge edge, Vertex newVertex)
     {
-
-
-        EnsureQuadrilateralIsConvex(edge);
 
 
        // Assume the shared edge runs from A to B.
@@ -131,6 +87,8 @@ public class TriangleSplitter
         var face1 = new Face(newToB,adjacentEdge1,xToNew);
 
         var face2= new Face(newToX, adjacentEdge2, aToNew);
+
+
         var face3 = new Face(newToA, twinAdjacentEdge1, yToNew);
 
         var face4 = new Face(newToY, twinAdjacentEdge2, bToNew);

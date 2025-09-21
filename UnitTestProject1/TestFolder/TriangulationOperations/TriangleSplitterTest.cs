@@ -33,11 +33,11 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
             // Step 1: Create the HashSet of tuples representing expected edges
             var expectedEdges = 
             new HashSet<(Vertex Origin, Vertex Dest, HalfEdge Twin)>(
-                face.EnumerateEdges(e=>e).Select(e => (e.Origin, e.Dest, e.Twin))
+                face.GetEdges().Select(e => (e.Origin, e.Dest, e.Twin))
             );
 
 
-            var original_edges = new HashSet<HalfEdge>(face.EnumerateEdges(e => e));
+            var original_edges = new HashSet<HalfEdge>(face.GetEdges());
 
             splitter.SplitTriangle(face, vD);
 

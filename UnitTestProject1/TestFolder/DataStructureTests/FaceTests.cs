@@ -94,7 +94,7 @@ namespace UnitTestProject1.TestFolder
 
 
         [TestMethod]
-        public void FaceConstructor_EnumerateEdgesAndVertices_RunsWithoutError()
+        public void EnumerateEdgesAndVertices_RunsWithoutError()
         {
             // Create face using vertex constructor
             var face = new Face(vA, vB, vC);
@@ -103,7 +103,7 @@ namespace UnitTestProject1.TestFolder
             List<HalfEdge> edges = null;
             try
             {
-                edges = face.EnumerateEdges(e => e).ToList();
+                edges = face.GetEdges().ToList();
             }
             catch (Exception ex)
             {
@@ -116,7 +116,7 @@ namespace UnitTestProject1.TestFolder
 
             // Check vertices robustly
             var expectedVertices = new[] { vA, vB, vC };
-            var actualVertices = face.GetVertices(); // assumes face.Vertices exists
+            var actualVertices = face.GetVertices().ToList(); // assumes face.Vertices exists
 
             Assert.AreEqual(expectedVertices.Length, actualVertices.Count, "Face should have exactly 3 vertices");
 
@@ -168,7 +168,7 @@ namespace UnitTestProject1.TestFolder
 
                 // Verify that the edge is part of the face by iterating directly
                 bool found = false;
-                foreach (var e in face.EnumerateEdges(edge => edge))
+                foreach (var e in face.GetEdges())
                 {
                     if (e == oppositeEdge)
                     {

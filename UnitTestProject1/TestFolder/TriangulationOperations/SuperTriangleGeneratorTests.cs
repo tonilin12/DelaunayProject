@@ -33,7 +33,7 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
             Assert.IsNotNull(superTriangle, "SuperTriangle should not be null.");
 
             // Assert: superTriangle has 3 distinct vertices
-            var verts = superTriangle.GetVertices();
+            var verts = superTriangle.GetVertices().ToList();
             Assert.AreEqual(3, verts.Count, "SuperTriangle should have 3 vertices.");
             Assert.AreNotEqual(verts[0], verts[1]);
             Assert.AreNotEqual(verts[1], verts[2]);
