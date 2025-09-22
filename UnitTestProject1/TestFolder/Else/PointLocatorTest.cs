@@ -4,96 +4,205 @@ using System.Linq;
 using System.Numerics;
 using WindowsFormsApp1.myitem.GeometryFolder;
 
-[TestClass]
-public class PointLocatorTest
+
+
+namespace UnitTestProject1.TestFolder.Else
 {
-    // Shared vertices and face list for general use
-    private Vertex vA, vB, vC, vD, vE;
-    private List<Face> faceList;
-
-    [TestInitialize]
-    public void Setup()
+    [TestClass]
+    public class PointLocatorTest
     {
-        vA = new Vertex(new Vector2(100, 100));
-        vB = new Vertex(new Vector2(700, 100));
-        vC = new Vertex(new Vector2(400, 500));
-        vD = new Vertex(new Vector2(200, 200));
-        vE = new Vertex(new Vector2(600, 200));
+        // Shared vertices and face list for general use
+        private Vertex vA, vB, vC, vD, vE;
+        private List<Face> faceList;
 
-        var originalFace = new Face(vA, vB, vC);
-        faceList = new List<Face> { originalFace };
 
-        var firstSplit = TriangulationOperation.SplitTriangle(originalFace, vD);
-        faceList.Remove(originalFace);
-        faceList.AddRange(firstSplit);
 
-        var secondSplit = TriangulationOperation.SplitTriangle(firstSplit[0], vE);
-        faceList.Remove(firstSplit[0]);
-        faceList.AddRange(secondSplit);
-    }
-
- 
-
-    public static List<HalfEdge> LocateAndAssertMidEdgeVertices(Face startFace, Face targetFace)
-    {
-        var locatedEdges = new List<HalfEdge>();
-
-        foreach (var edge in targetFace.GetEdges())
+        /// <summary>
+        /// Generate a point strictly inside a triangle using barycentric coordinates.
+        /// Guarantees 0 < u,v,w < 1 to avoid edges.
+        /// </summary>
+        private Vertex GetStrictlyInsidePoint(Vertex v1, Vertex v2, Vertex v3)
         {
-            // Compute midpoint
-            Vector2 midPoint = (edge.Origin.Position + edge.Dest.Position) / 2f;
-            var vertex = new Vertex(midPoint);
+            // Use fixed barycentric weights strictly inside (can also randomize slightly)
+            float u = 0.3f;
+            float v = 0.3f;
+            float w = 1f - u - v; // w = 0.5f
 
-            // Locate vertex starting from startFace
-            var locator = PointLocator.LocatePointInMesh(startFace, vertex);
+            // Compute the position
+            Vector2 pos = u * v1.Position + v * v2.Position + w * v3.Position;
+            return new Vertex(pos);
+        }
 
-            // Assert that the point is on an edge
-            Assert.IsTrue(locator.isOnEdge,
-                $"Vertex at {vertex.Position} was expected to lie on an edge, but isOnEdge is false.");
+
+
+        [TestInitialize]
+        public void Setup()
+        {
+            // Initial triangle vertices
+            vA = new Vertex(new Vector2(100, 100));
+            vB = new Vertex(new Vector2(700, 100));
+            vC = new Vertex(new Vector2(400, 500));
+
+            // Split triangle to add internal vertices
+            vD = GetStrictlyInsidePoint(vA, vB, vC);
+            var face0 = new Face(vA, vB, vC);
+            faceList = new List<Face> { face0 };
+
+            var split1 = TriangulationOperation.SplitTriangle(face0, vD);
+            faceList.Remove(face0);
+            faceList.AddRange(split1);
+
+            var face1= faceList.First();
+            var vertecies=face1.GetVertices().ToArray();    
+            vE = GetStrictlyInsidePoint(vertecies[0], vertecies[1], vertecies[2]);
+            var split2 = TriangulationOperation.SplitTriangle(face1, vE);
+            faceList.Remove(face1);
+            faceList.AddRange(split2);
+
+        }
+
+
+
+        /// <summary>
+        /// Locate midpoints of all edges of a target face and assert they are on edges.
+        /// </summary>
+        private List<HalfEdge> LocateAndAssertMidEdgeVertices(Face startFace, Face targetFace)
+        {
+            var locatedEdges = new List<HalfEdge>();
+
+            foreach (var edge in targetFace.GetEdges())
+            {
+                Vector2 midPoint = (edge.Origin.Position + edge.Dest.Position) / 2f;
+                var vertex = new Vertex(midPoint);
+
+                var locator = PointLocator.LocatePointInMesh(startFace, vertex);
+
+                // Assert the point is on an edge
+                Assert.IsTrue(locator.isOnEdge,
+                    $"Vertex at {vertex.Position} was expected to lie on an edge, but isOnEdge is false.");
+
+                var destEdge = locator.destinationEdge;
+                Assert.IsNotNull(destEdge, "Located edge is null.");
+
+                // Assert collinearity
+                int orientation = GeometryUtils.TriangleOrientation(destEdge.Origin, destEdge.Dest, vertex);
+                Assert.IsTrue(orientation == 0,
+                    $"Vertex at {vertex.Position} is not collinear with edge {destEdge.Origin.Position} -> {destEdge.Dest.Position}.");
+
+                locatedEdges.Add(destEdge);
+            }
+
+            return locatedEdges;
+        }
+
+
+        [TestMethod]
+        public void LocateMidEdgeVertices_AllPairs()
+        {
+            foreach (var startFace in faceList)
+            {
+                foreach (var targetFace in faceList)
+                {
+                    // Call your helper directly
+                    var locatedEdges = LocateAndAssertMidEdgeVertices(startFace, targetFace);
+
+                    // Optional: verify the number of located edges matches the target face's edges
+                    Assert.AreEqual(targetFace.GetEdges().Count(), locatedEdges.Count,
+                        $"StartFace -> TargetFace: Number of located edges does not match.");
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Locate a point strictly inside a face and assert it's detected as inside.
+        /// </summary>
+        private void LocateAndAssertInside(Face startFace, Face targetFace)
+        {
+            var vertices = targetFace.GetVertices().ToArray();
+            var insidePoint = GetStrictlyInsidePoint(vertices[0], vertices[1], vertices[2]);
+
+            var locator = PointLocator.LocatePointInMesh(startFace, insidePoint);
+
 
             var destEdge = locator.destinationEdge;
             Assert.IsNotNull(destEdge, "Located edge is null.");
 
-            // Assert collinear using TriangleOrientation
-            int orientation = GeometryUtils.TriangleOrientation(destEdge.Origin, destEdge.Dest, vertex);
-            Assert.IsTrue(orientation == 0,
-                $"Vertex at {vertex.Position} is not collinear with edge {destEdge.Origin.Position} -> {destEdge.Dest.Position}.");
 
-            // Assert strictly between endpoints
-            Vector2 edgeVec = destEdge.Dest.Position - destEdge.Origin.Position;
-            Vector2 vertexVec = vertex.Position - destEdge.Origin.Position;
-            float dot = Vector2.Dot(edgeVec, vertexVec);
-            float lenSq = edgeVec.LengthSquared();
-            Assert.IsTrue(dot > 0 && dot < lenSq,
-                $"Vertex at {vertex.Position} is not strictly between endpoints {destEdge.Origin.Position} -> {destEdge.Dest.Position}.");
+            // Point must not be on edge
+            Assert.IsFalse(locator.isOnEdge, $"Vertex at {insidePoint.Position} should not lie on an edge {destEdge}.");
 
-            locatedEdges.Add(destEdge);
+
+            var locatedFace = destEdge.Face;
+
+            // Assert reference equality
+            Assert.AreSame(targetFace, locatedFace,
+                $"Point {insidePoint.Position} was expected to be inside the target face by reference.");
         }
 
-        return locatedEdges;
-    }
 
-
-
-    /// <summary>
-    /// Test locating mid-edge vertices on all pairs of faces using the consolidated helper.
-    /// </summary>
-    [TestMethod]
-    public void LocateVertexOnEdgeAllPairOfFace()
-    {
-        foreach (var startFace in faceList)
+        [TestMethod]
+        public void LocateInsidePoint_AllPairs()
         {
-            foreach (var targetFace in faceList)
+            foreach (var startFace in faceList)
             {
-                // Locate and assert mid-edge vertices
-                var locatedEdges = LocateAndAssertMidEdgeVertices(startFace, targetFace);
+                foreach (var targetFace in faceList)
+                {
+                    // Call the helper directly for inside points
+                    LocateAndAssertInside(startFace, targetFace);
+                }
+            }
+        }
 
-                // Verify the number of located edges matches the number of edges in targetFace
-                Assert.AreEqual(targetFace.GetEdges().Count(), locatedEdges.Count,
-                    $"StartFace {startFace.Id}, TargetFace {targetFace.Id}: Number of located edges does not match.");
+
+
+
+        /// <summary>
+        /// Locate all vertices of a target face and assert that the located edge's origin matches exactly the same vertex.
+        /// </summary>
+        private List<HalfEdge> LocateAndAssertFaceVerticesStrict(Face startFace, Face targetFace)
+        {
+            var locatedEdges = new List<HalfEdge>();
+
+            // Get the vertices of the target face
+            var targetVertices = targetFace.GetVertices().ToList();
+
+            foreach (var vertex in targetVertices)
+            {
+                // Locate the vertex in the mesh
+                var locator = PointLocator.LocatePointInMesh(startFace, vertex);
+
+                // Assert that a destination edge was found
+                Assert.IsNotNull(locator.destinationEdge, "Located edge is null.");
+
+                var destEdge = locator.destinationEdge;
+
+                // Assert that the located edge's origin matches the specific vertex
+                Assert.IsTrue(destEdge.Origin.PositionsEqual(vertex),
+                    $"Located edge origin {destEdge.Origin.Position} does not match the expected vertex {vertex.Position}.");
+
+
+                locatedEdges.Add(destEdge);
+            }
+
+            return locatedEdges;
+        }
+
+        [TestMethod]
+        public void LocateFaceVerticesStrict_AllPairs()
+        {
+            foreach (var startFace in faceList)
+            {
+                foreach (var targetFace in faceList)
+                {
+                    var locatedEdges = LocateAndAssertFaceVerticesStrict(startFace, targetFace);
+
+                    // Verify the number of located edges matches the number of vertices of the target face
+                    Assert.AreEqual(targetFace.GetVertices().Count(), locatedEdges.Count,
+                        $"StartFace -> TargetFace: Number of located edges does not match number of vertices.");
+                }
             }
         }
     }
-
-
 }
+
