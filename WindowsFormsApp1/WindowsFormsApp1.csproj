@@ -91,7 +91,7 @@
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\HalfEdge.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\Vertex.cs" />
     <Compile Include="myitem\HalfEdgeFolder\HalfEdgeHelpers\PointLocator.cs" />
-    <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\BaseTriangulation.cs" />
+    <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\TriangulationBuilder.cs" />
     <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\FlipFunctions.cs" />
     <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\TriangleSplitter.cs" />
     <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\SuperTriangleGenerator.cs" />

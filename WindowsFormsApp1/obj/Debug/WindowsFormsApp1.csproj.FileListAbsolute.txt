@@ -87,3 +87,4 @@ C:\Users\Toni Lin\Desktop\DelaunayProject\WindowsFormsApp1\obj\Debug\WindowsForm
 C:\Users\Toni Lin\Desktop\DelaunayProject\WindowsFormsApp1\obj\Debug\WindowsF.A1EEDF9B.Up2Date
 C:\Users\Toni Lin\Desktop\DelaunayProject\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
 C:\Users\Toni Lin\Desktop\DelaunayProject\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe.config

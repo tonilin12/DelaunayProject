@@ -7,14 +7,6 @@ public static class PointLocator
 {
     private const int MAX_ITERATIONS = 1000;
 
-    private class PointLocationResult
-    {
-        public bool IsInside { get; set; }
-        public bool IsOnEdge { get; set; }
-        public HalfEdge DestinationEdge { get; set; }
-        public HalfEdge NextHalfEdge { get; set; }
-    }
-
     /// <summary>
     /// Checks if point P lies on segment AB, including endpoints.
     /// </summary>
@@ -28,6 +20,14 @@ public static class PointLocator
         float lenSq = ab.LengthSquared();
         if (dot > lenSq) return false;     // after end
         return true;                        // on segment, including endpoints
+    }
+
+    private class PointLocationResult
+    {
+        public bool IsInside { get; set; }
+        public bool IsOnEdge { get; set; }
+        public HalfEdge DestinationEdge { get; set; }
+        public HalfEdge NextHalfEdge { get; set; }
     }
 
     /// <summary>
@@ -46,20 +46,19 @@ public static class PointLocator
             int orientation = TriangleOrientation(e.Origin, e.Dest, point);
             bool onEdge = orientation == 0 && IsOnSegment(e.Origin, e.Dest, point);
 
-            // Track if point is on any edge
             if (onEdge)
             {
                 anyOnEdge = true;
                 if (e.Origin.PositionsEqual(point))
-                    exactMatchEdge = e;      // prefer exact match
+                    exactMatchEdge = e;  // prefer exact match
                 else if (firstOnEdge == null)
-                    firstOnEdge = e;        // fallback
+                    firstOnEdge = e;
             }
 
             if (orientation <= 0) allPositive = false;
 
             if (orientation < 0 && nextHalfEdge == null)
-                nextHalfEdge = e.Twin;        // first negative edge
+                nextHalfEdge = e.Twin;  // first negative edge
         }
 
         return new PointLocationResult
@@ -72,18 +71,16 @@ public static class PointLocator
     }
 
     /// <summary>
-    /// Locate the face or edge containing a point in a half-edge mesh.
-    /// Returns the destination edge, a flag for being on an edge, and traversed edges.
+    /// Internal traversal function, optional recording of edges.
     /// </summary>
     private static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
-    LocatePointInMesh(HalfEdge startEdge, Vertex point)
+    LocatePointInMesh(HalfEdge startEdge, Vertex point, bool recordTraversal)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
 
-        var traversed = new List<HalfEdge>();
-        var current = startEdge;
-
+        List<HalfEdge> traversed = recordTraversal ? new List<HalfEdge>() : null;
+        HalfEdge current = startEdge;
         int iterations = 0;
 
         while (iterations++ < MAX_ITERATIONS)
@@ -91,7 +88,8 @@ public static class PointLocator
             if (current == null)
                 throw new InvalidOperationException("Encountered null half-edge during traversal.");
 
-            traversed.Add(current);
+            if (recordTraversal)
+                traversed.Add(current);
 
             var result = GetPointLocation(current, point);
 
@@ -112,19 +110,18 @@ public static class PointLocator
         throw new InvalidOperationException($"Max iterations ({MAX_ITERATIONS}) reached while searching for point.");
     }
 
-
     /// <summary>
     /// Public entry point: locate a point starting from a face.
+    /// Optional parameter to record traversed edges.
     /// </summary>
     public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
-    LocatePointInMesh(Face startFace, Vertex point)
+    LocatePointInMesh(Face startFace, Vertex point, bool recordTraversal = false)
     {
         if (startFace == null) throw new ArgumentNullException(nameof(startFace));
         if (point == null) throw new ArgumentNullException(nameof(point));
         if (startFace.Edge == null)
             throw new ArgumentException("Face must have a valid edge.", nameof(startFace));
 
-        return LocatePointInMesh(startFace.Edge, point);
+        return LocatePointInMesh(startFace.Edge, point, recordTraversal);
     }
-
 }

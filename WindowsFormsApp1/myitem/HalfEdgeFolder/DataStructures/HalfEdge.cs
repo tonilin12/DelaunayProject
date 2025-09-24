@@ -78,37 +78,5 @@ public class HalfEdge
 
 
 
-    /// <summary>
-    /// Destroys this half-edge safely and cleans up references.
-    /// </summary>
-    /// 
-    /*
-    public void Destroy()
-    {
-        // Break twin relationship
-        if (Twin != null)
-        {
-            Twin.Twin = null;
-            Twin = null;
-        }
 
-        // Break Next/Prev relationships
-        if (Next != null)
-        {
-            if (Next._prev == this) Next._prev = null;
-            Next = null;
-        }
-
-        if (_prev != null)
-        {
-            if (_prev.Next == this) _prev.Next = null;
-            _prev = null;
-        }
-
-        // Remove face reference
-        Face = null;
-
-        // Remove origin reference (optional)
-        Origin = null;
-    }*/
 }
