@@ -5,14 +5,11 @@ using WindowsFormsApp1.myitem.GeometryFolder;
 
 public class TriangulationBuilder
 {
-    private readonly List<Vertex> _points;
-    private readonly Vertex[] _supertriangleVertices;
-    private int _currentIndex;
+    private readonly Queue<Vertex> _vertexQueue;
+    private readonly Vertex[] _superTriangleVertices;
+    private readonly HashSet<Face> _meshTriangles;
 
-    // Single set of triangles
-    private readonly HashSet<Face> _triangles;
-
-    public TriangulationBuilder(Face supertriangle, params Vertex[] initialPoints)
+    public TriangulationBuilder(Face supertriangle, params Vertex[] initialVertices)
     {
         if (supertriangle == null)
             throw new ArgumentNullException(nameof(supertriangle), "Supertriangle cannot be null.");
@@ -21,78 +18,103 @@ public class TriangulationBuilder
         if (vertices == null || vertices.Count() != 3)
             throw new ArgumentException("Supertriangle must have exactly 3 vertices.", nameof(supertriangle));
 
-        _supertriangleVertices = vertices.ToArray();
-        _points = initialPoints?.ToList() ?? new List<Vertex>();
-        _triangles = new HashSet<Face> { supertriangle };
+        _superTriangleVertices = vertices.ToArray();
+        _vertexQueue = new Queue<Vertex>(initialVertices ?? Array.Empty<Vertex>());
+        _meshTriangles = new HashSet<Face> { supertriangle };
     }
 
-    public bool HasMoreSteps => _currentIndex < _points.Count;
+    /// <summary>
+    /// Checks if there are more vertices to process.
+    /// </summary>
+    public bool HasMoreVerticesToProcess => _vertexQueue.Count > 0;
 
-    public void StepNext()
+    /// <summary>
+    /// Processes a single vertex in insertion order.
+    /// </summary>
+    public void ProcessSingleVertex()
     {
-        if (!HasMoreSteps) return;
-        InsertVertex(_points[_currentIndex++]);
+        if (!HasMoreVerticesToProcess) return;
+
+        Vertex vertex = _vertexQueue.Dequeue();
+
+        // Skip insertion if vertex already exists in mesh
+        if (VertexExists(vertex)) return;
+
+        Stack<Face> legalizationStack = InsertVertexIncrementally(vertex);
+        LegalizeEdges(legalizationStack, vertex);
     }
 
-    public void Step(int count)
+    /// <summary>
+    /// Adds vertices to the queue to be processed in order.
+    /// </summary>
+    public void AddVertices(params Vertex[] newVertices)
     {
-        for (int i = 0; i < count && HasMoreSteps; i++)
-            StepNext();
+        if (newVertices == null || newVertices.Length == 0) return;
+        foreach (var v in newVertices)
+            _vertexQueue.Enqueue(v);
     }
 
-    public void AddPoints(params Vertex[] newPoints)
+    /// <summary>
+    /// Returns internal triangles (excluding those with supertriangle vertices).
+    /// </summary>
+    public HashSet<Face> GetInternalTriangles()
     {
-        if (newPoints != null && newPoints.Length > 0)
-            _points.AddRange(newPoints);
-    }
-
-    // Returns only internal triangles (excluding those with supertriangle vertices)
-    public HashSet<Face> GetSnapshot()
-    {
-        return _triangles
-            .Where(tri => !tri.GetVertices().Any(v => _supertriangleVertices.Contains(v)))
+        return _meshTriangles
+            .Where(tri => !tri.GetVertices().Any(v => _superTriangleVertices.Contains(v)))
             .ToHashSet();
     }
 
-    // --- Private helpers ---
-    private void InsertVertex(Vertex p)
+    // ---------------- Private helpers ----------------
+
+    /// <summary>
+    /// Checks if a vertex already exists in the current mesh.
+    /// </summary>
+    private bool VertexExists(Vertex vertex)
     {
-        // Locate containing triangle or edge
-        var findPointData = PointLocator.LocatePointInMesh(_triangles.First(), p);
+        return _meshTriangles.Any(tri =>
+            tri.GetVertices().Any(v => v.PositionsEqual(vertex)));
+    }
+
+    /// <summary>
+    /// Inserts a vertex into the mesh and returns the stack of new triangles for legalization.
+    /// </summary>
+    private Stack<Face> InsertVertexIncrementally(Vertex vertex)
+    {
+        var findPointData = PointLocator.LocatePointInMesh(_meshTriangles.First(), vertex);
         var isOnEdge = findPointData.isOnEdge;
         var edge = findPointData.destinationEdge;
-        var containingFace = edge.Face;
 
+        // Vertex coincides with an existing edge vertex → skip insertion
+        if (isOnEdge && (edge.Origin.PositionsEqual(vertex) || edge.Dest.PositionsEqual(vertex)))
+            return new Stack<Face>();
+
+        var containingFace = edge.Face;
         List<Face> newTriangles;
 
-        if (edge.Origin.PositionsEqual(p))
-        {
-            // Vertex already exists
-            return;
-        }
-
-        // Split triangles as needed
         if (isOnEdge)
         {
-            newTriangles = TriangulationOperation.SplitTriangle_VertexOnEdge(edge, p);
-            _triangles.Remove(edge.Face);
-            _triangles.Remove(edge.Twin.Face);
+            // Split two adjacent triangles along the edge
+            newTriangles = TriangulationOperation.SplitTriangle_VertexOnEdge(edge, vertex);
+            _meshTriangles.Remove(edge.Face);
+            _meshTriangles.Remove(edge.Twin.Face);
         }
         else
         {
-            newTriangles = TriangulationOperation.SplitTriangle(containingFace, p);
-            _triangles.Remove(containingFace);
+            // Insert vertex inside a single triangle
+            newTriangles = TriangulationOperation.SplitTriangle(containingFace, vertex);
+            _meshTriangles.Remove(containingFace);
         }
 
-        // Add new triangles to the set
         foreach (var tri in newTriangles)
-            _triangles.Add(tri);
+            _meshTriangles.Add(tri);
 
-        // Legalize edges
-        LegalizeEdges(new Stack<Face>(newTriangles), p);
+        return new Stack<Face>(newTriangles);
     }
 
-    private void LegalizeEdges(Stack<Face> stack, Vertex p)
+    /// <summary>
+    /// Legalizes triangle edges using a stack-based incremental approach.
+    /// </summary>
+    private void LegalizeEdges(Stack<Face> stack, Vertex vertex)
     {
         int iterationLimit = 1000, iterationCount = 0;
 
@@ -101,19 +123,14 @@ public class TriangulationBuilder
             var triangle = stack.Pop();
             if (triangle == null) continue;
 
-            var oppositeTwin = triangle.GetOppositeTwinEdge(p);
-            if (oppositeTwin != null && GeometryUtils.IsInsideCircumcircle(oppositeTwin.Face, p))
+            var oppositeTwin = triangle.GetOppositeTwinEdge(vertex);
+            if (oppositeTwin != null && GeometryUtils.IsInsideOrOnCircumcircle(oppositeTwin.Face, vertex))
             {
                 TriangulationOperation.FlipEdge(ref oppositeTwin);
 
+                // Push affected triangles back for further legalization
                 stack.Push(triangle);
                 stack.Push(oppositeTwin.Face);
-
-                _triangles.Remove(triangle);
-                _triangles.Remove(oppositeTwin.Face);
-
-                _triangles.Add(triangle);
-                _triangles.Add(oppositeTwin.Face);
             }
         }
     }

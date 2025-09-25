@@ -71,13 +71,14 @@ public class Vertex
     /// Checks if this vertex is approximately equal to another vertex using Euclidean distance.
     /// Float-only version.
     /// </summary>
-    public bool PositionsEqual(Vertex other, float tolerance = Tolerance)
+    public bool PositionsEqual(Vertex other, float epsilon = 1e-6f)
     {
         if (other == null) return false;
 
         float dx = Position.X - other.Position.X;
         float dy = Position.Y - other.Position.Y;
 
-        return dx * dx + dy * dy <= tolerance * tolerance;
+        // Compare squared distance to squared epsilon
+        return dx * dx + dy * dy <= epsilon * epsilon;
     }
 }

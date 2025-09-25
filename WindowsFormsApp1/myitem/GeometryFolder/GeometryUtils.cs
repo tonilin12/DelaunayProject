@@ -48,7 +48,7 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
 
 
 
-        public static bool IsInsideCircumcircle(Face triangle, Vertex p)
+        public static bool IsInsideOrOnCircumcircle(Face triangle, Vertex p, float epsilon = 1e-6f)
         {
             if (triangle == null) throw new ArgumentNullException(nameof(triangle));
             if (p == null) throw new ArgumentNullException(nameof(p));
@@ -62,25 +62,59 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
             Vector2 c = vertices[2].Position;
             Vector2 pt = p.Position;
 
-            double ux = a.X - pt.X;
-            double uy = a.Y - pt.Y;
-            double uz = ux * ux + uy * uy;
+            // Translate points so pt is origin
+            Vector2 u = a - pt;
+            Vector2 v = b - pt;
+            Vector2 w = c - pt;
 
-            double vx = b.X - pt.X;
-            double vy = b.Y - pt.Y;
-            double vz = vx * vx + vy * vy;
+            float uz = u.X * u.X + u.Y * u.Y;
+            float vz = v.X * v.X + v.Y * v.Y;
+            float wz = w.X * w.X + w.Y * w.Y;
 
-            double wx = c.X - pt.X;
-            double wy = c.Y - pt.Y;
-            double wz = wx * wx + wy * wy;
+            // Determinant for circumcircle test
+            float det = u.X * (v.Y * wz - vz * w.Y)
+                      - u.Y * (v.X * wz - vz * w.X)
+                      + uz * (v.X * w.Y - v.Y * w.X);
 
-            double det = ux * (vy * wz - vz * wy)
-                       - uy * (vx * wz - vz * wx)
-                       + uz * (vx * wy - vy * wx);
+            // Use fixed epsilon
+            return det >= -epsilon;
+        }
+        public static bool IsPointInsideTriangle(Face face, Vector2 p)
+        {
+            var v = face.GetVertices().ToArray();
+            if (v.Length != 3)
+                return false;
 
+            float d1 = TriangleOrientation(p, v[0], v[1]);
+            float d2 = TriangleOrientation(p, v[1], v[2]);
+            float d3 = TriangleOrientation(p, v[2], v[0]);
 
-            return det > double.Epsilon; // using epsilon for robustness
+            bool hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+            bool hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+            return !(hasNeg && hasPos);
+        }
+
+        public static void Circumcircle(Vertex a, Vertex b, Vertex c, out Vector2 center, out float radius)
+        {
+            float d = 2 * (a.Position.X * (b.Position.Y - c.Position.Y) +
+                           b.Position.X * (c.Position.Y - a.Position.Y) +
+                           c.Position.X * (a.Position.Y - b.Position.Y));
+
+            float ux = ((a.Position.LengthSquared() * (b.Position.Y - c.Position.Y)) +
+                        (b.Position.LengthSquared() * (c.Position.Y - a.Position.Y)) +
+                        (c.Position.LengthSquared() * (a.Position.Y - b.Position.Y))) / d;
+
+            float uy = ((a.Position.LengthSquared() * (c.Position.X - b.Position.X)) +
+                        (b.Position.LengthSquared() * (a.Position.X - c.Position.X)) +
+                        (c.Position.LengthSquared() * (b.Position.X - a.Position.X))) / d;
+
+            center = new Vector2(ux, uy);
+            radius = Vector2.Distance(center, a.Position);
         }
 
     }
+
+
+
 }

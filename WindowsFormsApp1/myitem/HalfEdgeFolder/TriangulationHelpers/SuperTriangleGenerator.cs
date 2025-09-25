@@ -12,7 +12,7 @@ public class SuperTriangleGenerator
     {
 
 
-       float factor = 10.0f;
+       float factor = 2.0f;
 
 
 

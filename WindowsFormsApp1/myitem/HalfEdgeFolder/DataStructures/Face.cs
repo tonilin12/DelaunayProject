@@ -42,12 +42,9 @@ public class Face
         var p1 = edges[1].Origin.Position;
         var p2 = edges[2].Origin.Position;
 
-        // Compute twice the signed area of the triangle (p0, p1, p2)
-        float area2 = (p1.X - p0.X) * (p2.Y - p0.Y) -
-                      (p1.Y - p0.Y) * (p2.X - p0.X);
 
         // Check for collinearity
-        if (GeometryUtils.TriangleOrientation(edges.ToArray())==0)
+        if (GeometryUtils.TriangleOrientation(edges.ToArray()) == 0)
         {
             throw new ArgumentException("Degenerate face: the three vertices are collinear.");
         }
@@ -102,8 +99,12 @@ public class Face
 
     public IEnumerable<HalfEdge> GetEdges() => EnumerateEdges();
 
-    public IEnumerable<Vertex> GetVertices() =>
-        EnumerateEdges().Select(e => e.Origin);
+    public IEnumerable<Vertex> GetVertices()
+    {
+        foreach (var e in EnumerateEdges())
+            yield return e.Origin;
+    }
+
 
 
     /// <summary>
