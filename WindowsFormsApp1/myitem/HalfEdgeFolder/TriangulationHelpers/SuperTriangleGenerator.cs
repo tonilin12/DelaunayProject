@@ -50,7 +50,6 @@ public class SuperTriangleGenerator
         Vertex vC 
             = new Vertex(new Vector2(center.X, center.Y + 2 * a / (float)Math.Sqrt(3)));
 
-    
 
         // 10. Create supertriangle face
         superTriangle = new Face(vA, vB, vC);

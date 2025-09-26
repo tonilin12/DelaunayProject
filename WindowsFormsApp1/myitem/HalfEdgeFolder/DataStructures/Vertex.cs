@@ -1,12 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
-using System.Collections.Generic;
+using WindowsFormsApp1.myitem.GeometryFolder;
+using WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures;
 
-/// <summary>
-/// Represents a vertex in 2D space with an optional outgoing half-edge.
-/// Safe reference equality by default, with explicit approximate comparison helper.
-/// </summary>
 public class Vertex
 {
     /// <summary>
@@ -14,15 +12,30 @@ public class Vertex
     /// </summary>
     public Vector2 Position { get; set; }
 
+    private HalfEdge _outgoingHalfEdge;
     /// <summary>
     /// Optional outgoing half-edge from this vertex.
+    /// Automatically marks Voronoi cell as dirty when modified.
     /// </summary>
-    public HalfEdge OutgoingHalfEdge { get; set; }
+    public HalfEdge OutgoingHalfEdge
+    {
+        get => _outgoingHalfEdge;
+        set
+        {
+            _outgoingHalfEdge = value;
+            Voronoi.MarkDirty(); // automatically mark dirty
+        }
+    }
+
+    /// <summary>
+    /// Voronoi cell associated with this vertex.
+    /// </summary>
+    public VoronoiCell Voronoi { get; private set; }
 
     /// <summary>
     /// Default tolerance for approximate comparisons.
     /// </summary>
-    public const float Tolerance = 1e-5f;
+    private float Tolerance =GeometryUtils.GetEpsilon;
 
     /// <summary>
     /// Constructs a vertex at the given position.
@@ -30,9 +43,9 @@ public class Vertex
     public Vertex(Vector2 position)
     {
         Position = position;
-        OutgoingHalfEdge = null;
+        _outgoingHalfEdge = null;
+        Voronoi = new VoronoiCell(this);
     }
-
 
     /// <summary>
     /// Enumerates half-edges originating from this vertex in CCW order.
@@ -54,6 +67,7 @@ public class Vertex
             if (maxSteps.HasValue && steps >= maxSteps.Value)
                 yield break;
 
+            // Move to the next CCW edge around the vertex
             current = current.Twin?.Next;
         } while (current != null && current != start);
     }
@@ -78,7 +92,6 @@ public class Vertex
         float dx = Position.X - other.Position.X;
         float dy = Position.Y - other.Position.Y;
 
-        // Compare squared distance to squared epsilon
         return dx * dx + dy * dy <= epsilon * epsilon;
     }
 }

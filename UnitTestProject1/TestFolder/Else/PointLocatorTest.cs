@@ -85,7 +85,7 @@ namespace UnitTestProject1.TestFolder.Else
                 Assert.IsNotNull(destEdge, "Located edge is null.");
 
                 // Assert collinearity
-                int orientation = GeometryUtils.TriangleOrientation(destEdge.Origin, destEdge.Dest, vertex);
+                var orientation = GeometryUtils.GetSignedArea(destEdge.Origin, destEdge.Dest, vertex);
                 Assert.IsTrue(orientation == 0,
                     $"Vertex at {vertex.Position} is not collinear with edge {destEdge.Origin.Position} -> {destEdge.Dest.Position}.");
 

@@ -1,71 +1,55 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using WindowsFormsApp1.myitem.GeometryFolder;
 
 public class Face
 {
-    /// <summary>
-    /// A reference to one of the half-edges bordering this face.
-    /// </summary>
-    public HalfEdge Edge { get; set; }
+    private HalfEdge _edge;
 
-    /// <summary>
-    /// Generic utility: creates and links a cycle of half-edges for this face.
-    /// Handles both Next and Prev assignments.
-    /// </summary>
-    private IEnumerable<HalfEdge>
-    MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
+    public HalfEdge Edge
     {
-        if (items == null)
-            throw new ArgumentException("Input items cannot be null");
+        get => _edge;
+        set => _edge = value ?? throw new ArgumentNullException(nameof(value));
+    }
 
-        var edges = new List<HalfEdge>();
 
-        foreach (var item in items.Distinct())
+
+    private void ComputeCircumcircle(out Vector2 center, out float radius)
+    {
+        var v0 = Edge.Origin;
+        var v1 = Edge.Next.Origin;
+        var v2 = Edge.Next.Next.Origin;
+
+        GeometryUtils.Circumcircle(v0, v1, v2, out center, out radius);
+    }
+
+    public Vector2 Circumcenter
+    {
+        get
         {
-            var e = toHalfEdge(item);
-
-            // Assign face
-            e.Face = face;
-
-
-            edges.Add(e);
+            ComputeCircumcircle(out var center, out _);
+            return center;
         }
+    }
 
-        // Require at least 3 vertices
-        if (edges.Count != 3)
-            throw new ArgumentException("exactly 3 vertex is allowed as input");
-
-
-        var p0 = edges[0].Origin.Position;
-        var p1 = edges[1].Origin.Position;
-        var p2 = edges[2].Origin.Position;
-
-
-        // Check for collinearity
-        if (GeometryUtils.TriangleOrientation(edges.ToArray()) == 0)
+    public float Circumradius
+    {
+        get
         {
-            throw new ArgumentException("Degenerate face: the three vertices are collinear.");
+            ComputeCircumcircle(out _, out var radius);
+            return radius;
         }
-
-        // Properly link Next and Prev
-        for (int i = 0; i < edges.Count; i++)
-        {
-            var current = edges[i];
-            var next = edges[(i + 1) % edges.Count];
-
-            current.Next = next;
-        }
-
-        return edges;
     }
 
     /// <summary>
-    /// Constructor from vertices (creates new half-edges).
+    /// Constructor from vertices.
     /// </summary>
     public Face(params Vertex[] vertices)
     {
+        if (vertices == null || vertices.Length != 3)
+            throw new ArgumentException("Exactly 3 vertices are required.");
 
         var edges = MakeCycle(vertices, this, v => new HalfEdge(v)).ToList();
         Edge = edges[0];
@@ -76,25 +60,60 @@ public class Face
     /// </summary>
     public Face(params HalfEdge[] halfEdges)
     {
+        if (halfEdges == null || halfEdges.Length != 3)
+            throw new ArgumentException("Exactly 3 half-edges are required.");
 
         var edges = MakeCycle(halfEdges, this, e => e).ToList();
         Edge = edges[0];
     }
 
+    /// <summary>
+    /// Creates a linked cycle of half-edges and assigns the face.
+    /// </summary>
+    private IEnumerable<HalfEdge> MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
+    {
+        if (items == null)
+            throw new ArgumentException("Input items cannot be null");
+
+        var edges = new List<HalfEdge>();
+
+        foreach (var item in items.Distinct())
+        {
+            var e = toHalfEdge(item);
+            e.Face = face;
+            edges.Add(e);
+        }
+
+        if (edges.Count != 3)
+            throw new ArgumentException("Exactly 3 vertices/edges required for a triangular face.");
+
+        if (GeometryUtils.GetSignedArea(edges.ToArray()) == 0)
+            throw new ArgumentException("Degenerate face: the three vertices are collinear.");
+
+        // Link Next/Prev
+        for (int i = 0; i < edges.Count; i++)
+        {
+            edges[i].Next = edges[(i + 1) % edges.Count];
+            edges[(i + 1) % edges.Count].Prev = edges[i];
+        }
+
+        return edges;
+    }
+
+    /// <summary>
+    /// Enumerates all edges of the face.
+    /// </summary>
     private IEnumerable<HalfEdge> EnumerateEdges()
     {
-        if (Edge == null)
-            yield break;
+        if (Edge == null) yield break;
 
-        HalfEdge start = Edge;
-        HalfEdge current = start;
-
+        var start = Edge;
+        var current = start;
         do
         {
             yield return current;
             current = current.Next;
-        }
-        while (current != null && current != start);
+        } while (current != null && current != start);
     }
 
     public IEnumerable<HalfEdge> GetEdges() => EnumerateEdges();
@@ -105,46 +124,47 @@ public class Face
             yield return e.Origin;
     }
 
-
-
-    /// <summary>
-    /// Finds the opposite twin edge across
-    /// the edge that does not touch vertex p.
-    /// </summary>
-    /// <summary>
-    /// Finds the edge of this face that is opposite to vertex p.
-    /// </summary>
-    public HalfEdge GetOppositeEdge(Vertex p)
+    public IEnumerable<Vector2> GetNeighborCircumcenters()
     {
-        if (p == null) throw new ArgumentNullException(nameof(p));
-        if (Edge == null) return null;
+        var neighborCenters = new HashSet<Vector2>();
+
+        foreach (var edge in GetEdges())
+        {
+            var twinFace = edge.Twin?.Face;
+            if (twinFace != null)
+            {
+                neighborCenters.Add(twinFace.Circumcenter);
+            }
+        }
+
+        return neighborCenters;
+    }
+
+    /// <summary>
+    /// Finds the edge opposite to the given vertex.
+    /// </summary>
+    public HalfEdge GetOppositeEdge(Vertex v)
+    {
+        if (v == null) throw new ArgumentNullException(nameof(v));
 
         foreach (var e in GetEdges())
         {
-            if (e == null || e.Next == null) continue;
-
             var a = e.Origin;
             var b = e.Next.Origin;
-
-            // The edge opposite to p is the one whose vertices do NOT include p
-            if (!a.PositionsEqual(p) && !b.PositionsEqual(p))
-            {
+            if (!a.PositionsEqual(v) && !b.PositionsEqual(v))
                 return e;
-            }
         }
 
         return null;
     }
 
     /// <summary>
-    /// Finds the twin of the edge opposite to vertex p, if it exists.
+    /// Finds the twin of the edge opposite to the given vertex.
     /// </summary>
-    public HalfEdge GetOppositeTwinEdge(Vertex p)
+    public HalfEdge GetOppositeTwinEdge(Vertex v)
     {
-        var oppositeEdge = GetOppositeEdge(p);
-        return oppositeEdge?.Twin;
+        return GetOppositeEdge(v)?.Twin;
     }
-
 
     public override string ToString()
     {

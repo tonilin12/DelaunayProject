@@ -188,8 +188,8 @@
              var face2_vertices = face2.GetEdges().Select(e => e.Origin).ToArray();
 
 
-            var orientation1 = GeometryUtils.TriangleOrientation(face1_vertices);
-                var orientation2 = GeometryUtils.TriangleOrientation(face2_vertices);
+            var orientation1 = GeometryUtils.GetSignedArea(face1_vertices);
+                var orientation2 = GeometryUtils.GetSignedArea(face2_vertices);
 
 
                 // Additionally, they should be consistent

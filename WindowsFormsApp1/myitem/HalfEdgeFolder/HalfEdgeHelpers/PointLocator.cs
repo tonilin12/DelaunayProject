@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using WindowsFormsApp1.myitem.GeometryFolder;
 using static WindowsFormsApp1.myitem.GeometryFolder.GeometryUtils;
 
 public static class PointLocator
@@ -33,42 +34,62 @@ public static class PointLocator
     /// <summary>
     /// Computes point location relative to a face.
     /// </summary>
-    private static PointLocationResult GetPointLocation(HalfEdge startEdge, Vertex point)
+    private static PointLocationResult 
+    GetPointLocation(HalfEdge startEdge, Vertex point)
     {
-        bool allPositive = true;
         bool anyOnEdge = false;
-        HalfEdge nextHalfEdge = null;
+        bool allPositive = true;
+
         HalfEdge exactMatchEdge = null;
         HalfEdge firstOnEdge = null;
+        HalfEdge nextHalfEdge = null;
+
+        float minPositiveOrientation = float.MaxValue;
+        HalfEdge minPositiveEdge = null;
 
         foreach (var e in startEdge.Face.GetEdges())
         {
-            int orientation = TriangleOrientation(e.Origin, e.Dest, point);
-            bool onEdge = orientation == 0 && IsOnSegment(e.Origin, e.Dest, point);
+            // Compute signed area (TriangleOrientation returns float)
+            float orientation =GetSignedArea(e.Origin, e.Dest, point);
+
+            // Check if point is on this edge
+            bool onEdge = Math.Abs(orientation) < GeometryUtils.GetEpsilon && IsOnSegment(e.Origin, e.Dest, point);
 
             if (onEdge)
             {
                 anyOnEdge = true;
+
                 if (e.Origin.PositionsEqual(point))
-                    exactMatchEdge = e;  // prefer exact match
+                    exactMatchEdge = e; // prefer exact match
                 else if (firstOnEdge == null)
                     firstOnEdge = e;
             }
 
+            // Track if all orientations are positive (inside)
             if (orientation <= 0) allPositive = false;
 
+            // Track first negative orientation for walking outside
             if (orientation < 0 && nextHalfEdge == null)
-                nextHalfEdge = e.Twin;  // first negative edge
+                nextHalfEdge = e.Twin;
+
+            // Track smallest positive orientation (closest to leaving)
+            if (orientation > 0 && orientation < minPositiveOrientation)
+            {
+                minPositiveOrientation = orientation;
+                minPositiveEdge = e;
+            }
         }
 
         return new PointLocationResult
         {
             IsInside = allPositive,
             IsOnEdge = anyOnEdge,
-            DestinationEdge = exactMatchEdge ?? firstOnEdge,
+            DestinationEdge = exactMatchEdge ?? firstOnEdge ?? minPositiveEdge,
             NextHalfEdge = (!allPositive && !anyOnEdge) ? nextHalfEdge : null
         };
     }
+
+
 
     /// <summary>
     /// Internal traversal function, optional recording of edges.

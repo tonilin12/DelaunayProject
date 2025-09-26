@@ -33,7 +33,7 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
 
             // Construct faces
             faceCW = new Face(eAB, eBC, eCA);
-            faceCCW = new Face(eCB, eBA, eAC);
+            faceCCW = new Face( eAC,eCB,eBA);
         }
 
 

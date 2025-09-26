@@ -41,14 +41,14 @@ namespace UnitTestProject1.TestFolder.Else
         [TestMethod]
         public void TriangleOrientation_CCW_Returns1()
         {
-            int orientation = GeometryUtils.TriangleOrientation(vA, vB, vC);
+            var orientation = GeometryUtils.GetSignedArea(vA, vB, vC);
             Assert.AreEqual(1, orientation, "Triangle should be counterclockwise (CCW).");
         }
 
         [TestMethod]
         public void TriangleOrientation_CW_ReturnsMinus1()
         {
-            int orientation = GeometryUtils.TriangleOrientation(vA, vC, vB);
+            var orientation = GeometryUtils.GetSignedArea(vA, vC, vB);
             Assert.AreEqual(-1, orientation, "Triangle should be clockwise (CW).");
         }
 
@@ -59,7 +59,7 @@ namespace UnitTestProject1.TestFolder.Else
             Vertex v2 = new Vertex(new Vector2(1, 1));
             Vertex v3 = new Vertex(new Vector2(2, 2));
 
-            int orientation = GeometryUtils.TriangleOrientation(v1, v2, v3);
+            var orientation = GeometryUtils.GetSignedArea(v1, v2, v3);
             Assert.AreEqual(0, orientation, "Triangle is collinear, should return 0.");
         }
 
@@ -67,7 +67,7 @@ namespace UnitTestProject1.TestFolder.Else
         [ExpectedException(typeof(ArgumentException))]
         public void TriangleOrientation_InvalidCount_ThrowsException()
         {
-            GeometryUtils.TriangleOrientation(vA, vB); // only 2 vertices
+            GeometryUtils.GetSignedArea(vA, vB); // only 2 vertices
         }
 
         #endregion

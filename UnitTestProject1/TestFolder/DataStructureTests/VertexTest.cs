@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WindowsFormsApp1; // Replace with your namespace
+using WindowsFormsApp1; // Replace with your actual namespace
 
 namespace UnitTestProject1
 {
@@ -13,41 +13,31 @@ namespace UnitTestProject1
             var pos = new Vector2(5.0f, 6.0f);
             var v = new Vertex(pos);
 
-            Assert.AreEqual(pos, v.Position);
+            Assert.AreEqual(pos, v.Position, "Vertex position not set correctly.");
             Assert.IsNull(v.OutgoingHalfEdge, "OutgoingHalfEdge should be null by default.");
         }
-
 
         [TestMethod]
         public void Vertex_ToString_RoundTrip()
         {
-            // Step 1: Create a vertex
             var v = new Vertex(new Vector2(1.234567f, 2.345678f));
+            string str = v.ToString(); // e.g., "Vertex(1.234567, 2.345678)"
 
-            // Step 2: Convert vertex to string
-            string str = v.ToString(); // Expected format: "Vertex(x, y)"
-
-            // Step 3: Extract numbers from string
             var parts = str.Replace("Vertex(", "").Replace(")", "").Split(',');
+            float x = float.Parse(parts[0].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+            float y = float.Parse(parts[1].Trim(), System.Globalization.CultureInfo.InvariantCulture);
 
-            float x = float.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture);
-            float y = float.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture);
-
-            // Step 4: Reconstruct vertex from parsed values
             var parsedVertex = new Vertex(new Vector2(x, y));
 
-            // Step 5: Assert that the positions are approximately equal
-            Assert.IsTrue(v.PositionsEqual(parsedVertex), "Vertex round-trip via ToString failed.");
+            Assert.IsTrue(v.PositionsEqual(parsedVertex, 1e-6f), "Vertex round-trip via ToString failed.");
         }
-
-
-
 
         [TestMethod]
         public void PositionsEqual_WithinTolerance_ReturnsTrue()
         {
             var v1 = new Vertex(new Vector2(1.0f, 2.0f));
-            var v2 = new Vertex(new Vector2(1.000001f, 2.000001f)); // smaller than tolerance 1e-5
+            var v2 = new Vertex(new Vector2(1.0000005f, 2.0000005f)); // within default 1e-6 tolerance
+
             Assert.IsTrue(v1.PositionsEqual(v2), "Vertices within tolerance should be considered equal.");
         }
 
@@ -55,9 +45,9 @@ namespace UnitTestProject1
         public void PositionsEqual_OutsideTolerance_ReturnsFalse()
         {
             var v1 = new Vertex(new Vector2(1.0f, 2.0f));
-            var v2 = new Vertex(new Vector2(1.0001f, 2.0001f)); // larger than tolerance
+            var v2 = new Vertex(new Vector2(1.0001f, 2.0001f)); // clearly outside 1e-6 tolerance
+
             Assert.IsFalse(v1.PositionsEqual(v2), "Vertices outside tolerance should be considered different.");
         }
     }
-
 }

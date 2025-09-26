@@ -2,25 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WindowsFormsApp1.myitem.GeometryFolder
 {
-     public static class  GeometryUtils
-     {
+    public static class GeometryUtils
+    {
+        // Single precision constant for floating-point tolerance
+        private const float EPSILON = 1e-6f;
+        public static float GetEpsilon => EPSILON;
 
-        private const double EPSILON = 1e-12;
 
-
-
-        public static int TriangleOrientation(params object[] inputs)
+        /// <summary>
+        /// Computes signed area (determinant) of a triangle.
+        /// Positive = CCW, Negative = CW, Zero = Collinear
+        /// </summary>
+        public static float GetSignedArea(params object[] inputs)
         {
-
             if (inputs == null || inputs.Length != 3)
                 throw new ArgumentException("Triangle must have exactly 3 vertices.", nameof(inputs));
-
-
 
             Vector2[] positions = inputs.Select(v =>
             {
@@ -31,24 +30,23 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
                     "Each element must be Vector2, Vertex, or HalfEdge.", nameof(inputs));
             }).ToArray();
 
-
             Vector2 p0 = positions[0];
             Vector2 p1 = positions[1];
             Vector2 p2 = positions[2];
 
-            // Compute signed area determinant
-            double det = (p1.X - p0.X) * (p2.Y - p0.Y) -
-                      (p1.Y - p0.Y) * (p2.X - p0.X);
+            float det = (p1.X - p0.X) * (p2.Y - p0.Y) - (p1.Y - p0.Y) * (p2.X - p0.X);
 
-            if (det > EPSILON) return 1;    // CCW
-            if (det < -EPSILON) return -1;  // CW
-            return 0;                        // Collinear
+            // Treat extremely small numbers as zero
+            if (Math.Abs(det) < EPSILON)
+                det = 0f;
+
+            return det;
         }
 
-
-
-
-        public static bool IsInsideOrOnCircumcircle(Face triangle, Vertex p, float epsilon = 1e-6f)
+        /// <summary>
+        /// Determines if a point is inside or on the circumcircle of a triangle.
+        /// </summary>
+        public static bool IsInsideOrOnCircumcircle(Face triangle, Vertex p)
         {
             if (triangle == null) throw new ArgumentNullException(nameof(triangle));
             if (p == null) throw new ArgumentNullException(nameof(p));
@@ -76,18 +74,21 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
                       - u.Y * (v.X * wz - vz * w.X)
                       + uz * (v.X * w.Y - v.Y * w.X);
 
-            // Use fixed epsilon
-            return det >= -epsilon;
+            return det >= -EPSILON;
         }
+
+        /// <summary>
+        /// Checks if a point is inside a triangle.
+        /// </summary>
         public static bool IsPointInsideTriangle(Face face, Vector2 p)
         {
             var v = face.GetVertices().ToArray();
             if (v.Length != 3)
                 return false;
 
-            float d1 = TriangleOrientation(p, v[0], v[1]);
-            float d2 = TriangleOrientation(p, v[1], v[2]);
-            float d3 = TriangleOrientation(p, v[2], v[0]);
+            float d1 = GetSignedArea(p, v[0], v[1]);
+            float d2 = GetSignedArea(p, v[1], v[2]);
+            float d3 = GetSignedArea(p, v[2], v[0]);
 
             bool hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
             bool hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
@@ -95,6 +96,9 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
             return !(hasNeg && hasPos);
         }
 
+        /// <summary>
+        /// Computes the circumcircle of a triangle.
+        /// </summary>
         public static void Circumcircle(Vertex a, Vertex b, Vertex c, out Vector2 center, out float radius)
         {
             float d = 2 * (a.Position.X * (b.Position.Y - c.Position.Y) +
@@ -112,9 +116,5 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
             center = new Vector2(ux, uy);
             radius = Vector2.Distance(center, a.Position);
         }
-
     }
-
-
-
 }

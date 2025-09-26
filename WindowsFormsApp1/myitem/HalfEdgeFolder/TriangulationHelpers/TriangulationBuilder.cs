@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using WindowsFormsApp1.myitem.GeometryFolder;
 
 public class TriangulationBuilder
@@ -75,23 +76,46 @@ public class TriangulationBuilder
             tri.GetVertices().Any(v => v.PositionsEqual(vertex)));
     }
 
+
     /// <summary>
     /// Inserts a vertex into the mesh and returns the stack of new triangles for legalization.
     /// </summary>
     private Stack<Face> InsertVertexIncrementally(Vertex vertex)
     {
         var findPointData = PointLocator.LocatePointInMesh(_meshTriangles.First(), vertex);
-        var isOnEdge = findPointData.isOnEdge;
         var edge = findPointData.destinationEdge;
 
+        // Separate flags
+        bool isExactlyOnEdge = findPointData.isOnEdge;
+        bool isNearEdgeOrSkinny = false;
+
+        // Compute signed area if vertex is not exactly on edge
+        if (!isExactlyOnEdge)
+        {
+            // Triangle formed by: edge.Origin, edge.Dest, vertex
+            float signedArea = GeometryUtils.GetSignedArea(edge.Origin, edge.Dest, vertex);
+
+            // Scale epsilon relative to edge length
+            float edgeLength = Vector2.Distance(edge.Origin.Position, edge.Dest.Position);
+            float scaledEpsilon = GeometryUtils.GetEpsilon * edgeLength * 10f; // factor 10 can be tuned
+
+            // Treat as near-edge if triangle would be very skinny
+            if (Math.Abs(signedArea) < scaledEpsilon)
+            {
+                isNearEdgeOrSkinny = true;
+            }
+        }
+
         // Vertex coincides with an existing edge vertex → skip insertion
-        if (isOnEdge && (edge.Origin.PositionsEqual(vertex) || edge.Dest.PositionsEqual(vertex)))
+        if (edge.Origin.PositionsEqual(vertex))
+        {
             return new Stack<Face>();
+        }
 
         var containingFace = edge.Face;
         List<Face> newTriangles;
 
-        if (isOnEdge)
+        if (isExactlyOnEdge || isNearEdgeOrSkinny)
         {
             // Split two adjacent triangles along the edge
             newTriangles = TriangulationOperation.SplitTriangle_VertexOnEdge(edge, vertex);
@@ -110,6 +134,7 @@ public class TriangulationBuilder
 
         return new Stack<Face>(newTriangles);
     }
+
 
     /// <summary>
     /// Legalizes triangle edges using a stack-based incremental approach.
