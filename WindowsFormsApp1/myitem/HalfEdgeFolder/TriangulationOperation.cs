@@ -33,13 +33,13 @@ public static class TriangulationOperation
     /// Prepares vertices and edge constraints for triangulation, including adding supertriangle and sorting.
     /// </summary>
     public static void getSuperTriangle(
-        ref List<Vertex> vertices,
+        ref Vertex[] vertices,
         out Face superTriangle
     )
     {
         // Call the PrepareData function from TriangulationPreprocessor
         _supertriangleGenerator
-            .getSuperTriangle(ref vertices, out superTriangle);
+            .GetSuperTriangle(vertices, out superTriangle);
     }
 
 

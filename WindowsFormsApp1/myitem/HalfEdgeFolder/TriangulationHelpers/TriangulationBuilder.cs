@@ -38,8 +38,6 @@ public class TriangulationBuilder
 
         Vertex vertex = _vertexQueue.Dequeue();
 
-        // Skip insertion if vertex already exists in mesh
-        if (VertexExists(vertex)) return;
 
         Stack<Face> legalizationStack = InsertVertexIncrementally(vertex);
         LegalizeEdges(legalizationStack, vertex);
@@ -65,16 +63,7 @@ public class TriangulationBuilder
             .ToHashSet();
     }
 
-    // ---------------- Private helpers ----------------
 
-    /// <summary>
-    /// Checks if a vertex already exists in the current mesh.
-    /// </summary>
-    private bool VertexExists(Vertex vertex)
-    {
-        return _meshTriangles.Any(tri =>
-            tri.GetVertices().Any(v => v.PositionsEqual(vertex)));
-    }
 
 
     /// <summary>
@@ -87,24 +76,7 @@ public class TriangulationBuilder
 
         // Separate flags
         bool isExactlyOnEdge = findPointData.isOnEdge;
-        bool isNearEdgeOrSkinny = false;
 
-        // Compute signed area if vertex is not exactly on edge
-        if (!isExactlyOnEdge)
-        {
-            // Triangle formed by: edge.Origin, edge.Dest, vertex
-            float signedArea = GeometryUtils.GetSignedArea(edge.Origin, edge.Dest, vertex);
-
-            // Scale epsilon relative to edge length
-            float edgeLength = Vector2.Distance(edge.Origin.Position, edge.Dest.Position);
-            float scaledEpsilon = GeometryUtils.GetEpsilon * edgeLength * 10f; // factor 10 can be tuned
-
-            // Treat as near-edge if triangle would be very skinny
-            if (Math.Abs(signedArea) < scaledEpsilon)
-            {
-                isNearEdgeOrSkinny = true;
-            }
-        }
 
         // Vertex coincides with an existing edge vertex → skip insertion
         if (edge.Origin.PositionsEqual(vertex))
@@ -115,7 +87,9 @@ public class TriangulationBuilder
         var containingFace = edge.Face;
         List<Face> newTriangles;
 
-        if (isExactlyOnEdge || isNearEdgeOrSkinny)
+
+
+        if (isExactlyOnEdge)
         {
             // Split two adjacent triangles along the edge
             newTriangles = TriangulationOperation.SplitTriangle_VertexOnEdge(edge, vertex);
@@ -129,8 +103,10 @@ public class TriangulationBuilder
             _meshTriangles.Remove(containingFace);
         }
 
+
         foreach (var tri in newTriangles)
             _meshTriangles.Add(tri);
+
 
         return new Stack<Face>(newTriangles);
     }

@@ -15,8 +15,8 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
         [TestMethod]
         public void TestSuperTriangleGeneration()
         {
-            // Arrange: create some sample vertices
-            List<Vertex> vertices = new List<Vertex>
+            // Arrange: create some sample vertices as an array
+            Vertex[] vertices = new Vertex[]
             {
                 new Vertex(new Vector2(100, 100)),
                 new Vertex(new Vector2(200, 300)),
@@ -24,10 +24,11 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
                 new Vertex(new Vector2(50, 250))
             };
 
+            // Create the supertriangle generator
             SuperTriangleGenerator generator = new SuperTriangleGenerator();
 
             // Act: generate supertriangle
-            generator.getSuperTriangle(ref vertices, out Face superTriangle);
+            generator.GetSuperTriangle(vertices, out Face superTriangle);
 
             // Assert: superTriangle is not null
             Assert.IsNotNull(superTriangle, "SuperTriangle should not be null.");

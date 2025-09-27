@@ -10,7 +10,7 @@ namespace WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures
     {
         private readonly Vertex _vertex;
         private List<Vector2> _cachedPolygon;
-        private bool _isDirty = true;
+        public bool IsDirty { get; private set; } = true;
 
         public VoronoiCell(Vertex v)
         {
@@ -21,9 +21,11 @@ namespace WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures
         /// <summary>
         /// Marks the polygon as dirty to force recomputation.
         /// </summary>
+        /// Marks the polygon as dirty to force recomputation.
+        /// </summary>
         public void MarkDirty()
         {
-            _isDirty = true;
+            IsDirty = true;
         }
 
         /// <summary>
@@ -32,7 +34,7 @@ namespace WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures
         /// </summary>
         public List<Vector2> GetPolygon()
         {
-            if (!_isDirty)
+            if (!IsDirty)
                 return _cachedPolygon;
 
             var polygon = new List<Vector2>();
@@ -40,7 +42,7 @@ namespace WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures
             if (_vertex.OutgoingHalfEdge == null)
             {
                 _cachedPolygon = polygon;
-                _isDirty = false;
+                IsDirty = false;
                 return polygon;
             }
 
@@ -55,13 +57,11 @@ namespace WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures
             }
 
             // Ensure polygon is closed
-            if (polygon.Count > 2 && Vector2.DistanceSquared(polygon[0], polygon[^1]) > GeometryUtils.GetEpsilon)
-            {
+            if (polygon.Count > 2 && Vector2.DistanceSquared(polygon[0], polygon.Last()) > GeometryUtils.GetEpsilon)
                 polygon.Add(polygon[0]);
-            }
 
             _cachedPolygon = polygon;
-            _isDirty = false;
+            IsDirty = false;
             return polygon;
         }
     }

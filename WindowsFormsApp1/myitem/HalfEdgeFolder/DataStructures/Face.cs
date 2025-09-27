@@ -93,8 +93,15 @@ public class Face
         // Link Next/Prev
         for (int i = 0; i < edges.Count; i++)
         {
-            edges[i].Next = edges[(i + 1) % edges.Count];
-            edges[(i + 1) % edges.Count].Prev = edges[i];
+
+            var curr = edges[i];
+            var next = edges[(i + 1) % 3];
+
+            curr.Next = next;
+
+            // 🔥 mark the origin vertex as dirty
+            curr.Origin?.Voronoi?.MarkDirty();
+
         }
 
         return edges;
@@ -124,21 +131,7 @@ public class Face
             yield return e.Origin;
     }
 
-    public IEnumerable<Vector2> GetNeighborCircumcenters()
-    {
-        var neighborCenters = new HashSet<Vector2>();
-
-        foreach (var edge in GetEdges())
-        {
-            var twinFace = edge.Twin?.Face;
-            if (twinFace != null)
-            {
-                neighborCenters.Add(twinFace.Circumcenter);
-            }
-        }
-
-        return neighborCenters;
-    }
+ 
 
     /// <summary>
     /// Finds the edge opposite to the given vertex.

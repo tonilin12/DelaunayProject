@@ -44,8 +44,6 @@ public static class PointLocator
         HalfEdge firstOnEdge = null;
         HalfEdge nextHalfEdge = null;
 
-        float minPositiveOrientation = float.MaxValue;
-        HalfEdge minPositiveEdge = null;
 
         foreach (var e in startEdge.Face.GetEdges())
         {
@@ -72,19 +70,14 @@ public static class PointLocator
             if (orientation < 0 && nextHalfEdge == null)
                 nextHalfEdge = e.Twin;
 
-            // Track smallest positive orientation (closest to leaving)
-            if (orientation > 0 && orientation < minPositiveOrientation)
-            {
-                minPositiveOrientation = orientation;
-                minPositiveEdge = e;
-            }
+   
         }
 
         return new PointLocationResult
         {
             IsInside = allPositive,
             IsOnEdge = anyOnEdge,
-            DestinationEdge = exactMatchEdge ?? firstOnEdge ?? minPositiveEdge,
+            DestinationEdge = exactMatchEdge ?? firstOnEdge,
             NextHalfEdge = (!allPositive && !anyOnEdge) ? nextHalfEdge : null
         };
     }

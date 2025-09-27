@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.myitem.GeometryFolder;
 
@@ -14,6 +15,7 @@ namespace WindowsFormsApp1
         private HashSet<Face> triangulation;
         private Face superTriangle;
         private TriangulationBuilder triangulator;
+
         private MenuStrip menuStrip;
         private ToolStripMenuItem fileMenu;
         private ToolStripMenuItem resetMenu;
@@ -24,9 +26,11 @@ namespace WindowsFormsApp1
         private Face hoveredFace = null;
         private bool hasError = false;
 
-        // Visibility flags
         private bool showTriangles = true;
         private bool showVoronoi = true;
+
+        // Timeout for triangulation processing to avoid freeze / out-of-memory
+        private const int VertexProcessTimeoutMs = 500;
 
         public Form1()
         {
@@ -51,11 +55,7 @@ namespace WindowsFormsApp1
 
         private void InitializeMenu()
         {
-            menuStrip = new MenuStrip
-            {
-                Font = new Font("Segoe UI", 14, FontStyle.Regular)
-            };
-
+            menuStrip = new MenuStrip { Font = new Font("Segoe UI", 14, FontStyle.Regular) };
             fileMenu = new ToolStripMenuItem("Menu");
             resetMenu = new ToolStripMenuItem("Reset Everything");
             resetMenu.Click += ResetMenu_Click;
@@ -63,22 +63,14 @@ namespace WindowsFormsApp1
 
             viewMenu = new ToolStripMenuItem("View");
 
-            showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles")
-            {
-                Checked = true,
-                CheckOnClick = true
-            };
+            showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles") { Checked = true, CheckOnClick = true };
             showTrianglesMenuItem.CheckedChanged += (s, e) =>
             {
                 showTriangles = showTrianglesMenuItem.Checked;
                 Invalidate();
             };
 
-            showVoronoiMenuItem = new ToolStripMenuItem("Show Voronoi")
-            {
-                Checked = true,
-                CheckOnClick = true
-            };
+            showVoronoiMenuItem = new ToolStripMenuItem("Show Voronoi") { Checked = true, CheckOnClick = true };
             showVoronoiMenuItem.CheckedChanged += (s, e) =>
             {
                 showVoronoi = showVoronoiMenuItem.Checked;
@@ -103,7 +95,7 @@ namespace WindowsFormsApp1
             int screenWidth = Screen.PrimaryScreen.Bounds.Width;
             int screenHeight = Screen.PrimaryScreen.Bounds.Height;
 
-            var borderPoints = new List<Vertex>
+            var borderPoints = new Vertex[]
             {
                 new Vertex(new Vector2(0, 0)),
                 new Vertex(new Vector2(screenWidth, 0)),
@@ -139,26 +131,59 @@ namespace WindowsFormsApp1
             }
         }
 
+        /// <summary>
+        /// Processes a single vertex with a timeout to prevent runaway triangulation
+        /// </summary>
+        private void ProcessVertexWithTimeout(Vertex vertex, int timeoutMs = VertexProcessTimeoutMs)
+        {
+            Exception caughtException = null;
+
+            var task = Task.Run(() =>
+            {
+                try
+                {
+                    triangulator?.AddVertices(vertex);
+                    triangulator?.ProcessSingleVertex();
+                }
+                catch (Exception ex)
+                {
+                    caughtException = ex;
+                }
+            });
+
+            bool completed = task.Wait(timeoutMs);
+
+            if (!completed)
+                throw new TimeoutException($"Triangulation processing exceeded {timeoutMs} ms. Possible infinite loop or degenerate state.");
+
+            if (caughtException != null)
+                throw new InvalidOperationException("Error during triangulation: " + caughtException.Message, caughtException);
+        }
+
         private void Form1_MouseClick(object sender, MouseEventArgs e)
         {
             if (hasError) return;
             if (menuStrip.Bounds.Contains(e.Location)) return;
 
+            var vertex = new Vertex(new Vector2(e.X, e.Y));
+            revealedPoints.Add(vertex);
+            Invalidate(); // show immediately
+
             try
             {
-                var vertex = new Vertex(new Vector2(e.X, e.Y));
-                revealedPoints.Add(vertex);
-
-                triangulator?.AddVertices(vertex);
-                triangulator?.ProcessSingleVertex();
+                ProcessVertexWithTimeout(vertex);
                 triangulation = triangulator?.GetInternalTriangles();
-
-                this.Invalidate();
+                Invalidate();
+            }
+            catch (TimeoutException ex)
+            {
+                hasError = true;
+                MessageBox.Show(ex.Message, "Triangulation Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
                 hasError = true;
-                MessageBox.Show($"Critical error adding vertex: {ex.Message}", "Triangulation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Critical triangulation error: {ex.Message}", "Triangulation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -193,30 +218,25 @@ namespace WindowsFormsApp1
                 using (Pen circlePen = new Pen(Color.Green, 1))
                 using (Pen voronoiPen = new Pen(Color.DarkOrange, 2))
                 {
-                    // Draw Delaunay triangles
+                    // Draw triangles
                     if (showTriangles && triangulation != null)
                     {
                         foreach (var face in triangulation)
                         {
                             var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
                             if (verts.Length >= 3)
-                            {
                                 for (int i = 0; i < verts.Length; i++)
-                                {
                                     g.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
-                                }
-                            }
                         }
                     }
 
-                    // Draw Voronoi polygons using each vertex's Voronoi cell
+                    // Draw Voronoi polygons
                     if (showVoronoi && revealedPoints != null)
                     {
                         foreach (var v in revealedPoints)
                         {
                             var polygon = v.Voronoi?.GetPolygon();
                             if (polygon == null || polygon.Count < 2) continue;
-
                             for (int i = 0; i < polygon.Count; i++)
                             {
                                 var p1 = polygon[i];
@@ -229,19 +249,15 @@ namespace WindowsFormsApp1
                     // Draw vertices
                     float vertexRadius = 4;
                     foreach (var v in revealedPoints)
-                    {
                         g.FillEllipse(pointBrush, v.Position.X - vertexRadius, v.Position.Y - vertexRadius, vertexRadius * 2, vertexRadius * 2);
-                    }
 
-                    // Draw circumcircle for hovered face
+                    // Draw circumcircle
                     if (showTriangles && hoveredFace != null)
                     {
                         Vector2 center = hoveredFace.Circumcenter;
                         float radius = hoveredFace.Circumradius;
                         if (radius > 0f)
-                        {
                             g.DrawEllipse(circlePen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
-                        }
                     }
                 }
             }
@@ -252,9 +268,6 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            // Optional initialization code
-        }
+        private void Form1_Load(object sender, EventArgs e) { }
     }
 }

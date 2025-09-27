@@ -124,6 +124,12 @@ namespace UnitTestProject1.TestFolder
             {
                 Assert.AreSame(expectedVertices[i], actualVertices[i], $"Vertex at index {i} is not the exact instance expected.");
             }
+
+            // --- NEW PART: mark Voronoi cells dirty ---
+            foreach (var vertex in actualVertices)
+            {
+                Assert.IsTrue(vertex.Voronoi.IsDirty, $"Voronoi cell for vertex {vertex.Position} should be dirty after Delaunay update.");
+            }
         }
 
 
