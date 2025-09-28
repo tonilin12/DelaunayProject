@@ -3,68 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\halfedgehelpers\\pointlocator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\halfedgehelpers\\pointlocator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\unittestproject1\\testfolder\\else\\pointlocatortest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\else\\pointlocatortest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\vertex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\vertex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\voronoicell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\voronoicell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\datastructuretests\\voronoitest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\datastructuretests\\voronoitest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\triangulationoperations\\vertexenumeratetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\triangulationoperations\\vertexenumeratetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\face.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\face.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\face.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\triangulationoperations\\supertrianglegeneratortests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\triangulationoperations\\supertrianglegeneratortests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\else\\geometryutilstest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\else\\geometryutilstest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\triangulationoperations\\fliptest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\triangulationoperations\\fliptest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\datastructuretests\\facetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\datastructuretests\\facetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\datastructuretests\\vertextest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\datastructuretests\\vertextest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\geometryfolder\\geometryutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\geometryfolder\\geometryutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\halfedge.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -73,6 +33,81 @@
     {
       "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\flipfunctions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\flipfunctions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\vertex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\datastructures\\vertex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\datastructuretests\\voronoitest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\datastructuretests\\voronoitest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Toni Lin\\AppData\\Local\\Temp\\.vsdbgsrc\\8caa55885db827e4d60f3d5c73afc8fffa843cc71a5a1ef73ed88dc8694fb812\\ThrowHelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\datastructuretests\\vertextest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\datastructuretests\\vertextest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\unittestproject1\\testfolder\\datastructuretests\\facetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF0EAAA-FED3-47EB-AD74-5E944FFD8F07}|UnitTestProject1\\UnitTestProject1.csproj|solutionrelative:unittestproject1\\testfolder\\datastructuretests\\facetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\homeform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\homeform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\homeform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\homeform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\formfolder\\form1.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\formfolder\\form1.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A095F7-2E4A-4A4B-866A-2D04664B588B}|WindowsFormsApp1\\WindowsFormsApp1.csproj|solutionrelative:windowsformsapp1\\myitem\\halfedgefolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\PointSampleFolder\\script0.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:PointSampleFolder\\script0.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -82,61 +117,286 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 24,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TriangulationBuilder.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "ViewState": "AgIAADoAAAAAAAAAAAAkwEEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T21:20:49.162Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "VertexEnumerateTest.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\TriangulationOperations\\VertexEnumerateTest.cs",
-              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\TriangulationOperations\\VertexEnumerateTest.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\TriangulationOperations\\VertexEnumerateTest.cs",
-              "RelativeToolTip": "UnitTestProject1\\TestFolder\\TriangulationOperations\\VertexEnumerateTest.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T12:09:37.973Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\Form1.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\Form1.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\Form1.cs [Design]",
-              "RelativeToolTip": "WindowsFormsApp1\\Form1.cs [Design]",
+              "Title": "PointLocatorTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\Else\\PointLocatorTest.cs",
+              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\Else\\PointLocatorTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\Else\\PointLocatorTest.cs",
+              "RelativeToolTip": "UnitTestProject1\\TestFolder\\Else\\PointLocatorTest.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T20:40:07.275Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Form1.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\Form1.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\Form1.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\Form1.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\Form1.cs",
-              "ViewState": "AgIAANYAAAAAAAAAAAAwwAgBAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T20:40:08.907Z",
+              "WhenOpened": "2025-09-28T21:08:15.52Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "GeometryUtilsTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "RelativeToolTip": "UnitTestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "ViewState": "AgIAAKAAAAAAAAAAAAAcwLgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T18:25:13.555Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "FaceTests.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
+              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
+              "RelativeToolTip": "UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
+              "ViewState": "AgIAAHYAAAAAAAAAAIAwwH8AAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T17:53:29.436Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\Program.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\Program.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\Program.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\Program.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAkwBUAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T09:23:07.755Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "HomeForm.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAA3wBwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T09:26:37.861Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Face.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAEwB8AAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T21:26:36.693Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Vertex.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAEwCgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T21:03:28.965Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "VoronoiTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
+              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
+              "RelativeToolTip": "UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAuwB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T17:53:56.925Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ThrowHelper.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\AppData\\Local\\Temp\\.vsdbgsrc\\8caa55885db827e4d60f3d5c73afc8fffa843cc71a5a1ef73ed88dc8694fb812\\ThrowHelper.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\AppData\\Local\\Temp\\.vsdbgsrc\\8caa55885db827e4d60f3d5c73afc8fffa843cc71a5a1ef73ed88dc8694fb812\\ThrowHelper.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\AppData\\Local\\Temp\\.vsdbgsrc\\8caa55885db827e4d60f3d5c73afc8fffa843cc71a5a1ef73ed88dc8694fb812\\ThrowHelper.cs [Read Only]",
+              "RelativeToolTip": "..\\..\\..\\AppData\\Local\\Temp\\.vsdbgsrc\\8caa55885db827e4d60f3d5c73afc8fffa843cc71a5a1ef73ed88dc8694fb812\\ThrowHelper.cs [Read Only]",
+              "ViewState": "AgIAACsAAAAAAAAAAAApwDYAAAACAAAAAQAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T18:01:47.539Z",
+              "EditorCaption": " [Read Only]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "VertexTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
+              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
+              "RelativeToolTip": "UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T17:56:22.346Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs",
+              "ViewState": "AgIAAPoAAAAAAAAAAAASwAEBAABhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T20:40:08.907Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Form2.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs [Design]",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T14:46:18.152Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "Form2.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\Form2.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAtwBYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T14:46:58.974Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "HomeForm.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs [Design]",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\HomeForm.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T09:26:29.063Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "script0.cpp",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\PointSampleFolder\\script0.cpp",
+              "RelativeDocumentMoniker": "PointSampleFolder\\script0.cpp",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\PointSampleFolder\\script0.cpp",
+              "RelativeToolTip": "PointSampleFolder\\script0.cpp",
+              "ViewState": "AgIAAFcAAAAAAAAAAAAAAAkAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-09-28T15:11:05.566Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FlipFunctions.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
+              "ViewState": "AgIAAEwAAAAAAAAAAAAQwE8AAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T21:08:09.991Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs [Design]",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T20:40:07.275Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GeometryUtils.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\GeometryFolder\\GeometryUtils.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\GeometryFolder\\GeometryUtils.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\GeometryFolder\\GeometryUtils.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\GeometryFolder\\GeometryUtils.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAcwGEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T11:14:17.396Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "App.config",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\App.config",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\App.config",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\App.config",
+              "RelativeToolTip": "WindowsFormsApp1\\App.config",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2025-09-28T11:13:59.522Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "TriangulationBuilder.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAwwIoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T21:20:49.162Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.Designer.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.Designer.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-28T11:05:41.414Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "TriangulationOperation.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAswDkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T11:16:18.01Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Form1.resx",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.resx",
+              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.resx",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\FormFolder\\Form1.resx",
+              "RelativeToolTip": "WindowsFormsApp1\\myitem\\FormFolder\\Form1.resx",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2025-09-28T11:05:42.326Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
               "Title": "TriangleSplitter.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangleSplitter.cs",
               "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangleSplitter.cs",
@@ -144,98 +404,24 @@
               "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\TriangleSplitter.cs",
               "ViewState": "AgIAACgAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T21:10:04.087Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-26T21:10:04.087Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "PointLocator.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\HalfEdgeHelpers\\PointLocator.cs",
               "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\HalfEdgeHelpers\\PointLocator.cs",
               "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\HalfEdgeHelpers\\PointLocator.cs",
               "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\HalfEdgeHelpers\\PointLocator.cs",
-              "ViewState": "AgIAADYAAAAAAAAAAAAowC4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAIEAAAAAAAAAAAAkwIwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-26T21:09:38.021Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Vertex.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Vertex.cs",
-              "ViewState": "AgIAAEcAAAAAAAAAAAAqwFoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T21:03:28.965Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "VoronoiCell.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\VoronoiCell.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\VoronoiCell.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\VoronoiCell.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\VoronoiCell.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAAwwEQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T20:42:26.257Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "VoronoiTest.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
-              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
-              "RelativeToolTip": "UnitTestProject1\\TestFolder\\DataStructureTests\\VoronoiTest.cs",
-              "ViewState": "AgIAAEwAAAAAAAAAAAAwwF0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T10:48:01.124Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "TriangulationOperation.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationOperation.cs",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAYwCkAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T11:16:18.01Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Face.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\Face.cs",
-              "ViewState": "AgIAAIYAAAAAAAAAAAAUwIUAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T21:26:36.693Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "SuperTriangleGeneratorTests.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\TriangulationOperations\\SuperTriangleGeneratorTests.cs",
-              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\TriangulationOperations\\SuperTriangleGeneratorTests.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\TriangulationOperations\\SuperTriangleGeneratorTests.cs",
-              "RelativeToolTip": "UnitTestProject1\\TestFolder\\TriangulationOperations\\SuperTriangleGeneratorTests.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAQwBEAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T11:12:12.617Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 25,
               "Title": "SuperTriangleGenerator.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
               "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
@@ -247,7 +433,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 6,
               "Title": "HalfEdge.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\HalfEdge.cs",
               "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\DataStructures\\HalfEdge.cs",
@@ -256,54 +442,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-26T21:31:14.875Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "VertexTest.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
-              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
-              "RelativeToolTip": "UnitTestProject1\\TestFolder\\DataStructureTests\\VertexTest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T10:48:18.286Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "FlipTest.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\TriangulationOperations\\FlipTest.cs",
-              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\TriangulationOperations\\FlipTest.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\TriangulationOperations\\FlipTest.cs",
-              "RelativeToolTip": "UnitTestProject1\\TestFolder\\TriangulationOperations\\FlipTest.cs",
-              "ViewState": "AgIAACgAAAAAAAAAAAAQwC0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T10:55:52.268Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "FaceTests.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
-              "RelativeDocumentMoniker": "UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
-              "RelativeToolTip": "UnitTestProject1\\TestFolder\\DataStructureTests\\FaceTests.cs",
-              "ViewState": "AgIAAHMAAAAAAAAAAAAwwIIAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-27T10:59:37.016Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "FlipFunctions.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
-              "RelativeDocumentMoniker": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
-              "RelativeToolTip": "WindowsFormsApp1\\myitem\\HalfEdgeFolder\\TriangulationHelpers\\FlipFunctions.cs",
-              "ViewState": "AgIAAE8AAAAAAAAAAAAAAE8AAAArAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T21:08:09.991Z"
             }
           ]
         }

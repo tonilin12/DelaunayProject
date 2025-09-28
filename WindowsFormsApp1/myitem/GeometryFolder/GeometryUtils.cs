@@ -99,7 +99,7 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
         /// <summary>
         /// Computes the circumcircle of a triangle.
         /// </summary>
-        public static void Circumcircle(Vertex a, Vertex b, Vertex c, out Vector2 center, out float radius)
+        public static Vector2 Circumcenter(Vertex a, Vertex b, Vertex c)
         {
             float d = 2 * (a.Position.X * (b.Position.Y - c.Position.Y) +
                            b.Position.X * (c.Position.Y - a.Position.Y) +
@@ -113,8 +113,8 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
                         (b.Position.LengthSquared() * (a.Position.X - c.Position.X)) +
                         (c.Position.LengthSquared() * (b.Position.X - a.Position.X))) / d;
 
-            center = new Vector2(ux, uy);
-            radius = Vector2.Distance(center, a.Position);
+            return new Vector2(ux, uy);
         }
+
     }
 }

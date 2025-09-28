@@ -151,40 +151,37 @@ namespace UnitTestProject1.TestFolder.Else
         }
 
         [TestMethod]
-        public void Test_Circumcircle_ComputesCorrectCenterAndRadius()
+        public void Test_Circumcenter_ComputesCorrectCenter()
         {
             var a = new Vertex(new Vector2(0, 0));
             var b = new Vertex(new Vector2(4, 0));
             var c = new Vertex(new Vector2(0, 3));
 
-            GeometryUtils.Circumcircle(a, b, c, out Vector2 center, out float radius);
+            Vector2 center = GeometryUtils.Circumcenter(a, b, c);
 
-            // The circumcenter of this right triangle is at (2,1.5) and radius = sqrt(2^2 + 1.5^2) = 2.5
+            // The circumcenter of this right triangle is at (2,1.5)
             var expectedCenter = new Vector2(2, 1.5f);
-            var expectedRadius = 2.5f;
 
-            Assert.AreEqual(expectedCenter.X, center.X, 0.0001f, "Circumcircle center X mismatch.");
-            Assert.AreEqual(expectedCenter.Y, center.Y, 0.0001f, "Circumcircle center Y mismatch.");
-            Assert.AreEqual(expectedRadius, radius, 0.0001f, "Circumcircle radius mismatch.");
+            Assert.AreEqual(expectedCenter.X, center.X, 0.0001f, "Circumcenter X mismatch.");
+            Assert.AreEqual(expectedCenter.Y, center.Y, 0.0001f, "Circumcenter Y mismatch.");
         }
 
         [TestMethod]
-        public void Test_Circumcircle_RadiusMatchesDistanceToAllVertices()
+        public void Test_Circumcenter_PositionEquidistantFromVertices()
         {
             var a = new Vertex(new Vector2(1, 1));
             var b = new Vertex(new Vector2(4, 5));
             var c = new Vertex(new Vector2(6, 2));
 
-            GeometryUtils.Circumcircle(a, b, c, out Vector2 center, out float radius);
+            Vector2 center = GeometryUtils.Circumcenter(a, b, c);
 
             float distA = Vector2.Distance(center, a.Position);
             float distB = Vector2.Distance(center, b.Position);
             float distC = Vector2.Distance(center, c.Position);
 
-            // All distances should equal the computed radius
-            Assert.AreEqual(radius, distA, 0.0001f);
-            Assert.AreEqual(radius, distB, 0.0001f);
-            Assert.AreEqual(radius, distC, 0.0001f);
+            // Distances from center to all vertices should be equal
+            Assert.AreEqual(distA, distB, 0.0001f, "Distance from center to A and B mismatch.");
+            Assert.AreEqual(distA, distC, 0.0001f, "Distance from center to A and C mismatch.");
         }
     }
 

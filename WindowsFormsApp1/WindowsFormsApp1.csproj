@@ -80,17 +80,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="myitem\FormFolder\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="myitem\FormFolder\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="myitem\FormFolder\Form2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="myitem\FormFolder\Form2.Designer.cs">
+      <DependentUpon>Form2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="myitem\FormFolder\HomeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="myitem\FormFolder\HomeForm.Designer.cs">
+      <DependentUpon>HomeForm.cs</DependentUpon>
     </Compile>
     <Compile Include="myitem\GeometryFolder\GeometryUtils.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\Face.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\HalfEdge.cs" />
     <Compile Include="myitem\HalfEdgeFolder\DataStructures\Vertex.cs" />
-    <Compile Include="myitem\HalfEdgeFolder\DataStructures\VoronoiCell.cs" />
     <Compile Include="myitem\HalfEdgeFolder\HalfEdgeHelpers\PointLocator.cs" />
     <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\TriangulationBuilder.cs" />
     <Compile Include="myitem\HalfEdgeFolder\TriangulationHelpers\FlipFunctions.cs" />
@@ -99,8 +110,14 @@
     <Compile Include="myitem\HalfEdgeFolder\TriangulationOperation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="myitem\FormFolder\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="myitem\FormFolder\Form2.resx">
+      <DependentUpon>Form2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="myitem\FormFolder\HomeForm.resx">
+      <DependentUpon>HomeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

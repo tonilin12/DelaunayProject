@@ -11,41 +11,56 @@ public class Face
     public HalfEdge Edge
     {
         get => _edge;
-        set => _edge = value ?? throw new ArgumentNullException(nameof(value));
+        set
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            _edge = value;
+
+            // Invalidate cached circumcircle and mark Voronoi dirty
+            InvalidateCircumcircle();
+        }
     }
 
+    // -----------------------------
+    // Cached circumcircle
+    // -----------------------------
+    private Vector2? _cachedCircumcenter = null;
 
-
-    private void ComputeCircumcircle(out Vector2 center, out float radius)
+    private void ComputeCircumcircle()
     {
+        if (_cachedCircumcenter.HasValue)
+            return; // Already computed
+
         var v0 = Edge.Origin;
         var v1 = Edge.Next.Origin;
         var v2 = Edge.Next.Next.Origin;
 
-        GeometryUtils.Circumcircle(v0, v1, v2, out center, out radius);
+        _cachedCircumcenter = GeometryUtils.Circumcenter(v0, v1, v2);
+
     }
 
     public Vector2 Circumcenter
     {
         get
         {
-            ComputeCircumcircle(out var center, out _);
-            return center;
+            ComputeCircumcircle();
+            return _cachedCircumcenter.Value;
         }
     }
 
-    public float Circumradius
-    {
-        get
-        {
-            ComputeCircumcircle(out _, out var radius);
-            return radius;
-        }
-    }
 
     /// <summary>
-    /// Constructor from vertices.
+    /// Invalidate cached circumcircle (call if vertices or edges move)
     /// </summary>
+    public void InvalidateCircumcircle()
+    {
+        _cachedCircumcenter = null;
+    }
+
+    // -----------------------------
+    // Constructors
+    // -----------------------------
     public Face(params Vertex[] vertices)
     {
         if (vertices == null || vertices.Length != 3)
@@ -55,9 +70,6 @@ public class Face
         Edge = edges[0];
     }
 
-    /// <summary>
-    /// Constructor from existing half-edges.
-    /// </summary>
     public Face(params HalfEdge[] halfEdges)
     {
         if (halfEdges == null || halfEdges.Length != 3)
@@ -67,9 +79,9 @@ public class Face
         Edge = edges[0];
     }
 
-    /// <summary>
-    /// Creates a linked cycle of half-edges and assigns the face.
-    /// </summary>
+    // -----------------------------
+    // Helper: create cycle of half-edges
+    // -----------------------------
     private IEnumerable<HalfEdge> MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
     {
         if (items == null)
@@ -90,26 +102,24 @@ public class Face
         if (GeometryUtils.GetSignedArea(edges.ToArray()) == 0)
             throw new ArgumentException("Degenerate face: the three vertices are collinear.");
 
-        // Link Next/Prev
         for (int i = 0; i < edges.Count; i++)
         {
-
             var curr = edges[i];
             var next = edges[(i + 1) % 3];
 
             curr.Next = next;
 
-            // 🔥 mark the origin vertex as dirty
-            curr.Origin?.Voronoi?.MarkDirty();
-
         }
+
+        // Invalidate cached circumcircle after linking edges
+        InvalidateCircumcircle();
 
         return edges;
     }
 
-    /// <summary>
-    /// Enumerates all edges of the face.
-    /// </summary>
+    // -----------------------------
+    // Enumerators
+    // -----------------------------
     private IEnumerable<HalfEdge> EnumerateEdges()
     {
         if (Edge == null) yield break;
@@ -131,11 +141,9 @@ public class Face
             yield return e.Origin;
     }
 
- 
-
-    /// <summary>
-    /// Finds the edge opposite to the given vertex.
-    /// </summary>
+    // -----------------------------
+    // Opposite edge utilities
+    // -----------------------------
     public HalfEdge GetOppositeEdge(Vertex v)
     {
         if (v == null) throw new ArgumentNullException(nameof(v));
@@ -151,9 +159,6 @@ public class Face
         return null;
     }
 
-    /// <summary>
-    /// Finds the twin of the edge opposite to the given vertex.
-    /// </summary>
     public HalfEdge GetOppositeTwinEdge(Vertex v)
     {
         return GetOppositeEdge(v)?.Twin;

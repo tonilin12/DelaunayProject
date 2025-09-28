@@ -50,8 +50,8 @@ namespace UnitTestProject1.TestFolder.DataStructureTests
                 {
                     foreach (var tri_v in face.GetVertices())
                     {
-                        var actualVoronoi = tri_v.Voronoi.GetPolygon()
-                        .Take(tri_v.Voronoi.GetPolygon().Count - 1)
+                        var actualVoronoi = tri_v.GetVoronoiCell()
+                        .Take(tri_v.GetVoronoiCell().Count - 1)
                         .ToList();
 
                         var expectedVoronoi = tri_v.EnumerateEdges(e => e.Face.Circumcenter).ToList();

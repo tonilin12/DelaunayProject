@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using WindowsFormsApp1.myitem.GeometryFolder;
-using WindowsFormsApp1.myitem.HalfEdgeFolder.DataStructures;
 
 public class Vertex
 {
@@ -23,14 +22,9 @@ public class Vertex
         set
         {
             _outgoingHalfEdge = value;
-            Voronoi.MarkDirty(); // automatically mark dirty
         }
     }
 
-    /// <summary>
-    /// Voronoi cell associated with this vertex.
-    /// </summary>
-    public VoronoiCell Voronoi { get; private set; }
 
     /// <summary>
     /// Default tolerance for approximate comparisons.
@@ -44,7 +38,6 @@ public class Vertex
     {
         Position = position;
         _outgoingHalfEdge = null;
-        Voronoi = new VoronoiCell(this);
     }
 
     /// <summary>
@@ -93,5 +86,32 @@ public class Vertex
         float dy = Position.Y - other.Position.Y;
 
         return dx * dx + dy * dy <= epsilon * epsilon;
+    }
+
+    /// <summary>
+    /// Computes the Voronoi polygon around this vertex on the fly.
+    /// Uses the circumcenters of adjacent faces.
+    /// </summary>
+    public List<Vector2> GetVoronoiCell()
+    {
+        var polygon = new List<Vector2>();
+
+        if (OutgoingHalfEdge == null)
+            return polygon;
+
+        // Traverse all edges around the vertex in CCW order
+        foreach (var center in EnumerateEdges(e => e.Face?.Circumcenter))
+        {
+            if (center.HasValue)
+            {
+                 polygon.Add(center.Value);
+            }
+        }
+
+        // Close the polygon if necessary
+        if (polygon.Count > 2 && Vector2.DistanceSquared(polygon[0], polygon[1]) > GeometryUtils.GetEpsilon)
+            polygon.Add(polygon[0]);
+
+        return polygon;
     }
 }
