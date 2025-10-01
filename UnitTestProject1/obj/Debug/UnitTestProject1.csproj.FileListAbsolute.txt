@@ -9,7 +9,6 @@ C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\UnitTestProj
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\WindowsFormsApp1.exe
-C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\WindowsFormsApp1.pdb
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\WindowsFormsApp1.exe.config
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
 C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
@@ -36,3 +35,8 @@ C:\Users\Toni Lin\Desktop\DelaunayProject\UnitTestProject1\obj\Debug\UnitTestPro
 C:\Users\Toni Lin\Desktop\DelaunayProject\UnitTestProject1\obj\Debug\UnitTest.40E657F8.Up2Date
 C:\Users\Toni Lin\Desktop\DelaunayProject\UnitTestProject1\obj\Debug\UnitTestProject1.dll
 C:\Users\Toni Lin\Desktop\DelaunayProject\UnitTestProject1\obj\Debug\UnitTestProject1.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\WindowsFormsApp1.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\MathNet.Numerics.dll
+C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\System.ValueTuple.dll
+C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\MathNet.Numerics.xml
+C:\Users\Toni Lin\Desktop\temp\program00\UnitTestProject1\bin\Debug\System.ValueTuple.xml

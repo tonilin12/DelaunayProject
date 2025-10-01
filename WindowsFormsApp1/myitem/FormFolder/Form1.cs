@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.myitem.GeometryFolder;
@@ -11,7 +12,7 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-        private List<Vertex> revealedPoints;
+        private readonly object _lock = new object(); // lock for thread-safety
         private HashSet<Face> triangulation;
         private Face superTriangle;
         private TriangulationBuilder triangulator;
@@ -29,7 +30,6 @@ namespace WindowsFormsApp1
         private bool showTriangles = true;
         private bool showVoronoi = true;
 
-        // Timeout for triangulation processing to avoid freeze / out-of-memory
         private const int VertexProcessTimeoutMs = 500;
 
         public Form1()
@@ -38,8 +38,8 @@ namespace WindowsFormsApp1
             this.DoubleBuffered = true;
             this.ClientSize = new Size(800, 600);
 
-            InitializeTriangulation();
             InitializeMenu();
+            InitializeTriangulation();
 
             this.Paint += Form1_Paint;
             this.MouseClick += Form1_MouseClick;
@@ -51,31 +51,37 @@ namespace WindowsFormsApp1
                 MessageBox.Show($"Unexpected error: {e.Exception.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 hasError = true;
             };
+
+
         }
 
         private void InitializeMenu()
         {
-            menuStrip = new MenuStrip { Font = new Font("Segoe UI", 14, FontStyle.Regular) };
-            fileMenu = new ToolStripMenuItem("Menu");
+            menuStrip = new MenuStrip();
+            menuStrip.Font = new Font("Segoe UI", 14, FontStyle.Regular);
+
+            fileMenu = new ToolStripMenuItem("File");
             resetMenu = new ToolStripMenuItem("Reset Everything");
             resetMenu.Click += ResetMenu_Click;
             fileMenu.DropDownItems.Add(resetMenu);
 
             viewMenu = new ToolStripMenuItem("View");
 
-            showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles") { Checked = true, CheckOnClick = true };
-            showTrianglesMenuItem.CheckedChanged += (s, e) =>
+            showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles", null, (s, e) =>
             {
-                showTriangles = showTrianglesMenuItem.Checked;
+                showTriangles = !showTriangles;
+                showTrianglesMenuItem.Checked = showTriangles;
                 Invalidate();
-            };
+            })
+            { Checked = showTriangles };
 
-            showVoronoiMenuItem = new ToolStripMenuItem("Show Voronoi") { Checked = true, CheckOnClick = true };
-            showVoronoiMenuItem.CheckedChanged += (s, e) =>
+            showVoronoiMenuItem = new ToolStripMenuItem("Show Voronoi", null, (s, e) =>
             {
-                showVoronoi = showVoronoiMenuItem.Checked;
+                showVoronoi = !showVoronoi;
+                showVoronoiMenuItem.Checked = showVoronoi;
                 Invalidate();
-            };
+            })
+            { Checked = showVoronoi };
 
             viewMenu.DropDownItems.Add(showTrianglesMenuItem);
             viewMenu.DropDownItems.Add(showVoronoiMenuItem);
@@ -89,31 +95,39 @@ namespace WindowsFormsApp1
 
         private void InitializeTriangulation()
         {
-            revealedPoints = new List<Vertex>();
             hasError = false;
 
-            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
-            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
-
-            var borderPoints = new Vertex[]
+            lock (_lock)
             {
-                new Vertex(new Vector2(0, 0)),
-                new Vertex(new Vector2(screenWidth, 0)),
-                new Vertex(new Vector2(0, screenHeight)),
-                new Vertex(new Vector2(screenWidth, screenHeight))
-            };
-
-            try
-            {
-                TriangulationOperation.getSuperTriangle(ref borderPoints, out superTriangle);
-                triangulator = new TriangulationBuilder(superTriangle);
+                // Remove references to previous mesh; GC will reclaim if nothing else references them
+                triangulation?.Clear();
                 triangulation = null;
+                triangulator = null;
                 hoveredFace = null;
-            }
-            catch (Exception ex)
-            {
-                hasError = true;
-                MessageBox.Show($"Critical error initializing triangulation: {ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                superTriangle = null;
+
+                int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+                int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+                var borderPoints = new Vertex[]
+                {
+                    new Vertex(new Vector2(0, 0)),
+                    new Vertex(new Vector2(screenWidth, 0)),
+                    new Vertex(new Vector2(0, screenHeight)),
+                    new Vertex(new Vector2(screenWidth, screenHeight))
+                };
+
+                try
+                {
+                    TriangulationOperation.getSuperTriangle(ref borderPoints, out superTriangle);
+                    triangulator = new TriangulationBuilder(superTriangle);
+                    // triangulation stays null until we add vertices
+                }
+                catch (Exception ex)
+                {
+                    hasError = true;
+                    MessageBox.Show($"Critical error initializing triangulation: {ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -121,58 +135,100 @@ namespace WindowsFormsApp1
         {
             try
             {
-                InitializeTriangulation();
-                this.Invalidate();
+                if (hasError)
+                {
+                    // Hard reset: restart application (guaranteed clean slate)
+                    System.Diagnostics.Process.Start(Application.ExecutablePath);
+                    Application.Exit();
+                }
+                else
+                {
+                    // Soft reset: reinitialize state in this process
+                    SoftReset();
+                }
             }
             catch (Exception ex)
             {
-                hasError = true;
-                MessageBox.Show($"Critical error resetting triangulation: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error during reset: {ex.Message}", "Reset Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        /// Processes a single vertex with a timeout to prevent runaway triangulation
-        /// </summary>
-        private void ProcessVertexWithTimeout(Vertex vertex, int timeoutMs = VertexProcessTimeoutMs)
+        private void SoftReset()
         {
-            Exception caughtException = null;
-
-            var task = Task.Run(() =>
+            lock (_lock)
             {
-                try
-                {
-                    triangulator?.AddVertices(vertex);
-                    triangulator?.ProcessSingleVertex();
-                }
-                catch (Exception ex)
-                {
-                    caughtException = ex;
-                }
-            });
+                // Clear references to allow GC to reclaim memory eventually
+                if (triangulation != null)
+                    triangulation.Clear();
+                triangulation = null;
 
-            bool completed = task.Wait(timeoutMs);
+                hoveredFace = null;
 
-            if (!completed)
-                throw new TimeoutException($"Triangulation processing exceeded {timeoutMs} ms. Possible infinite loop or degenerate state.");
+                triangulator = null;
 
-            if (caughtException != null)
-                throw new InvalidOperationException("Error during triangulation: " + caughtException.Message, caughtException);
+
+                hasError = false;
+
+                // Recreate base triangulation state
+                InitializeTriangulation();
+
+                // Redraw UI
+                Invalidate();
+            }
         }
 
-        private void Form1_MouseClick(object sender, MouseEventArgs e)
+        private async Task ProcessVertexWithTimeoutAsync(Vertex vertex, int timeoutMs = VertexProcessTimeoutMs)
+        {
+            Exception caughtException = null;
+            using (var cts = new CancellationTokenSource())
+            {
+                var worker = Task.Run(() =>
+                {
+                    try
+                    {
+                        lock (_lock)
+                        {
+                            triangulator?.AddVertices(vertex);
+                            triangulator?.ProcessSingleVertex();
+                            triangulation = triangulator?.GetInternalTriangles();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        caughtException = ex;
+                    }
+                }, cts.Token);
+
+                var completed = await Task.WhenAny(worker, Task.Delay(timeoutMs));
+                if (completed != worker)
+                {
+                    // timeout
+                    try { cts.Cancel(); } catch { }
+                    throw new TimeoutException($"Triangulation processing exceeded {timeoutMs} ms.");
+                }
+
+                // ensure any exceptions are observed
+                await worker;
+
+               //throw new InvalidOperationException("Test exception - startup failed.");
+
+
+                if (caughtException != null)
+                    throw new InvalidOperationException("Error during triangulation: " + caughtException.Message, caughtException);
+            }
+        }
+
+        private async void Form1_MouseClick(object sender, MouseEventArgs e)
         {
             if (hasError) return;
             if (menuStrip.Bounds.Contains(e.Location)) return;
 
             var vertex = new Vertex(new Vector2(e.X, e.Y));
-            revealedPoints.Add(vertex);
-            Invalidate(); // show immediately
 
             try
             {
-                ProcessVertexWithTimeout(vertex);
-                triangulation = triangulator?.GetInternalTriangles();
+                await ProcessVertexWithTimeoutAsync(vertex);
+                // triangulation updated inside the worker; repaint now
                 Invalidate();
             }
             catch (TimeoutException ex)
@@ -189,87 +245,88 @@ namespace WindowsFormsApp1
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
+            // quick bailouts - do not lock unless we have triangulation
             if (hasError || triangulation == null) return;
 
-            try
+            var p = new Vector2(e.X, e.Y);
+
+            lock (_lock)
             {
-                var p = new Vector2(e.X, e.Y);
+                // safe read of triangulation under lock
                 hoveredFace = triangulation.FirstOrDefault(face => GeometryUtils.IsPointInsideTriangle(face, p));
-                Invalidate();
             }
-            catch (Exception ex)
-            {
-                hasError = true;
-                MessageBox.Show($"Critical error detecting hovered triangle: {ex.Message}", "Triangulation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            Invalidate();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             if (hasError) return;
 
-            try
-            {
-                Graphics g = e.Graphics;
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var graphics = e.Graphics;
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            // All drawing is done on UI thread; lock to read triangulation/triangulator safely
+            lock (_lock)
+            {
                 using (Pen edgePen = new Pen(Color.Blue, 2))
                 using (Brush pointBrush = new SolidBrush(Color.Red))
                 using (Pen circlePen = new Pen(Color.Green, 1))
                 using (Pen voronoiPen = new Pen(Color.DarkOrange, 2))
                 {
-                    // Draw triangles
                     if (showTriangles && triangulation != null)
                     {
                         foreach (var face in triangulation)
                         {
-                            var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
-                            if (verts.Length >= 3)
-                                for (int i = 0; i < verts.Length; i++)
-                                    g.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
+                            var vert0 = face.GetVertices().ToList();
+                            var verts = vert0.Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
+
+                            if (verts.Length < 3) continue;
+
+                            for (int i = 0; i < verts.Length; i++)
+                                graphics.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
                         }
                     }
 
-                    // Draw Voronoi polygons
-                    if (showVoronoi && revealedPoints != null)
+                    var internalVertices = triangulator?.GetInternalVertices();
+                    if (showVoronoi && internalVertices != null)
                     {
-                        foreach (var v in revealedPoints)
+                        foreach (var v in internalVertices)
                         {
                             var polygon = v.GetVoronoiCell();
                             if (polygon == null || polygon.Count < 2) continue;
+
                             for (int i = 0; i < polygon.Count; i++)
                             {
                                 var p1 = polygon[i];
                                 var p2 = polygon[(i + 1) % polygon.Count];
-                                g.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
+                                graphics.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
                             }
+
                         }
                     }
 
-                    // Draw vertices
-                    float vertexRadius = 4;
-                    foreach (var v in revealedPoints)
-                        g.FillEllipse(pointBrush, v.Position.X - vertexRadius, v.Position.Y - vertexRadius, vertexRadius * 2, vertexRadius * 2);
+                    if (internalVertices != null)
+                    {
+                        float vertexRadius = 3;
+                        foreach (var v in internalVertices)
+                            graphics.FillEllipse(pointBrush, v.Position.X - vertexRadius, v.Position.Y - vertexRadius, vertexRadius * 2, vertexRadius * 2);
+                    }
 
-                    // Draw circumcircle
                     if (showTriangles && hoveredFace != null)
                     {
+                        // Access to hoveredFace is under lock, so safe.
                         Vector2 center = hoveredFace.Circumcenter;
                         float radius = Vector2.Distance(center, hoveredFace.GetVertices().First().Position);
-
-
                         if (radius > 0f)
-                            g.DrawEllipse(circlePen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                            graphics.DrawEllipse(circlePen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                hasError = true;
-                MessageBox.Show($"Critical error during painting: {ex.Message}", "Render Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
-        private void Form1_Load(object sender, EventArgs e) { }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // optional additional initialization
+        }
     }
 }

@@ -39,6 +39,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.2.2.10\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
     </Reference>
@@ -48,6 +51,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestFolder\DataStructureTests\FaceTests.cs" />
@@ -57,10 +63,11 @@
     <Compile Include="TestFolder\DataStructureTests\VoronoiTest.cs" />
     <Compile Include="TestFolder\Else\GeometryUtilsTest.cs" />
     <Compile Include="TestFolder\Else\PointLocatorTest.cs" />
-    <Compile Include="TestFolder\TriangulationOperations\FlipTest.cs" />
-    <Compile Include="TestFolder\TriangulationOperations\SuperTriangleGeneratorTests.cs" />
-    <Compile Include="TestFolder\TriangulationOperations\TriangleSplitterTest.cs" />
-    <Compile Include="TestFolder\TriangulationOperations\VertexEnumerateTest.cs" />
+    <Compile Include="TestFolder\TriangulationTestFolder\FlipTest.cs" />
+    <Compile Include="TestFolder\TriangulationTestFolder\SuperTriangleGeneratorTests.cs" />
+    <Compile Include="TestFolder\TriangulationTestFolder\TriangleSplitterTest.cs" />
+    <Compile Include="TestFolder\TriangulationTestFolder\TriangulationTest.cs" />
+    <Compile Include="TestFolder\TriangulationTestFolder\VertexEnumerateTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -71,6 +78,9 @@
       <Project>{31a095f7-2e4a-4a4b-866a-2d04664b588b}</Project>
       <Name>WindowsFormsApp1</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestFolder\NewFolder1\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -8,21 +8,6 @@ public static class PointLocator
 {
     private const int MAX_ITERATIONS = 1000;
 
-    /// <summary>
-    /// Checks if point P lies on segment AB, including endpoints.
-    /// </summary>
-    private static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
-    {
-        Vector2 ap = p.Position - a.Position;
-        Vector2 ab = b.Position - a.Position;
-
-        float dot = Vector2.Dot(ap, ab);
-        if (dot < 0) return false;         // before start
-        float lenSq = ab.LengthSquared();
-        if (dot > lenSq) return false;     // after end
-        return true;                        // on segment, including endpoints
-    }
-
     private class PointLocationResult
     {
         public bool IsInside { get; set; }
@@ -31,64 +16,70 @@ public static class PointLocator
         public HalfEdge NextHalfEdge { get; set; }
     }
 
-    /// <summary>
-    /// Computes point location relative to a face.
-    /// </summary>
-    private static PointLocationResult 
-    GetPointLocation(HalfEdge startEdge, Vertex point)
+    private static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
+    {
+        Vector2 ap = p.Position - a.Position;
+        Vector2 ab = b.Position - a.Position;
+        float dot = Vector2.Dot(ap, ab);
+        if (dot < 0) return false;
+        float lenSq = ab.LengthSquared();
+        if (dot > lenSq) return false;
+        return true;
+    }
+
+    private static PointLocationResult GetPointLocation(HalfEdge startEdge, Vertex point)
     {
         bool anyOnEdge = false;
         bool allPositive = true;
-
-        HalfEdge exactMatchEdge = null;
-        HalfEdge firstOnEdge = null;
+        HalfEdge exactVertexEdge = null;
+        HalfEdge firstEdgeOnSegment = null;
         HalfEdge nextHalfEdge = null;
 
+        Func<Vertex, bool> IsExactVertex = v => v != null && v.PositionsEqual(point);
 
-        foreach (var e in startEdge.Face.GetEdges())
+        Func<HalfEdge, bool> IsPointOnEdge = edge =>
         {
-            // Compute signed area (TriangleOrientation returns float)
-            float orientation =GetSignedArea(e.Origin, e.Dest, point);
+            if (edge == null || edge.Origin == null || edge.Dest == null) return false;
+            float orientation = GetSignedArea(edge.Origin, edge.Dest, point);
+            return Math.Abs(orientation) < GeometryUtils.GetEpsilon && IsOnSegment(edge.Origin, edge.Dest, point);
+        };
 
-            // Check if point is on this edge
-            bool onEdge = Math.Abs(orientation) < GeometryUtils.GetEpsilon && IsOnSegment(e.Origin, e.Dest, point);
+        foreach (var edge in startEdge.Face.GetEdges())
+        {
+            if (edge == null || edge.Origin == null || edge.Dest == null) continue;
 
+            if (IsExactVertex(edge.Origin))
+                exactVertexEdge = edge;
+
+            bool onEdge = IsPointOnEdge(edge);
             if (onEdge)
             {
                 anyOnEdge = true;
-
-                if (e.Origin.PositionsEqual(point))
-                    exactMatchEdge = e; // prefer exact match
-                else if (firstOnEdge == null)
-                    firstOnEdge = e;
+                if (firstEdgeOnSegment == null && exactVertexEdge == null)
+                    firstEdgeOnSegment = edge;
             }
 
-            // Track if all orientations are positive (inside)
+            float orientation = GetSignedArea(edge.Origin, edge.Dest, point);
             if (orientation <= 0) allPositive = false;
 
-            // Track first negative orientation for walking outside
             if (orientation < 0 && nextHalfEdge == null)
-                nextHalfEdge = e.Twin;
-
-   
+                nextHalfEdge = edge.Twin;
         }
 
         return new PointLocationResult
         {
-            IsInside = allPositive,
+            IsInside = !anyOnEdge && allPositive,
             IsOnEdge = anyOnEdge,
-            DestinationEdge = exactMatchEdge ?? firstOnEdge,
+            DestinationEdge = exactVertexEdge ?? firstEdgeOnSegment,
             NextHalfEdge = (!allPositive && !anyOnEdge) ? nextHalfEdge : null
         };
     }
 
-
-
     /// <summary>
-    /// Internal traversal function, optional recording of edges.
+    /// Core traversal function starting from a half-edge
     /// </summary>
-    private static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
-    LocatePointInMesh(HalfEdge startEdge, Vertex point, bool recordTraversal)
+    public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
+    LocatePointInMesh(HalfEdge startEdge, Vertex point, bool recordTraversal = false)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
@@ -107,16 +98,17 @@ public static class PointLocator
 
             var result = GetPointLocation(current, point);
 
-            if (result.IsInside)
-                return (current, false, traversed);
+            if (result.DestinationEdge != null && result.DestinationEdge.Origin.PositionsEqual(point))
+                return (result.DestinationEdge, true, traversed); // existing vertex
 
             if (result.IsOnEdge)
-                return (result.DestinationEdge, true, traversed);
+                return (result.DestinationEdge, true, traversed); // point on edge
+
+            if (result.IsInside)
+                return (current, false, traversed); // inside triangle
 
             if (result.NextHalfEdge == null)
-                throw new InvalidOperationException(
-                    "Point outside face but no adjacent twin found (non-manifold or boundary)."
-                );
+                throw new InvalidOperationException("Point outside face but no adjacent twin found.");
 
             current = result.NextHalfEdge;
         }
@@ -125,8 +117,7 @@ public static class PointLocator
     }
 
     /// <summary>
-    /// Public entry point: locate a point starting from a face.
-    /// Optional parameter to record traversed edges.
+    /// Overload: start search from a face instead of a half-edge
     /// </summary>
     public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> traversedEdges)
     LocatePointInMesh(Face startFace, Vertex point, bool recordTraversal = false)

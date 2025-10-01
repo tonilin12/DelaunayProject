@@ -41,7 +41,7 @@ public class Vertex
     }
 
     /// <summary>
-    /// Enumerates half-edges originating from this vertex in CCW order.
+    /// Enumerates half-edges originating from this vertex in CCW order, safely avoiding infinite loops.
     /// </summary>
     public IEnumerable<T> EnumerateEdges<T>(Func<HalfEdge, T> selector, int? maxSteps = null)
     {
@@ -52,9 +52,13 @@ public class Vertex
         HalfEdge current = start;
         int steps = 0;
 
-        do
+        // Keep track of visited edges to prevent infinite loops
+        HashSet<HalfEdge> visited = new HashSet<HalfEdge>();
+
+        while (current != null && !visited.Contains(current))
         {
             yield return selector(current);
+            visited.Add(current);
             steps++;
 
             if (maxSteps.HasValue && steps >= maxSteps.Value)
@@ -62,31 +66,9 @@ public class Vertex
 
             // Move to the next CCW edge around the vertex
             current = current.Twin?.Next;
-        } while (current != null && current != start);
+        }
     }
 
-    /// <summary>
-    /// Returns a string representation of the vertex.
-    /// </summary>
-    public override string ToString()
-    {
-        return string.Format(CultureInfo.InvariantCulture,
-            "Vertex({0:F6}, {1:F6})", Position.X, Position.Y);
-    }
-
-    /// <summary>
-    /// Checks if this vertex is approximately equal to another vertex using Euclidean distance.
-    /// Float-only version.
-    /// </summary>
-    public bool PositionsEqual(Vertex other, float epsilon = 1e-6f)
-    {
-        if (other == null) return false;
-
-        float dx = Position.X - other.Position.X;
-        float dy = Position.Y - other.Position.Y;
-
-        return dx * dx + dy * dy <= epsilon * epsilon;
-    }
 
     /// <summary>
     /// Computes the Voronoi polygon around this vertex on the fly.
@@ -113,5 +95,29 @@ public class Vertex
             polygon.Add(polygon[0]);
 
         return polygon;
+    }
+
+
+    /// <summary>
+    /// Returns a string representation of the vertex.
+    /// </summary>
+    public override string ToString()
+    {
+        return string.Format(CultureInfo.InvariantCulture,
+            "Vertex({0:F6}, {1:F6})", Position.X, Position.Y);
+    }
+
+    /// <summary>
+    /// Checks if this vertex is approximately equal to another vertex using Euclidean distance.
+    /// Float-only version.
+    /// </summary>
+    public bool PositionsEqual(Vertex other, float epsilon = 1e-6f)
+    {
+        if (other == null) return false;
+
+        float dx = Position.X - other.Position.X;
+        float dy = Position.Y - other.Position.Y;
+
+        return dx * dx + dy * dy <= epsilon * epsilon;
     }
 }

@@ -5,18 +5,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-def read_obj_points(filename="points_fixed.obj") -> np.ndarray:
+def read_obj_points_2d(filename: str = "points_fixed.obj") -> np.ndarray:
     """
-    Reads a simple OBJ file containing only vertex positions (v x y z).
-    Only x and y are returned as a Nx2 array.
-
-    Args:
-        filename (str): Name of the OBJ file (located in the same folder as this script).
-
-    Returns:
-        np.ndarray: Nx2 array of points (float32)
+    Reads 2D points from an OBJ file (x, y only).
+    Returns points as (N,2) array.
     """
-    script_dir = Path(__file__).parent
+    script_dir = Path(__file__).parent if "__file__" in globals() else Path.cwd()
     file_path = script_dir / filename
 
     if not file_path.is_file():
@@ -27,82 +21,117 @@ def read_obj_points(filename="points_fixed.obj") -> np.ndarray:
         for line in f:
             if line.startswith("v "):
                 parts = line.strip().split()
-                if len(parts) >= 3:
+                if len(parts) >= 3:  # x, y
                     x, y = float(parts[1]), float(parts[2])
                     points.append([x, y])
 
-    points_2d = np.array(points, dtype=np.float32)
-    print(f"Loaded {len(points_2d)} points from {file_path}")
-    print(f"First 5 points:\n{points_2d[:5]}")
-    print(f"Total points count: {points_2d.shape[0]}")
-    return points_2d
+    points_arr = np.array(points, dtype=np.float64)
+    print(f"Loaded {len(points_arr)} points from {file_path}")
+    if len(points_arr) > 0:
+        print(f"First 5 points:\n{points_arr[:5]}")
+    return points_arr
 
-
-def check_poisson_disk(points: np.ndarray, min_dist: float):
+def evaluate_pointcloud_2d(points: np.ndarray, cv_threshold: float = 0.6):
     """
-    Checks if a point set satisfies a minimum distance (Poisson-disk property).
-
-    Args:
-        points (np.ndarray): Nx2 array of points.
-        min_dist (float): Minimum allowed distance between points.
-
-    Returns:
-        bool: True if all points satisfy the minimum distance.
+    Evaluates 2D point cloud quality for triangulation or mesh operations.
+    Returns metrics and a suitability assessment.
     """
+    n_points = points.shape[0]
+    metrics = {}
+    print(f"\n--- 2D Point Cloud Quality Metrics for {n_points} points ---")
+
+    if n_points < 2:
+        return {
+            "metrics": {},
+            "assessment": "Too few points to evaluate quality."
+        }
+
+    # --- Nearest-neighbor distances ---
     tree = KDTree(points)
     distances, _ = tree.query(points, k=2)
     nearest = distances[:, 1]
-    min_actual = nearest.min()
-    print(f"Minimum distance between points: {min_actual:.4f}")
-    print(f"Expected minimum distance: {min_dist}")
-    is_poisson = min_actual >= min_dist
-    print(f"Poisson-disk property satisfied? {is_poisson}")
-    return is_poisson
 
+    min_dist = nearest.min()
+    mean_dist = nearest.mean()
+    std_dist = nearest.std()
+    cv_dist = std_dist / mean_dist if mean_dist != 0 else float('inf')
+    uniform_pass = cv_dist <= cv_threshold
 
-def plot_all_points(points: np.ndarray, title="All Points"):
+    metrics.update({
+        "min_distance": min_dist,
+        "mean_distance": mean_dist,
+        "std_distance": std_dist,
+        "cv_distance": cv_dist,
+        "uniform_pass": uniform_pass
+    })
+
+    # --- Coverage (voxel/grid-based) ---
+    bbox_min = points.min(axis=0)
+    bbox_max = points.max(axis=0)
+    bbox_size = bbox_max - bbox_min
+    grid_size = mean_dist
+    grid_indices = np.floor((points - bbox_min) / grid_size).astype(int)
+    unique_cells = np.unique(grid_indices, axis=0)
+    coverage_ratio = len(unique_cells) / np.prod(np.ceil(bbox_size / grid_size))
+    metrics["coverage_ratio"] = coverage_ratio
+
+    # --- Outlier detection (points far from neighbors) ---
+    z_score = (nearest - mean_dist) / std_dist
+    outlier_mask = np.abs(z_score) > 3
+    outlier_ratio = np.sum(outlier_mask) / n_points
+    metrics["outlier_ratio"] = outlier_ratio
+
+    # --- Generate assessment ---
+    assessment = []
+    if n_points < 10:
+        assessment.append("Too few points for reliable triangulation.")
+    if not uniform_pass:
+        assessment.append("Points are unevenly spaced; triangulation may produce degenerate triangles.")
+    if coverage_ratio < 0.8:
+        assessment.append("Point cloud has poor coverage; some regions may be under-sampled.")
+    if outlier_ratio > 0.05:
+        assessment.append("Significant outliers detected; consider cleaning the point cloud.")
+
+    if not assessment:
+        assessment.append("Point cloud appears suitable for triangulation and mesh operations.")
+
+    print("\n--- Assessment ---")
+    for line in assessment:
+        print("-", line)
+
+    return {
+        "metrics": metrics,
+        "assessment": assessment
+    }
+
+def plot_pointcloud_2d(points: np.ndarray, title="2D Point Cloud", show=True):
     """
-    Plots all points using Pandas + Seaborn.
+    Plots 2D point cloud using matplotlib.
     """
     df = pd.DataFrame(points, columns=["x", "y"])
     plt.figure(figsize=(6, 6))
-    sns.scatterplot(data=df, x="x", y="y", s=10, color="blue", alpha=0.6)
+    sns.scatterplot(data=df, x="x", y="y", s=10, alpha=0.6)
     plt.title(title)
-    plt.xlabel("x")
-    plt.ylabel("y")
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.axis("equal")
-    plt.show()
-
-
-def plot_blue_noise_spectrum(points: np.ndarray, width=512, height=512):
-    """
-    Plots the radial power spectrum of the point set to inspect blue-noise characteristics.
-    """
-    img = np.zeros((height, width))
-    xs = (points[:, 0] * width).astype(int)
-    ys = (points[:, 1] * height).astype(int)
-    xs = np.clip(xs, 0, width-1)
-    ys = np.clip(ys, 0, height-1)
-    img[ys, xs] = 1
-
-    ps = np.abs(np.fft.fftshift(np.fft.fft2(img)))**2
-    plt.figure(figsize=(6, 6))
-    plt.imshow(np.log1p(ps), cmap='gray')
-    plt.title("Power Spectrum (log scale)")
-    plt.axis("off")
-    plt.show()
-
+    if show:
+        plt.show()
 
 if __name__ == "__main__":
-    # Load OBJ points
-    points = read_obj_points("points_fixed.obj")
+    OBJ_FILENAME = "points_fixed.obj"
+    CV_THRESHOLD = 0.6
 
-    # Check Poisson-disk property
-    expected_min_dist = 1.0  # adjust to your generation parameter
-    check_poisson_disk(points, min_dist=expected_min_dist)
+    # --- Read points ---
+    pts = read_obj_points_2d(OBJ_FILENAME)
 
-    # Plot all points
-    plot_all_points(points, title="All Poisson Disk Points")
+    # --- Evaluate quality ---
+    results = evaluate_pointcloud_2d(pts, cv_threshold=CV_THRESHOLD)
 
-    # Plot blue-noise spectrum
-    plot_blue_noise_spectrum(points)
+    # --- Plot ---
+    plot_pointcloud_2d(pts, title="2D Point Cloud Quality Check")
+
+    # --- Optional: print metrics ---
+    print("\nMetrics:")
+    for k, v in results["metrics"].items():
+        print(f"{k}: {v:.4f}")

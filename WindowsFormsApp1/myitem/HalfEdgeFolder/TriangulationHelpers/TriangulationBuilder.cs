@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using WindowsFormsApp1.myitem.GeometryFolder;
 
 public class TriangulationBuilder
@@ -43,6 +44,9 @@ public class TriangulationBuilder
         LegalizeEdges(legalizationStack, vertex);
     }
 
+
+
+
     /// <summary>
     /// Adds vertices to the queue to be processed in order.
     /// </summary>
@@ -61,6 +65,17 @@ public class TriangulationBuilder
         return _meshTriangles
             .Where(tri => !tri.GetVertices().Any(v => _superTriangleVertices.Contains(v)))
             .ToHashSet();
+    }
+
+    public List<Vertex> GetInternalVertices()
+    {
+        var superVerticesSet = new HashSet<Vertex>(_superTriangleVertices);
+
+        return _meshTriangles
+            .SelectMany(tri => tri.GetVertices()) // flatten all triangle vertices
+            .Where(v => !superVerticesSet.Contains(v)) // remove super-triangle vertices
+            .Distinct() // keep vertices unique
+            .ToList();
     }
 
 
