@@ -1,2 +1,0 @@
-Vertices at crash:
-(210, 120)
