@@ -16,6 +16,8 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
+        #region Fields
+
         private readonly object _lock = new object(); // lock for thread-safety
         private HashSet<Face>? triangulation;
         private Face superTriangle;
@@ -38,6 +40,16 @@ namespace WindowsFormsApp1
 
         private const int VertexProcessTimeoutMs = 500;
 
+
+        private bool isProcessingVertex = false;
+
+        private bool isStepByStepMode = false; // default: step-by-step animation
+
+
+        #endregion
+
+        #region Constructor
+
         public Form1()
         {
             this.Text = "Interactive Incremental Triangulation";
@@ -59,25 +71,27 @@ namespace WindowsFormsApp1
             };
         }
 
-        // ---------------------------
-        // Menu Initialization
-        // ---------------------------
+        #endregion
+
+        #region Menu Initialization
+
         private void InitializeMenu()
         {
             menuStrip = new MenuStrip();
             menuStrip.Font = new Font("Segoe UI", 14, FontStyle.Regular);
 
+            // ----- File Menu -----
             fileMenu = new ToolStripMenuItem("File");
             resetMenu = new ToolStripMenuItem("Reset Everything");
             resetMenu.Click += ResetMenu_Click;
 
-            // Export OBJ option
             exportObjMenu = new ToolStripMenuItem("Export Triangulation (.obj)");
             exportObjMenu.Click += ExportObjMenu_Click;
 
             fileMenu.DropDownItems.Add(resetMenu);
             fileMenu.DropDownItems.Add(exportObjMenu);
 
+            // ----- View Menu -----
             viewMenu = new ToolStripMenuItem("View");
 
             showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles", null, (s, e) =>
@@ -99,6 +113,19 @@ namespace WindowsFormsApp1
             viewMenu.DropDownItems.Add(showTrianglesMenuItem);
             viewMenu.DropDownItems.Add(showVoronoiMenuItem);
 
+            // ----- Step-by-Step Mode Menu Item -----
+            var stepModeMenuItem = new ToolStripMenuItem("Step-by-Step Mode")
+            {
+                Checked = isStepByStepMode
+            };
+            stepModeMenuItem.Click += (s, e) =>
+            {
+                isStepByStepMode = !isStepByStepMode;
+                stepModeMenuItem.Checked = isStepByStepMode;
+            };
+            viewMenu.DropDownItems.Add(stepModeMenuItem);
+
+            // ----- Add menus to menuStrip -----
             menuStrip.Items.Add(fileMenu);
             menuStrip.Items.Add(viewMenu);
 
@@ -106,9 +133,13 @@ namespace WindowsFormsApp1
             this.Controls.Add(menuStrip);
         }
 
-        // ---------------------------
-        // Triangulation Initialization
-        // ---------------------------
+
+
+        #endregion
+
+        #region TriangInitialization
+
+
         private void InitializeTriangulation()
         {
             hasError = false;
@@ -141,14 +172,18 @@ namespace WindowsFormsApp1
                 catch (Exception ex)
                 {
                     hasError = true;
-                    MessageBox.Show($"Critical error initializing triangulation: {ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Critical error initializing triangulation: {ex.Message}",
+                                    "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        // ---------------------------
-        // Reset
-        // ---------------------------
+        #endregion
+
+
+
+        #region Reset
+
         private void ResetMenu_Click(object sender, EventArgs e)
         {
             try
@@ -186,68 +221,90 @@ namespace WindowsFormsApp1
             }
         }
 
-        // ---------------------------
-        // Vertex Processing
-        // ---------------------------
-        private async Task ProcessVertexWithTimeoutAsync(Vertex vertex, int timeoutMs = VertexProcessTimeoutMs)
+        #endregion
+        #region Vertex Processing
+
+
+        private async Task ProcessVertexStepByStepAsync(Vertex vertex)
         {
-            Exception caughtException = null;
-            using (var cts = new CancellationTokenSource())
+            if (triangulator == null || isProcessingVertex) return;
+
+            isProcessingVertex = true;  // lock input
+            try
             {
-                var worker = Task.Run(() =>
+                triangulator.AddVertices(vertex);
+
+                bool vertexAdded = false;
+                var actions = triangulator.ProcessSingleVertexStepByStep();
+
+                if (isStepByStepMode)
                 {
-                    try
+                    // Animated step-by-step mode
+                    foreach (var action in actions)
+                    {
+                        HashSet<Face>? snapshot;
+
+                        await Task.Run(() =>
+                        {
+                            lock (_lock)
+                            {
+                                action();
+
+                                if (!vertexAdded)
+                                {
+                                    insertedVertices.Add(vertex);
+                                    vertexAdded = true;
+                                }
+
+                                snapshot = triangulator.GetInternalTriangles().ToHashSet();
+                                triangulation = snapshot;
+                            }
+                        });
+
+                        this.BeginInvoke(() => Invalidate());
+                        await Task.Delay(200);
+                    }
+                }
+                else
+                {
+                    // Normal/instant mode: execute all actions immediately
+                    await Task.Run(() =>
                     {
                         lock (_lock)
                         {
-                            triangulator?.AddVertices(vertex);
-                            triangulator?.ProcessSingleVertex();
-                            HashSet<Face>? faces = triangulator?.GetInternalTriangles().ToHashSet();
-                            triangulation = faces;
+                            foreach (var action in actions)
+                                action();
 
-                            // Store insertion order
                             insertedVertices.Add(vertex);
+                            triangulation = triangulator.GetInternalTriangles().ToHashSet();
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        caughtException = ex;
-                    }
-                }, cts.Token);
+                    });
 
-                var completed = await Task.WhenAny(worker, Task.Delay(timeoutMs));
-                if (completed != worker)
-                {
-                    try { cts.Cancel(); } catch { }
-                    throw new TimeoutException($"Triangulation processing exceeded {timeoutMs} ms.");
+                    this.BeginInvoke(() => Invalidate());
                 }
-
-                await worker;
-
-                if (caughtException != null)
-                    throw new InvalidOperationException("Error during triangulation: " + caughtException.Message, caughtException);
+            }
+            finally
+            {
+                isProcessingVertex = false; // unlock input
             }
         }
 
-        // ---------------------------
-        // Mouse Events
-        // ---------------------------
+
+
+        #endregion
+
+        #region Mouse Events
+
         private async void Form1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (hasError) return;
+            if (hasError || isProcessingVertex) return; // prevent click during animation
             if (menuStrip.Bounds.Contains(e.Location)) return;
 
             var vertex = new Vertex(e.X, e.Y);
 
             try
             {
-                await ProcessVertexWithTimeoutAsync(vertex);
-                Invalidate();
-            }
-            catch (TimeoutException ex)
-            {
-                hasError = true;
-                MessageBox.Show(ex.Message, "Triangulation Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                await ProcessVertexStepByStepAsync(vertex);
             }
             catch (Exception ex)
             {
@@ -266,86 +323,96 @@ namespace WindowsFormsApp1
             {
                 hoveredFace = triangulation.FirstOrDefault(face => GeometryUtils.IsPointInsideTriangle(face, p));
             }
+
             Invalidate();
         }
 
-        // ---------------------------
-        // Paint
-        // ---------------------------
+        #endregion
+
+        #region Paint
+
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             if (hasError) return;
 
-            var graphics = e.Graphics;
-            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            HashSet<Face> trianglesSnapshot;
+            List<Vertex> verticesSnapshot;
+            Face hoveredSnapshot;
 
             lock (_lock)
             {
-                using (Pen edgePen = new Pen(Color.Blue, 2))
-                using (Brush pointBrush = new SolidBrush(Color.Red))
-                using (Pen circlePen = new Pen(Color.Green, 1))
-                using (Pen voronoiPen = new Pen(Color.DarkOrange, 2))
+                trianglesSnapshot = triangulation != null ? new HashSet<Face>(triangulation) : new HashSet<Face>();
+                verticesSnapshot = new List<Vertex>(insertedVertices);
+                hoveredSnapshot = hoveredFace;
+            }
+
+            using (var edgePen = new Pen(Color.Blue, 2))
+            using (var pointBrush = new SolidBrush(Color.Red))
+            using (var circlePen = new Pen(Color.Green, 1))
+            using (var voronoiPen = new Pen(Color.DarkOrange, 2))
+            {
+                // Draw triangles
+                if (showTriangles)
                 {
-                    // Draw Delaunay triangles
-                    if (showTriangles && triangulation != null)
+                    foreach (var face in trianglesSnapshot)
                     {
-                        foreach (var face in triangulation)
+                        var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
+                        if (verts.Length < 3) continue;
+
+                        for (int i = 0; i < verts.Length; i++)
+                            g.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
+                    }
+                }
+
+                // Draw vertices
+                float radius = 3;
+                foreach (var v in verticesSnapshot)
+                    g.FillEllipse(pointBrush, v.Position.X - radius, v.Position.Y - radius, radius * 2, radius * 2);
+
+                // Highlight hovered triangle
+                if (showTriangles && hoveredSnapshot != null)
+                {
+                    Vector2 center = hoveredSnapshot.Circumcenter;
+                    float r = Vector2.Distance(center, hoveredSnapshot.GetVertices().First().Position);
+                    if (r > 0f)
+                        g.DrawEllipse(circlePen, center.X - r, center.Y - r, r * 2, r * 2);
+                }
+
+                // Draw Voronoi
+                if (showVoronoi && triangulator != null)
+                {
+                    var voronoiCells = VoronoiBuilder.BuildDiagram(triangulator);
+                    foreach (var cell in voronoiCells)
+                    {
+                        var polygon = cell.Polygon;
+                        if (polygon == null || polygon.Count < 2) continue;
+
+                        for (int i = 0; i < polygon.Count; i++)
                         {
-                            var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
-                            if (verts.Length < 3) continue;
-
-                            for (int i = 0; i < verts.Length; i++)
-                                graphics.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
+                            var p1 = polygon[i];
+                            var p2 = polygon[(i + 1) % polygon.Count];
+                            g.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
                         }
-                    }
-
-                    // Draw Voronoi diagram
-                    if (showVoronoi && triangulator != null)
-                    {
-                        var voronoiCells = VoronoiBuilder.BuildDiagram(triangulator);
-
-                        foreach (var cell in voronoiCells)
-                        {
-                            var polygon = cell.Polygon;
-                            if (polygon == null || polygon.Count < 2) continue;
-
-                            for (int i = 0; i < polygon.Count; i++)
-                            {
-                                var p1 = polygon[i];
-                                var p2 = polygon[(i + 1) % polygon.Count];
-                                graphics.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
-                            }
-                        }
-                    }
-
-                    // Draw vertices
-                    if (triangulator != null)
-                    {
-                        float vertexRadius = 3;
-                        foreach (var v in insertedVertices)
-                            graphics.FillEllipse(pointBrush, v.Position.X - vertexRadius, v.Position.Y - vertexRadius, vertexRadius * 2, vertexRadius * 2);
-                    }
-
-                    // Highlight hovered triangle
-                    if (showTriangles && hoveredFace != null)
-                    {
-                        Vector2 center = hoveredFace.Circumcenter;
-                        float radius = Vector2.Distance(center, hoveredFace.GetVertices().First().Position);
-                        if (radius > 0f)
-                            graphics.DrawEllipse(circlePen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
                     }
                 }
             }
         }
+    
+
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
             // optional initialization
         }
 
-        // ---------------------------
-        // Export OBJ + Insertion Log
-        // ---------------------------
+        #endregion
+
+        #region Export OBJ + Insertion Log
+
         private void ExportObjMenu_Click(object sender, EventArgs e)
         {
             try
@@ -358,21 +425,17 @@ namespace WindowsFormsApp1
                         return;
                     }
 
-                    // --- Create export folder with timestamp ---
                     string projectDir = AppDomain.CurrentDomain.BaseDirectory;
                     string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                     string exportDir = Path.Combine(projectDir, "Exports", $"Triangulation_{timestamp}");
                     Directory.CreateDirectory(exportDir);
 
-                    // --- File paths ---
                     string objFilePath = Path.Combine(exportDir, "triangulation.obj");
                     string logFilePath = Path.Combine(exportDir, "insertion_log.txt");
 
-                    // --- Export triangulation and insertion log ---
-                    ExportTriangulationToObj(objFilePath); // Uses the corrected OBJ export method
+                    ExportTriangulationToObj(objFilePath);
                     ExportInsertionLog(logFilePath);
 
-                    // --- Feedback to the user ---
                     MessageBox.Show(
                         $"Triangulation export finished successfully!\n\nOBJ file: {objFilePath}\nInsertion log: {logFilePath}",
                         "Export Complete",
@@ -386,7 +449,6 @@ namespace WindowsFormsApp1
                 MessageBox.Show($"Failed to export triangulation: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void ExportTriangulationToObj(string filePath)
         {
@@ -405,13 +467,8 @@ namespace WindowsFormsApp1
                         writer.WriteLine("# Triangulation OBJ Export");
                         writer.WriteLine("# Generated by Interactive Incremental Triangulation");
 
-                        // --- Step 1: Collect unique vertices from triangulation faces ---
-                        var allVerts = triangulation
-                            .SelectMany(f => f.GetVertices())            // flatten all face vertices
-                            .ToList();
+                        var allVerts = triangulation.SelectMany(f => f.GetVertices()).ToList();
 
-                        // Group by position to get unique vertices (tuple uses exact float equality;
-                        // that's OK here since your points are created from integer screen coords)
                         var vertexList = allVerts
                             .GroupBy(v => (v.Position.X, v.Position.Y))
                             .Select(g => g.First())
@@ -419,26 +476,23 @@ namespace WindowsFormsApp1
                             .ThenBy(v => v.Position.Y)
                             .ToList();
 
-                        // --- Step 2: Build mapping from position -> OBJ index ---
                         var vertexIndices = new Dictionary<(float x, float y), int>();
                         for (int i = 0; i < vertexList.Count; i++)
                         {
                             var v = vertexList[i];
                             var key = (v.Position.X, v.Position.Y);
-                            vertexIndices[key] = i + 1; // OBJ indices start at 1
+                            vertexIndices[key] = i + 1;
 
-                            // Use InvariantCulture to force dot decimal separator
                             writer.WriteLine(
                                 $"v {v.Position.X.ToString("F6", CultureInfo.InvariantCulture)} " +
                                 $"{v.Position.Y.ToString("F6", CultureInfo.InvariantCulture)} " +
                                 $"{(0.0).ToString("F6", CultureInfo.InvariantCulture)}");
                         }
 
-                        // --- Step 3: Write faces using the position-based index map ---
                         foreach (var face in triangulation)
                         {
                             var verts = face.GetVertices().ToArray();
-                            if (verts.Length != 3) continue; // skip degenerate
+                            if (verts.Length != 3) continue;
 
                             int idx1 = vertexIndices[(verts[0].Position.X, verts[0].Position.Y)];
                             int idx2 = vertexIndices[(verts[1].Position.X, verts[1].Position.Y)];
@@ -447,7 +501,6 @@ namespace WindowsFormsApp1
                             writer.WriteLine($"f {idx1} {idx2} {idx3}");
                         }
 
-                        // newline at end
                         writer.WriteLine();
                     }
                 }
@@ -457,9 +510,6 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
-
-
 
         private void ExportInsertionLog(string logFilePath)
         {
@@ -479,5 +529,7 @@ namespace WindowsFormsApp1
                 }
             }
         }
+
+        #endregion
     }
 }

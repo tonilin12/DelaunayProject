@@ -33,7 +33,7 @@ namespace TestProject1.TestFolder.TriangulationOperations
             // Step 1: Create the HashSet of tuples representing expected edges
             var expectedEdges = 
             new HashSet<(Vertex Origin, Vertex Dest, HalfEdge Twin)>(
-                face.GetEdges().Select(e => (e.Origin, e.Dest, e.Twin))
+                collection: face.GetEdges().Select(e => (e.Origin, e.Dest, e.Twin))
             );
 
 
@@ -46,7 +46,7 @@ namespace TestProject1.TestFolder.TriangulationOperations
             vD.GetVertexEdges()                 // returns IEnumerable<HalfEdge>
               .Select(e =>
               {
-                  original_edges.Remove(e.Next); // now works based on Origin->Dest equality
+                  original_edges.Remove(e.Next!); // now works based on Origin->Dest equality
                   return e;
               })
               .ToList();
@@ -89,10 +89,10 @@ namespace TestProject1.TestFolder.TriangulationOperations
 
             var originalEdges = new HashSet<HalfEdge>();
 
-            originalEdges.Add(edge.Next);
-            originalEdges.Add(edge.Next.Next);
-            originalEdges.Add(edge.Twin.Next);
-            originalEdges.Add(edge.Twin.Next.Next);
+            originalEdges.Add(edge.Next!);
+            originalEdges.Add(edge?.Next?.Next!);
+            originalEdges.Add(edge?.Twin.Next!);
+            originalEdges.Add(edge?.Twin.Next?.Next!);
 
             splitter.SplitTriangle_VertexOnEdge(edge, vE);
 

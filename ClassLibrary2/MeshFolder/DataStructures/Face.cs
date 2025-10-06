@@ -141,29 +141,8 @@ public class Face
             yield return e.Origin;
     }
 
-    // -----------------------------
-    // Opposite edge utilities
-    // -----------------------------
-    public HalfEdge GetOppositeEdge(Vertex v)
-    {
-        if (v == null) throw new ArgumentNullException(nameof(v));
 
-        foreach (var e in GetEdges())
-        {
-            var a = e.Origin;
-            var b = e.Next.Origin;
-            if (!a.PositionsEqual(v) && !b.PositionsEqual(v))
-                return e;
-        }
-
-        return null;
-    }
-
-    public HalfEdge GetOppositeTwinEdge(Vertex v)
-    {
-        return GetOppositeEdge(v).Twin;
-    }
-
+ 
     public override string ToString()
     {
         return string.Join(" → ", GetVertices().Select(v => v.ToString()));

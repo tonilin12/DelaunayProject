@@ -48,16 +48,16 @@ namespace TestProject1.TestFolder.Else
             var face0 = new Face(vA, vB, vC);
             faceList = new List<Face> { face0 };
 
-            var split1 = TriangulationOperation.SplitTriangle(face0, vD);
+            TriangulationOperation.SplitTriangle(face0, vD);
             faceList.Remove(face0);
-            faceList.AddRange(split1);
+            faceList.AddRange(vD.GetVertexEdges().Select(e=>e.Face));
 
             var face1= faceList.First();
             var vertecies=face1.GetVertices().ToArray();    
             vE = GetStrictlyInsidePoint(vertecies[0], vertecies[1], vertecies[2]);
-            var split2 = TriangulationOperation.SplitTriangle(face1, vE);
+            TriangulationOperation.SplitTriangle(face1, vE);
             faceList.Remove(face1);
-            faceList.AddRange(split2);
+            faceList.AddRange(vE.GetVertexEdges().Select(e => e.Face));
 
         }
 

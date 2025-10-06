@@ -11,7 +11,7 @@ public class TriangleSplitter
     /// <param name="triangle">The original triangle to split.</param>
     /// <param name="newVertex">The new vertex that will be connected to the original triangle's vertices.</param>
     /// <returns>A list containing the three smaller faces resulting from the split.</returns>
-    public List<Face> SplitTriangle(Face triangle, Vertex newVertex)
+    public void SplitTriangle(Face triangle, Vertex newVertex)
     {
         // Split the triangle into three smaller triangles
         var originalEdges = triangle.GetEdges().ToArray();
@@ -36,14 +36,13 @@ public class TriangleSplitter
         var face3 = new Face(dToC, originalEdges[2], aToD);
 
         // Return the faces as a list
-        return new List<Face> { face1, face2, face3 };
     }
 
 
 
 
 
-    public List<Face>
+    public void
     SplitTriangle_VertexOnEdge(HalfEdge edge, Vertex newVertex)
     {
 
@@ -61,9 +60,9 @@ public class TriangleSplitter
 
        // Retrieve neighboring edges from both adjacent faces.
        var adjacentEdge1 = edge.Next;      // B -> X in triangle1
-        var adjacentEdge2 = edge.Next.Next;        // X -> A in triangle1
-        var twinAdjacentEdge1 = edge.Twin.Next; // A -> Y in triangle2
-        var twinAdjacentEdge2 = edge.Twin.Next.Next;   // Y -> B in triangle2
+        var adjacentEdge2 = edge?.Next?.Next;        // X -> A in triangle1
+        var twinAdjacentEdge1 = edge?.Twin?.Next; // A -> Y in triangle2
+        var twinAdjacentEdge2 = edge?.Twin?.Next?.Next;   // Y -> B in triangle2
 
 
         // Create a pair to represent the new segment from newVertex to B.
@@ -95,7 +94,6 @@ public class TriangleSplitter
 
 
 
-        return new List<Face> { face1, face2, face3,face4 };
 
 
     }

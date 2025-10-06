@@ -149,39 +149,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
 
 
 
-        [TestMethod]
-        public void GetOppositeEdge_ReturnsCorrectEdge_DirectIteration()
-        {
-            // Arrange: create a face with any 3 vertices
-            var vertices = new[] { vA, vB, vC };
-            var face = new Face(vertices[0], vertices[1], vertices[2]);
 
-            // Act & Assert: for each vertex, find the edge opposite it
-            foreach (var vertex in vertices)
-            {
-                var oppositeEdge = face.GetOppositeEdge(vertex);
-
-                // Opposite edge must not be null
-                Assert.IsNotNull(oppositeEdge, $"Opposite edge for vertex {vertex} should not be null");
-
-                // Opposite edge must not contain the vertex as origin or next.origin
-                Assert.IsFalse(oppositeEdge.Origin.PositionsEqual(vertex), $"Opposite edge origin matches vertex {vertex}");
-                Assert.IsFalse(oppositeEdge.Next.Origin.PositionsEqual(vertex), $"Opposite edge next.origin matches vertex {vertex}");
-
-                // Verify that the edge is part of the face by iterating directly
-                bool found = false;
-                foreach (var e in face.GetEdges())
-                {
-                    if (e == oppositeEdge)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                Assert.IsTrue(found, $"Opposite edge for vertex {vertex} is not part of the face edges");
-            }
-        }
 
 
 

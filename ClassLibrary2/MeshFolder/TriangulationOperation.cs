@@ -17,16 +17,16 @@ public static class TriangulationOperation
     /// <param name="triangle">The face (triangle) to be split.</param>
     /// <param name="newVertex">The vertex used to split the triangle.</param>
     /// <returns>A list of 3 new triangle faces formed after the split.</returns>
-    public static List<Face> SplitTriangle(Face triangle, Vertex newVertex)
+    public static void SplitTriangle(Face triangle, Vertex newVertex)
     {
         // Assuming _triangleSplitter is an instance of TriangleSplitter
-        return _triangleSplitter.SplitTriangle(triangle, newVertex);
+       _triangleSplitter.SplitTriangle(triangle, newVertex);
     }
 
-    public static List<Face> SplitTriangle_VertexOnEdge(HalfEdge edge, Vertex newVertex)
+    public static void SplitTriangle_VertexOnEdge(HalfEdge edge, Vertex newVertex)
     {
         // Assuming _triangleSplitter is an instance of TriangleSplitter
-        return _triangleSplitter.SplitTriangle_VertexOnEdge(edge, newVertex);
+        _triangleSplitter.SplitTriangle_VertexOnEdge(edge, newVertex);
     }
 
     /// <summary>

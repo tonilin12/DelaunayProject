@@ -11,12 +11,8 @@ public class TriangulationBuilder
     private readonly Vertex[] _superTriangleVertices;
     private readonly HashSet<Face> _meshTriangles;
 
-    // 🔹 New: Keep track of the last inserted triangle for fast walking
+    // Keep track of the last inserted triangle for fast walking
     private Face _lastInsertedTriangle;
-
-    // ---------------- Cache ----------------
-    private IEnumerable<Face>? _cachedInternalTrianglesView;
-    private bool _internalTrianglesDirty = true;
 
     public TriangulationBuilder(Face supertriangle, params Vertex[] initialVertices)
     {
@@ -31,45 +27,11 @@ public class TriangulationBuilder
         _vertexQueue = new Queue<Vertex>(initialVertices ?? Array.Empty<Vertex>());
         _meshTriangles = new HashSet<Face> { supertriangle };
 
-        _lastInsertedTriangle = supertriangle; // start walk from supertriangle
-        _internalTrianglesDirty = true;
+        _lastInsertedTriangle = supertriangle;
     }
 
-    /// <summary>
-    /// Checks if there are more vertices to process.
-    /// </summary>
     public bool HasMoreVerticesToProcess => _vertexQueue.Count > 0;
 
-    /// <summary>
-    /// Processes a single vertex in insertion order.
-    /// </summary>
-    public void ProcessSingleVertex()
-    {
-        if (!HasMoreVerticesToProcess) return;
-
-        Vertex vertex = _vertexQueue.Dequeue();
-
-        Stack<Face> legalizationStack = InsertVertexIncrementally(vertex);
-        LegalizeEdges(legalizationStack, vertex);
-
-        // Mark internal triangle cache dirty
-        _internalTrianglesDirty = true;
-    }
-
-    /// <summary>
-    /// Processes all vertices currently in the queue (in insertion order).
-    /// </summary>
-    public void ProcessAllVertices()
-    {
-        while (HasMoreVerticesToProcess)
-        {
-            ProcessSingleVertex();
-        }
-    }
-
-    /// <summary>
-    /// Adds vertices to the queue to be processed in order.
-    /// </summary>
     public void AddVertices(params Vertex[] newVertices)
     {
         if (newVertices == null || newVertices.Length == 0) return;
@@ -77,138 +39,110 @@ public class TriangulationBuilder
             _vertexQueue.Enqueue(v);
     }
 
-    /// <summary>
-    /// Returns a cached view of internal triangles (excluding those with supertriangle vertices).
-    /// </summary>
     public IEnumerable<Face> GetInternalTriangles()
     {
-        if (_cachedInternalTrianglesView == null || _internalTrianglesDirty)
-        {
-            _cachedInternalTrianglesView = _meshTriangles
-                .Where(tri => !tri.GetVertices().Any(v => _superTriangleVertices.Contains(v)))
-                .ToList(); // materialize once
-            _internalTrianglesDirty = false;
-        }
-
-        return _cachedInternalTrianglesView;
+        return _meshTriangles
+            .Where(tri => !tri.GetVertices().Any(v => _superTriangleVertices.Contains(v)));
     }
 
     public IEnumerable<Vertex> GetInternalVertices()
     {
         var superVerticesSet = new HashSet<Vertex>(_superTriangleVertices);
-
-        // Choose the source triangles based on the condition
-        IEnumerable<Face> sourceTriangles =
-            (_cachedInternalTrianglesView == null && GetInternalTriangles().Any())
-            ? GetInternalTriangles()
-            : _meshTriangles;
-
-        return sourceTriangles
+        return GetInternalTriangles()
             .SelectMany(tri => tri.GetVertices())
             .Where(v => !superVerticesSet.Contains(v))
             .Distinct();
     }
 
+    public void ProcessSingleVertex()
+    {
+        foreach (var action in ProcessSingleVertexStepByStep())
+            action();
+    }
 
-    /// <summary>
-    /// Inserts a vertex into the mesh and returns the stack of new triangles for legalization.
-    /// Uses _lastInsertedTriangle as starting point for walking.
-    /// </summary>
-    private Stack<Face> InsertVertexIncrementally(Vertex vertex)
+    public IEnumerable<Action> ProcessSingleVertexStepByStep()
+    {
+        if (!HasMoreVerticesToProcess) yield break;
+
+        Vertex vertex = _vertexQueue.Dequeue();
+
+        // Step 1: Insert vertex and get stack for edge legalization
+        Stack<HalfEdge> stack = InsertSingleVertex(vertex);
+
+        // Yield vertex-inserted action (optional)
+        yield return () => { };
+
+        // Step 2: Yield edge flip actions
+        foreach (var flip in EnumerateFlips(stack, vertex))
+            yield return flip;
+    }
+
+    public void ProcessAllVertices()
+    {
+        while (HasMoreVerticesToProcess)
+            ProcessSingleVertex();
+    }
+
+    private Stack<HalfEdge> InsertSingleVertex(Vertex vertex)
     {
         var startingTriangle = _lastInsertedTriangle ?? _meshTriangles.First();
-        var findPointData = MeshNavigator.LocatePointInMesh(startingTriangle, vertex);
-        var edge = findPointData.destinationEdge;
-        bool isExactlyOnEdge = findPointData.isOnEdge;
+        var pointData = MeshNavigator.LocatePointInMesh(startingTriangle, vertex);
+        var edge = pointData.destinationEdge;
+        bool isOnEdge = pointData.isOnEdge;
 
         if (edge.Origin.PositionsEqual(vertex))
-            return new Stack<Face>();
+            return new Stack<HalfEdge>();
 
         var containingFace = edge.Face;
-        List<Face> newTriangles;
 
-        if (isExactlyOnEdge)
+        if (isOnEdge)
         {
-            newTriangles = TriangulationOperation.SplitTriangle_VertexOnEdge(edge, vertex);
+            TriangulationOperation.SplitTriangle_VertexOnEdge(edge, vertex);
             _meshTriangles.Remove(edge.Face);
-            _meshTriangles.Remove(edge.Twin.Face);
+            if (edge.Twin?.Face != null) _meshTriangles.Remove(edge.Twin.Face);
         }
         else
         {
-            newTriangles = TriangulationOperation.SplitTriangle(containingFace, vertex);
+            TriangulationOperation.SplitTriangle(containingFace, vertex);
             _meshTriangles.Remove(containingFace);
         }
 
-        foreach (var tri in newTriangles)
-            _meshTriangles.Add(tri);
+        _lastInsertedTriangle = vertex.OutgoingHalfEdge?.Face!;
 
-        _lastInsertedTriangle = newTriangles[0];
+        var stack = new Stack<HalfEdge>();
+        foreach (var e in vertex.GetVertexEdges())
+        {
+            _meshTriangles.Add(e.Face);
+            stack.Push(e.Next!);
+        }
 
-        return new Stack<Face>(newTriangles);
+        return stack;
     }
 
-
-    private IEnumerable<Action> LegalizeEdgesActions(Stack<Face> stack, Vertex vertex)
+    private IEnumerable<Action> EnumerateFlips(Stack<HalfEdge> stack, Vertex vertex)
     {
         int iterationLimit = 1_000_000;
         int iterationCount = 0;
 
         while (stack.Count > 0 && iterationCount++ < iterationLimit)
         {
-            var triangle = stack.Pop();
-            if (triangle == null) continue;
+            var edge = stack.Pop();
+            if (edge.Twin == null) continue;
 
-            var oppositeTwin = triangle.GetOppositeTwinEdge(vertex);
-
-            if (oppositeTwin != null && GeometryUtils.IsInsideOrOnCircumcircle(oppositeTwin.Face, vertex))
+            var twin = edge.Twin;
+            if (GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
             {
-                // Yield a lambda that will execute the flip when called
-                yield return () => TriangulationOperation.FlipEdge(ref oppositeTwin);
+                yield return () => TriangulationOperation.FlipEdge(ref twin);
 
-                // Push back to stack to continue processing
-                stack.Push(triangle);
-                stack.Push(oppositeTwin.Face);
+                stack.Push(edge.Next!);
+                stack.Push(twin.Next?.Next!);
             }
         }
     }
 
-
-    /// <summary>
-    /// Generates a sequence of deferred flip actions for edge legalization.
-    /// </summary>
-    private IEnumerable<Action> PrepareLegalizeEdgeActions(Stack<Face> stack, Vertex vertex)
+    private void LegalizeEdges(Stack<HalfEdge> stack, Vertex vertex)
     {
-        int iterationLimit = 1_000_000;
-        int iterationCount = 0;
-
-        while (stack.Count > 0 && iterationCount++ < iterationLimit)
-        {
-            var triangle = stack.Pop();
-            if (triangle == null) continue;
-
-            var oppositeTwin = triangle.GetOppositeTwinEdge(vertex);
-
-            if (oppositeTwin != null && GeometryUtils.IsInsideOrOnCircumcircle(oppositeTwin.Face, vertex))
-            {
-                // Yield a lambda that will execute the flip when called
-                yield return () => TriangulationOperation.FlipEdge(ref oppositeTwin);
-
-                // Push back to stack to continue processing further flips
-                stack.Push(triangle);
-                stack.Push(oppositeTwin.Face);
-            }
-        }
+        foreach (var flip in EnumerateFlips(stack, vertex))
+            flip();
     }
-
-    /// <summary>
-    /// Executes edge flips for the given stack and vertex using the prepared sequence of actions.
-    /// </summary>
-    private void LegalizeEdges(Stack<Face> stack, Vertex vertex)
-    {
-        foreach (var flipAction in PrepareLegalizeEdgeActions(stack, vertex))
-        {
-            flipAction(); // perform the flip
-        }
-    }
-
 }

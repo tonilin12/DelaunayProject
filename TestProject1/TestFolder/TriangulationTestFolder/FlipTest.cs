@@ -37,9 +37,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
                 // Link twin edges
                 face1.Edge.Twin = face2.Edge;
                 face2.Edge.Twin = face1.Edge;
-                // Link twin edges
-                face1.Edge.Twin = face2.Edge;
-                face2.Edge.Twin = face1.Edge;
+       
             }
 
 
@@ -103,23 +101,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
             }
 
 
-            private bool IsLegalTriangle(IReadOnlyList<Vertex> verts)
-            {
-                if (verts.Count != 3) return false;
-
-                // Distinct vertices
-                if (verts.Distinct().Count() != 3) return false;
-
-                // Check 2D area to ensure non-collinear
-                var a = verts[0].Position;
-                var b = verts[1].Position;
-                var c = verts[2].Position;
-
-                float area = (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
-                return Math.Abs(area) > float.Epsilon;
-            }
-
-
 
             [TestMethod]
             public void TestFlipCorrectness()
@@ -131,8 +112,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
                 // The two opposite vertices (one from each adjacent triangle) before the flip
                 var oppositeVerticesBefore = (
-                    FromFace1: edge.Next.Next.Origin,
-                    FromFace2: edge.Twin.Next.Next.Origin
+                    FromFace1: edge?.Next?.Dest,
+                    FromFace2: edge?.Twin?.Next?.Dest
                 );
 
 
@@ -189,7 +170,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
             var orientation1 = GeometryUtils.GetSignedArea(face1_vertices);
-                var orientation2 = GeometryUtils.GetSignedArea(face2_vertices);
+            var orientation2 = GeometryUtils.GetSignedArea(face2_vertices);
 
 
                 // Additionally, they should be consistent
@@ -199,7 +180,34 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
             }
 
+            [TestMethod]
+            public void DoubleFlip_RestoresOriginalConfiguration()
+            {
+                // Arrange: take a shared edge and record initial configuration
+                var edge = face1.Edge;
 
-        }
+                // Record original vertices of both faces
+                var originalFace1Vertices = face1.GetEdges().Select(e => e.Origin).ToArray();
+                var originalFace2Vertices = face2.GetEdges().Select(e => e.Origin).ToArray();
+
+                // Record original twin relationships
+                var originalTwin = edge.Twin;
+
+                // Record original destinations for easy comparison
+                var originalEdgeOrigin = edge.Origin;
+                var originalEdgeDest = edge.Dest;
+
+
+                // Act: flip the edge twice
+                TriangulationOperation.FlipEdge(ref edge); // first flip
+                TriangulationOperation.FlipEdge(ref edge); // first flip
+
+                bool edge_swapped =
+                edge.Origin.PositionsEqual(originalEdgeDest) &&
+                edge.Dest.PositionsEqual(originalEdgeOrigin);
+
+                 Assert.IsTrue(edge_swapped, "flipping edge twice unexpected result topology corruption");
+             }
     }
+}
 
