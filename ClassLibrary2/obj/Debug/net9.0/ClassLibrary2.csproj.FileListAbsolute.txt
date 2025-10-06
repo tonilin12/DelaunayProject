@@ -23,6 +23,7 @@ C:\Users\Toni Lin\Desktop\temp\program00\ClassLibrary2\obj\Debug\net9.0\ref\Clas
 C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Debug\net9.0\ClassLibrary2.deps.json
 C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Debug\net9.0\ClassLibrary2.dll
 C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Debug\net9.0\ClassLibrary2.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Debug\net9.0\ClassLibrary2.csproj.AssemblyReference.cache
 C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Debug\net9.0\ClassLibrary2.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Debug\net9.0\ClassLibrary2.AssemblyInfoInputs.cache
 C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Debug\net9.0\ClassLibrary2.AssemblyInfo.cs

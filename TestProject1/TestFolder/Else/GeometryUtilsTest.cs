@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
-using WindowsFormsApp1.myitem.GeometryFolder;
+using ClassLibrary2.GeometryFolder;
 
 namespace TestProject1.TestFolder.Else
 {
@@ -12,11 +12,11 @@ namespace TestProject1.TestFolder.Else
     [TestClass]
     public class GeometryUtilsTests
     {
-        private Vertex vA;
-        private Vertex vB;
-        private Vertex vC;
-        private Vertex vInside;
-        private Vertex vOutside;
+        private Vertex? vA;
+        private Vertex? vB;
+        private Vertex? vC;
+        private Vertex? vInside;
+        private Vertex? vOutside;
 
         private Face triangle;
 
@@ -24,16 +24,16 @@ namespace TestProject1.TestFolder.Else
         public void Setup()
         {
             // Triangle vertices
-            vA = new Vertex(new Vector2(0, 0));
-            vB = new Vertex(new Vector2(1, 0));
-            vC = new Vertex(new Vector2(0, 1));
+            vA = new Vertex(0, 0);
+            vB = new Vertex(1, 0);
+            vC = new Vertex(0, 1);
 
             // Create triangle face
             triangle = new Face(vA, vB, vC);
 
             // Points to test inside/outside circumcircle
-            vInside = new Vertex(new Vector2(0.25f, 0.25f));
-            vOutside = new Vertex(new Vector2(2f, 2f));
+            vInside = new Vertex(0.25f, 0.25f);
+            vOutside = new Vertex(2f, 2f);
         }
 
         #region TriangleOrientation Tests
@@ -55,9 +55,9 @@ namespace TestProject1.TestFolder.Else
         [TestMethod]
         public void TriangleOrientation_Collinear_Returns0()
         {
-            Vertex v1 = new Vertex(new Vector2(0, 0));
-            Vertex v2 = new Vertex(new Vector2(1, 1));
-            Vertex v3 = new Vertex(new Vector2(2, 2));
+            Vertex v1 = new Vertex(0, 0);
+            Vertex v2 = new Vertex(1, 1);
+            Vertex v3 = new Vertex(2, 2);
 
             var orientation = GeometryUtils.GetSignedArea(v1, v2, v3);
             Assert.AreEqual(0, orientation, "Triangle is collinear, should return 0.");
@@ -108,9 +108,9 @@ namespace TestProject1.TestFolder.Else
         [TestMethod]
         public void Test_IsPointInsideTriangle_PointInside_ReturnsTrue()
         {
-            var a = new Vertex(new Vector2(0, 0));
-            var b = new Vertex(new Vector2(5, 0));
-            var c = new Vertex(new Vector2(2.5f, 5));
+            var a = new Vertex(0, 0);
+            var b = new Vertex(5, 0);
+            var c = new Vertex(2.5f, 5);
             var face = new Face(a, b, c);
 
             var pointInside = new Vector2(2.5f, 2);
@@ -123,9 +123,9 @@ namespace TestProject1.TestFolder.Else
         [TestMethod]
         public void Test_IsPointInsideTriangle_PointOutside_ReturnsFalse()
         {
-            var a = new Vertex(new Vector2(0, 0));
-            var b = new Vertex(new Vector2(5, 0));
-            var c = new Vertex(new Vector2(2.5f, 5));
+            var a = new Vertex(0, 0);
+            var b = new Vertex(5, 0);
+            var c = new Vertex(2.5f, 5);
             var face = new Face(a, b, c);
 
             var pointOutside = new Vector2(5, 5);
@@ -138,9 +138,9 @@ namespace TestProject1.TestFolder.Else
         [TestMethod]
         public void Test_IsPointInsideTriangle_PointOnEdge_ReturnsTrue()
         {
-            var a = new Vertex(new Vector2(0, 0));
-            var b = new Vertex(new Vector2(5, 0));
-            var c = new Vertex(new Vector2(2.5f, 5));
+            var a = new Vertex(0, 0);
+            var b = new Vertex(5, 0);
+            var c = new Vertex(2.5f, 5);
             var face = new Face(a, b, c);
 
             var pointOnEdge = new Vector2(2.5f, 0);
@@ -153,9 +153,9 @@ namespace TestProject1.TestFolder.Else
         [TestMethod]
         public void Test_Circumcenter_ComputesCorrectCenter()
         {
-            var a = new Vertex(new Vector2(0, 0));
-            var b = new Vertex(new Vector2(4, 0));
-            var c = new Vertex(new Vector2(0, 3));
+            var a = new Vertex(0, 0);
+            var b = new Vertex(4, 0);
+            var c = new Vertex(0, 3);
 
             Vector2 center = GeometryUtils.Circumcenter(a, b, c);
 
@@ -169,9 +169,9 @@ namespace TestProject1.TestFolder.Else
         [TestMethod]
         public void Test_Circumcenter_PositionEquidistantFromVertices()
         {
-            var a = new Vertex(new Vector2(1, 1));
-            var b = new Vertex(new Vector2(4, 5));
-            var c = new Vertex(new Vector2(6, 2));
+            var a = new Vertex(1, 1);
+            var b = new Vertex(4, 5);
+            var c = new Vertex(6, 2);
 
             Vector2 center = GeometryUtils.Circumcenter(a, b, c);
 

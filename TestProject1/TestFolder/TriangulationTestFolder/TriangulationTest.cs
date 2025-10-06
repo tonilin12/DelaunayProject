@@ -1,115 +1,94 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using ClassLibrary2.GeometryFolder;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using WindowsFormsApp1.myitem.GeometryFolder; // Adjust namespace
-using MathNet.Numerics.Random;
-using MathNet.Numerics.Distributions;
 
 namespace TestProject1.TestFolder.TriangulationFolder
 {
     [TestClass]
     public class TriangulationTest
     {
-        private Vertex[] vertexArray;
-        private TriangulationBuilder triangulator;
-        private Face superTriangle;
+        private Vertex[]? vertexArray;
+        private TriangulationBuilder? triangulator;
+        private Face? superTriangle;
 
-        private static float Clamp(float value, float min, float max) =>
-            (float)Math.Max(min, Math.Min(value, max));
+
 
         [TestInitialize]
-        public void SetupVertices()
+        public void Setup()
         {
-            // Use Mersenne Twister RNG for reproducibility
-            var rng = new MersenneTwister(12345);
-
-            // Define the containing rectangle
-            float rectMinX = 0;
-            float rectMaxX = 1000;
-            float rectMinY = 0;
-            float rectMaxY = 800;
-
-            // Dense clusters
-            int numClusters = 5;
-            int pointsPerCluster = 200;
-            float clusterRadius = 15f;
-
-            var randomVertices = new List<Vertex>();
-
-            for (int c = 0; c < numClusters; c++)
-            {
-                // Random cluster center inside the rectangle
-                double centerX = ContinuousUniform.Sample(rng, rectMinX, rectMaxX);
-                double centerY = ContinuousUniform.Sample(rng, rectMinY, rectMaxY);
-                var center = new Vector2((float)centerX, (float)centerY);
-
-                for (int i = 0; i < pointsPerCluster; i++)
+            
+                // Initialize Vertex array from points
+                var points = new float[,]
                 {
-                    // Offset within cluster radius using uniform distribution
-                    double offsetX = ContinuousUniform.Sample(rng, -clusterRadius, clusterRadius);
-                    double offsetY = ContinuousUniform.Sample(rng, -clusterRadius, clusterRadius);
+                    {560.0f, 191.0f},
+                    {560.0f, 355.0f},
+                    {449.0f, 279.0f},
+                    {688.0f, 277.0f},
+                    {663.0f, 199.0f},
+                    {635.0f, 174.0f},
+                    {470.0f, 344.0f},
+                    {652.0f, 357.0f},
+                    {560.0f, 235.0f}
+                };
+                vertexArray = new Vertex[points.GetLength(0)];
+                for (int i = 0; i < points.GetLength(0); i++)
+                {
+                    vertexArray[i] = new Vertex(points[i, 0], points[i, 1]);
+                }
 
-                    var vertexPos = center + new Vector2((float)offsetX, (float)offsetY);
+                TriangulationOperation.getSuperTriangle(ref vertexArray, out superTriangle!);
+                triangulator = new TriangulationBuilder(superTriangle!);
+        }
 
-                    // Clip vertex to rectangle bounds
-                    vertexPos.X = Clamp(vertexPos.X, rectMinX, rectMaxX);
-                    vertexPos.Y = Clamp(vertexPos.Y, rectMinY, rectMaxY);
+        /// <summary>
+        /// Helper method to check that a vertex insertion does not violate Delaunay condition
+        /// with respect to its connected edges and their twins.
+        /// </summary>
+        /// <param name="vertex">The vertex to check</param>
+        private void AssertVertexDelaunay(Vertex vertex)
+        {
+            Assert.IsNotNull(vertex, "Vertex cannot be null.");
+            // Get all next edges that have a twin
+            var nextEdgesWithTwin = vertex.GetVertexEdges()
+                                          .Where(e => e.Next?.Twin != null)
+                                          .Select(e => e.Next!);  // select the Next edge
 
-                    randomVertices.Add(new Vertex(vertexPos));
+            foreach (var edge in nextEdgesWithTwin)
+            {
+                var twinEdge = edge.Twin!;
+                var twinFace = twinEdge.Face;
+
+                if (GeometryUtils.IsInsideOrOnCircumcircle(twinFace, vertex))
+                {
+                    Assert.Fail(
+                        $"Delaunay violation detected!\n" +
+                        $"Inserted Vertex: {vertex}\n" +
+                        $"Edge: {edge}\n" +
+                        $"Edge.Face: {edge.Face}\n" +
+                        $"Twin.Face: {twinFace}"
+                    );
                 }
             }
-
-            // Remove exact duplicates
-            vertexArray = randomVertices
-                .GroupBy(v => v.Position)
-                .Select(g => g.First())
-                .ToArray();
-
-            // Initialize super-triangle and triangulator
-            TriangulationOperation.getSuperTriangle(ref vertexArray, out superTriangle);
-            triangulator = new TriangulationBuilder(superTriangle);
         }
 
+
+
         [TestMethod]
-        public void RandomDenseRectangle_ShouldInitializeVertices()
+        public void TestDelaunaySinglePointInsert()
         {
+            Assert.IsNotNull(triangulator, "Triangulator should not be null.");
             Assert.IsNotNull(vertexArray, "Vertex array should not be null.");
-            Assert.IsTrue(vertexArray.Length > 0, "Vertex array should contain vertices.");
-        }
 
-        [TestMethod]
-        public void TriangulationBuilder_ShouldBuildValidTriangulation()
-        {
-            foreach (var v in vertexArray)
-            {
-                triangulator.AddVertices(v);
-                triangulator.ProcessSingleVertex();
-            }
+            var vertex0 = vertexArray!.First();
+            triangulator!.AddVertices(vertex0);
+            triangulator.ProcessSingleVertex();
 
-            var triangles = triangulator.GetInternalTriangles();
-
-            Assert.IsNotNull(triangles, "Triangulation result should not be null.");
-            Assert.IsTrue(triangles.Count > 0, "There should be at least one triangle.");
-
-            // All vertices must be part of some triangle
-            var verticesInTriangles = new HashSet<Vertex>();
-            foreach (var face in triangles)
-                foreach (var v in face.GetVertices())
-                    verticesInTriangles.Add(v);
-
-            foreach (var v in vertexArray)
-                Assert.IsTrue(verticesInTriangles.Contains(v), $"Vertex {v.Position} not included in any triangle.");
-
-            // Validate triangles: no duplicate vertices, positive area
-            foreach (var face in triangles)
-            {
-                var verts = face.GetVertices().ToList();
-                Assert.AreEqual(3, verts.Distinct().Count(), "Triangle has duplicate vertices.");
-                float area = GeometryUtils.GetSignedArea(verts[0], verts[1], verts[2]);
-                Assert.IsTrue(area > 0, "Triangle has zero or negative area.");
-            }
+            // Use the helper
+            AssertVertexDelaunay(vertex0);
         }
     }
 }

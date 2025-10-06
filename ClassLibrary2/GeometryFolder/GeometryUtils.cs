@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace WindowsFormsApp1.myitem.GeometryFolder
+namespace ClassLibrary2.GeometryFolder
 {
     public static class GeometryUtils
     {
@@ -76,7 +76,7 @@ namespace WindowsFormsApp1.myitem.GeometryFolder
 
             return det >= -EPSILON;
         }
-
+       
         /// <summary>
         /// Checks if a point is inside a triangle.
         /// </summary>

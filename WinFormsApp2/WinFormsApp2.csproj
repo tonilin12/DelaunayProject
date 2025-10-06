@@ -13,13 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="myitem\FormFolder\Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="myitem\FormFolder\Form2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="myitem\FormFolder\HomeForm.cs">
+    <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

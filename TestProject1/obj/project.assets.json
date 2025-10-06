@@ -2,15 +2,34 @@
   "version": 3,
   "targets": {
     "net9.0": {
-      "MathNet.Numerics/5.0.0": {
+      "DocumentFormat.OpenXml/3.3.0": {
         "type": "package",
+        "dependencies": {
+          "DocumentFormat.OpenXml.Framework": "3.3.0"
+        },
         "compile": {
-          "lib/net6.0/MathNet.Numerics.dll": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/MathNet.Numerics.dll": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "DocumentFormat.OpenXml.Framework/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "System.IO.Packaging": "8.0.1"
+        },
+        "compile": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
             "related": ".xml"
           }
         }
@@ -676,6 +695,22 @@
           }
         }
       },
+      "System.IO.Packaging/8.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/System.IO.Packaging.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/System.IO.Packaging.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
       "System.Reflection.Metadata/1.6.0": {
         "type": "package",
         "compile": {
@@ -692,6 +727,9 @@
       "ClassLibrary2/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "DocumentFormat.OpenXml": "3.3.0"
+        },
         "compile": {
           "bin/placeholder/ClassLibrary2.dll": {}
         },
@@ -702,26 +740,52 @@
     }
   },
   "libraries": {
-    "MathNet.Numerics/5.0.0": {
-      "sha512": "pg1W2VwaEQMAiTpGK840hZgzavnqjlCMTVSbtVCXVyT+7AX4mc1o89SPv4TBlAjhgCOo9c1Y+jZ5m3ti2YgGgA==",
+    "DocumentFormat.OpenXml/3.3.0": {
+      "sha512": "JogRPJNiE6kKvbuCqVRX691pPWeGMqdQgjrUwRYkdpfkMmtElfqAgcRR73geYj7OtBeEpstldZXXzJw27LUI9w==",
       "type": "package",
-      "path": "mathnet.numerics/5.0.0",
+      "path": "documentformat.openxml/3.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "README.md",
+        "documentformat.openxml.3.3.0.nupkg.sha512",
+        "documentformat.openxml.nuspec",
         "icon.png",
-        "lib/net461/MathNet.Numerics.dll",
-        "lib/net461/MathNet.Numerics.xml",
-        "lib/net48/MathNet.Numerics.dll",
-        "lib/net48/MathNet.Numerics.xml",
-        "lib/net5.0/MathNet.Numerics.dll",
-        "lib/net5.0/MathNet.Numerics.xml",
-        "lib/net6.0/MathNet.Numerics.dll",
-        "lib/net6.0/MathNet.Numerics.xml",
-        "lib/netstandard2.0/MathNet.Numerics.dll",
-        "lib/netstandard2.0/MathNet.Numerics.xml",
-        "mathnet.numerics.5.0.0.nupkg.sha512",
-        "mathnet.numerics.nuspec"
+        "lib/net35/DocumentFormat.OpenXml.dll",
+        "lib/net35/DocumentFormat.OpenXml.xml",
+        "lib/net40/DocumentFormat.OpenXml.dll",
+        "lib/net40/DocumentFormat.OpenXml.xml",
+        "lib/net46/DocumentFormat.OpenXml.dll",
+        "lib/net46/DocumentFormat.OpenXml.xml",
+        "lib/net8.0/DocumentFormat.OpenXml.dll",
+        "lib/net8.0/DocumentFormat.OpenXml.xml",
+        "lib/netstandard2.0/DocumentFormat.OpenXml.dll",
+        "lib/netstandard2.0/DocumentFormat.OpenXml.xml"
+      ]
+    },
+    "DocumentFormat.OpenXml.Framework/3.3.0": {
+      "sha512": "R5CLzEoeyr7XDB7g3NTxRobcU19agaxVAhGZm+fZUShJGiU4bw8oUgnA2BNFepigJckfFMayOBMAbV3kDXNInA==",
+      "type": "package",
+      "path": "documentformat.openxml.framework/3.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "documentformat.openxml.framework.3.3.0.nupkg.sha512",
+        "documentformat.openxml.framework.nuspec",
+        "icon.png",
+        "lib/net35/DocumentFormat.OpenXml.Framework.dll",
+        "lib/net35/DocumentFormat.OpenXml.Framework.xml",
+        "lib/net40/DocumentFormat.OpenXml.Framework.dll",
+        "lib/net40/DocumentFormat.OpenXml.Framework.xml",
+        "lib/net46/DocumentFormat.OpenXml.Framework.dll",
+        "lib/net46/DocumentFormat.OpenXml.Framework.xml",
+        "lib/net6.0/DocumentFormat.OpenXml.Framework.dll",
+        "lib/net6.0/DocumentFormat.OpenXml.Framework.xml",
+        "lib/net8.0/DocumentFormat.OpenXml.Framework.dll",
+        "lib/net8.0/DocumentFormat.OpenXml.Framework.xml",
+        "lib/netstandard2.0/DocumentFormat.OpenXml.Framework.dll",
+        "lib/netstandard2.0/DocumentFormat.OpenXml.Framework.xml"
       ]
     },
     "Microsoft.ApplicationInsights/2.22.0": {
@@ -1646,6 +1710,35 @@
         "version.txt"
       ]
     },
+    "System.IO.Packaging/8.0.1": {
+      "sha512": "KYkIOAvPexQOLDxPO2g0BVoWInnQhPpkFzRqvNrNrMhVT6kqhVr0zEb6KCHlptLFukxnZrjuMVAnxK7pOGUYrw==",
+      "type": "package",
+      "path": "system.io.packaging/8.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.IO.Packaging.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/System.IO.Packaging.targets",
+        "lib/net462/System.IO.Packaging.dll",
+        "lib/net462/System.IO.Packaging.xml",
+        "lib/net6.0/System.IO.Packaging.dll",
+        "lib/net6.0/System.IO.Packaging.xml",
+        "lib/net7.0/System.IO.Packaging.dll",
+        "lib/net7.0/System.IO.Packaging.xml",
+        "lib/net8.0/System.IO.Packaging.dll",
+        "lib/net8.0/System.IO.Packaging.xml",
+        "lib/netstandard2.0/System.IO.Packaging.dll",
+        "lib/netstandard2.0/System.IO.Packaging.xml",
+        "system.io.packaging.8.0.1.nupkg.sha512",
+        "system.io.packaging.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "System.Reflection.Metadata/1.6.0": {
       "sha512": "COC1aiAJjCoA5GBF+QKL2uLqEBew4JsCkQmoHKbN3TlOZKa2fKLz5CpiRQKDz0RsAOEGsVKqOD5bomsXq/4STQ==",
       "type": "package",
@@ -1679,7 +1772,6 @@
       "MSTest.Analyzers >= 3.6.4",
       "MSTest.TestAdapter >= 3.6.4",
       "MSTest.TestFramework >= 3.6.4",
-      "MathNet.Numerics >= 5.0.0",
       "Microsoft.NET.Test.Sdk >= 17.11.1"
     ]
   },
@@ -1751,10 +1843,6 @@
             "target": "Package",
             "version": "[3.6.4, )",
             "versionOverride": "[3.6.4, )"
-          },
-          "MathNet.Numerics": {
-            "target": "Package",
-            "version": "[5.0.0, )"
           },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",

@@ -19,14 +19,14 @@ namespace TestProject1.TestFolder.TriangulationOperations
         public void SplitTriangle_PointInsideFace()
         {
             // Step 1: Create original triangle
-            var vA = new Vertex(new Vector2(0, 0));
-            var vB = new Vertex(new Vector2(1, 0));
-            var vC = new Vertex(new Vector2(0, 1));
+            var vA = new Vertex(0, 0);
+            var vB = new Vertex(1, 0);
+            var vC = new Vertex(0, 1);
             var face = new Face(vA, vB, vC);
 
 
             // Step 2: Add new vertex inside the triangle
-            var vD = new Vertex(new Vector2(0.3f, 0.3f));
+            var vD = new Vertex(0.3f, 0.3f);
 
 
 
@@ -43,11 +43,14 @@ namespace TestProject1.TestFolder.TriangulationOperations
 
 
 
-            vD.EnumerateEdges(e =>
-            {
-                original_edges.Remove(e.Next); // now works based on Origin->Dest equality
-                return e;
-            }).ToList();
+            vD.GetVertexEdges()                 // returns IEnumerable<HalfEdge>
+              .Select(e =>
+              {
+                  original_edges.Remove(e.Next); // now works based on Origin->Dest equality
+                  return e;
+              })
+              .ToList();
+
 
             Assert.AreEqual(0, original_edges.Count);
 
@@ -58,12 +61,12 @@ namespace TestProject1.TestFolder.TriangulationOperations
         {
 
             // Shared middle edge
-            var vA = new Vertex(new Vector2(0.25f, 0f));  // left point of middle edge
-            var vB = new Vertex(new Vector2(0.75f, 0f));  // right point of middle edge
+            var vA = new Vertex(0.25f, 0f);  // left point of middle edge
+            var vB = new Vertex(0.75f, 0f);  // right point of middle edge
 
             // One vertex above and one below, forming a convex quad
-            var vC = new Vertex(new Vector2(0.5f, 0.5f));   // top vertex
-            var vD = new Vertex(new Vector2(0.5f, -0.5f));  // bottom vertex
+            var vC = new Vertex(0.5f, 0.5f);   // top vertex
+            var vD = new Vertex(0.5f, -0.5f);  // bottom vertex
 
 
 
@@ -78,7 +81,10 @@ namespace TestProject1.TestFolder.TriangulationOperations
             var edge = face1.Edge;
 
 
-            var vE = new Vertex(Vector2.Lerp(vA.Position, vB.Position, 0.5f));
+            var vE = new Vertex(
+                (vA.Position.X + vB.Position.X) / 2f,
+                (vA.Position.Y + vB.Position.Y) / 2f
+            );
 
 
             var originalEdges = new HashSet<HalfEdge>();
@@ -91,12 +97,13 @@ namespace TestProject1.TestFolder.TriangulationOperations
             splitter.SplitTriangle_VertexOnEdge(edge, vE);
 
 
-
-            vE.EnumerateEdges(e =>
-            {
-                originalEdges.Remove(e.Next); // now works based on Origin->Dest equality
-                return e;
-            }).ToList();
+            vE.GetVertexEdges()
+                .Select(e =>
+                {
+                    originalEdges.Remove(e.Next); // now works based on Origin->Dest equality
+                    return e;
+                })
+                .ToList();
 
             Assert.AreEqual(0, originalEdges.Count);
 

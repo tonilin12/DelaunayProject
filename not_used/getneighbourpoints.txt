@@ -1,0 +1,170 @@
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace ClassLibrary2.MeshFolder.TriangulationHelpers
+{
+    /// <summary>
+    /// A spatial grid structure for fast neighbor queries in 2D.
+    /// Points are stored in bins based on their positions, allowing
+    /// efficient retrieval of nearby points.
+    /// </summary>
+    public class SpatialGrid
+    {
+        // All points stored contiguously for cache-friendly access
+        private readonly Vertex[] allPoints;
+
+        // Start index of each bin in allPoints array
+        private readonly int[] binOffsets;
+
+        // Number of points in each bin
+        private readonly int[] binCounts;
+
+        // Number of bins per row/column
+        private readonly int gridSize;
+
+        // Total width and height of the bounding box
+        private readonly float width;
+        private readonly float height;
+
+        // Bounding box of all points
+        private readonly Vector2 minBounds;
+        private readonly Vector2 maxBounds;
+
+        // Total number of bins (gridSize * gridSize)
+        private readonly int totalBins;
+
+        // Precomputed multipliers for bin index calculation (avoids divisions at runtime)
+        private readonly float invWidth;
+        private readonly float invHeight;
+
+        // Safety constants
+        private const float ClampFactor = 0.99f; // Ensure points on max boundary are inside grid
+        private const float Epsilon = 1e-6f;     // Prevent division by zero
+
+        /// <summary>
+        /// Constructs a spatial grid from a collection of vertices.
+        /// </summary>
+        /// <param name="points">Collection of 2D points</param>
+        /// <param name="customGridSize">Optional fixed grid size (number of bins per row/column)</param>
+        public SpatialGrid(IEnumerable<Vertex> points)
+        {
+            if (points == null) throw new ArgumentNullException(nameof(points));
+
+            // Convert input to array for random access
+            var pointArray = points is Vertex[] arr ? arr : new List<Vertex>(points).ToArray();
+            if (pointArray.Length == 0)
+                throw new ArgumentException("Points collection cannot be empty.", nameof(points));
+
+            // Compute bounding box of all points
+            ComputeBounds(pointArray, out minBounds, out maxBounds);
+            width = Math.Max(maxBounds.X - minBounds.X, Epsilon);
+            height = Math.Max(maxBounds.Y - minBounds.Y, Epsilon);
+
+            // Determine grid size (number of bins per row/column)
+            gridSize = Math.Max(1, (int)Math.Ceiling(Math.Pow(pointArray.Length, 0.25)));
+            totalBins = gridSize * gridSize;
+
+            // Precompute multipliers for fast bin calculation (avoid divisions)
+            invWidth = ClampFactor * gridSize / width;
+            invHeight = ClampFactor * gridSize / height;
+
+            // STEP 1: Count how many points fall into each bin
+            var tempCounts = new int[totalBins]; // temporary counts
+            var binIndices = new int[pointArray.Length]; // remember each point's bin
+
+            for (int i = 0; i < pointArray.Length; i++)
+            {
+                int idx = GetBinIndex(pointArray[i].Position, out int row, out int col);
+                binIndices[i] = idx;
+                tempCounts[idx]++; // increment count for this bin
+            }
+
+            // STEP 2: Compute bin offsets (starting index in allPoints array for each bin)
+            binOffsets = new int[totalBins];
+            binCounts = new int[totalBins]; // will track number of points filled per bin
+
+            int offset = 0;
+            for (int i = 0; i < totalBins; i++)
+            {
+                binOffsets[i] = offset; // start index for this bin
+                binCounts[i] = 0;       // initialize counter for filling
+                offset += tempCounts[i]; // move offset for next bin
+            }
+
+            // STEP 3: Allocate contiguous array and fill bins
+            allPoints = new Vertex[pointArray.Length];
+            for (int i = 0; i < pointArray.Length; i++)
+            {
+                int idx = binIndices[i];
+                int pos = binOffsets[idx] + binCounts[idx]; // compute position to insert
+                allPoints[pos] = pointArray[i];            // insert point into contiguous array
+                binCounts[idx]++;                          // increment count for this bin
+            }
+        }
+
+        #region Private Helpers
+
+        /// <summary>
+        /// Computes the axis-aligned bounding box of a set of points.
+        /// </summary>
+        private static void ComputeBounds(Vertex[] points, out Vector2 min, out Vector2 max)
+        {
+            var minV = new Vector2(float.MaxValue, float.MaxValue);
+            var maxV = new Vector2(float.MinValue, float.MinValue);
+
+            foreach (var v in points)
+            {
+                minV.X = Math.Min(minV.X, v.Position.X);
+                minV.Y = Math.Min(minV.Y, v.Position.Y);
+                maxV.X = Math.Max(maxV.X, v.Position.X);
+                maxV.Y = Math.Max(maxV.Y, v.Position.Y);
+            }
+
+            min = minV;
+            max = maxV;
+        }
+
+        /// <summary>
+        /// Maps a point to its corresponding bin index.
+        /// </summary>
+        private int GetBinIndex(Vector2 pos, out int row, out int col)
+        {
+            // Normalize position to grid coordinates
+            row = (int)((pos.Y - minBounds.Y) * invHeight);
+            col = (int)((pos.X - minBounds.X) * invWidth);
+
+            // Clamp to grid bounds
+            row = Math.Clamp(row, 0, gridSize - 1);
+            col = Math.Clamp(col, 0, gridSize - 1);
+
+            // Return single linear index
+            return row * gridSize + col;
+        }
+
+        #endregion
+
+        #region Public API
+
+        /// <summary>
+        /// Enumerates all points in the grid in row-major order.
+        /// </summary>
+        public IEnumerable<Vertex> GetAllPoints()
+        {
+            for (int i = 0; i < allPoints.Length; i++)
+                yield return allPoints[i];
+        }
+
+
+        /// <summary>Number of bins per row/column</summary>
+        public int GridSize => gridSize;
+
+        /// <summary>Total number of bins in the grid</summary>
+        public int TotalBins => totalBins;
+
+        /// <summary>Number of points in a specific bin</summary>
+        public int BinPointCount(int binIndex) => (binIndex >= 0 && binIndex < totalBins) ? binCounts[binIndex] : 0;
+
+        #endregion
+    }
+}

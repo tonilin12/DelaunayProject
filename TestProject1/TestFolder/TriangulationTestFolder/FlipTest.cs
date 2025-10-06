@@ -1,11 +1,11 @@
-﻿    using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using ClassLibrary2.GeometryFolder;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Numerics;
     using System.Text;
     using System.Threading.Tasks;
-    using WindowsFormsApp1.myitem.GeometryFolder;
 
     namespace TestProject1.TestFolder.TriangulationOperations
     {
@@ -22,12 +22,12 @@
             public void Setup()
             {
                 // Shared middle edge
-                var vA = new Vertex(new Vector2(0.25f, 0f));  // left point of middle edge
-                var vB = new Vertex(new Vector2(0.75f, 0f));  // right point of middle edge
+                var vA = new Vertex(0.25f, 0f);  // left point of middle edge
+                var vB = new Vertex(0.75f, 0f);  // right point of middle edge
 
                 // One vertex above and one below, forming a convex quad
-                var vC = new Vertex(new Vector2(0.5f, 0.5f));   // top vertex
-                var vD = new Vertex(new Vector2(0.5f, -0.5f));  // bottom vertex
+                var vC = new Vertex(0.5f, 0.5f);   // top vertex
+                var vD = new Vertex(0.5f, -0.5f);  // bottom vertex
 
 
                 // Faces

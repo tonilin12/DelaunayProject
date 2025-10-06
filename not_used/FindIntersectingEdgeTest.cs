@@ -10,6 +10,33 @@ using System.Threading.Tasks;
 using WindowsFormsApp1.myitem.GeometryFolder;
 
 
+        public static bool IsEdgeCrossingSegment(HalfEdge edge, Vertex a, Vertex b)
+        {
+            if (edge == null || edge.Origin == null || edge.Next?.Origin == null)
+                throw new ArgumentNullException(nameof(edge));
+            if (a == null || b == null)
+                throw new ArgumentNullException("Vertices a and b cannot be null.");
+
+            Vector2 p1 = edge.Origin.Position;
+            Vector2 p2 = edge.Next.Origin.Position;
+            Vector2 q1 = a.Position;
+            Vector2 q2 = b.Position;
+
+            float o1 = GetSignedArea(p1, p2, q1);
+            float o2 = GetSignedArea(p1, p2, q2);
+            float o3 = GetSignedArea(q1, q2, p1);
+            float o4 = GetSignedArea(q1, q2, p2);
+
+            // Use EPSILON to avoid floating-point errors
+            float eps = GetEpsilon;
+
+            // Strict crossing: segments intersect if signs differ beyond epsilon
+            bool cond1 = (o1 > eps && o2 < -eps) || (o1 < -eps && o2 > eps);
+            bool cond2 = (o3 > eps && o4 < -eps) || (o3 < -eps && o4 > eps);
+
+            return cond1 && cond2;
+        }
+
    public static IEnumerable<HalfEdge> FindIntersectingEdges(Vertex a, Vertex b)
    {
        if (a == null || b == null)
@@ -25,7 +52,7 @@ using WindowsFormsApp1.myitem.GeometryFolder;
                edgesToVisit.Enqueue(edge);
        }
 
-       const int MAX_ITER = 10000; // safety
+       const int MAX_ITER = 1000000; // safety
        int iterations = 0;
 
        while (edgesToVisit.Count > 0)

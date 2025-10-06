@@ -1,28 +1,28 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestProject1.TestFolder.TriangulationOperations
 {
-
     [TestClass]
     public class SuperTriangleGeneratorTests
     {
+        private static Random _random = new Random();
+
         [TestMethod]
-        public void TestSuperTriangleGeneration()
+        public void TestSuperTriangleGeneration_WithRandomVertices()
         {
-            // Arrange: create some sample vertices as an array
-            Vertex[] vertices = new Vertex[]
+            // Arrange: create a random set of vertices
+            int vertexCount = _random.Next(4, 10); // between 4 and 10 vertices
+            Vertex[] vertices = new Vertex[vertexCount];
+
+            for (int i = 0; i < vertexCount; i++)
             {
-                new Vertex(new Vector2(100, 100)),
-                new Vertex(new Vector2(200, 300)),
-                new Vertex(new Vector2(400, 150)),
-                new Vertex(new Vector2(50, 250))
-            };
+                float x = (float)_random.NextDouble() * 500; // range 0–500
+                float y = (float)_random.NextDouble() * 500; // range 0–500
+                vertices[i] = new Vertex(x, y);
+            }
 
             // Create the supertriangle generator
             SuperTriangleGenerator generator = new SuperTriangleGenerator();
@@ -40,11 +40,11 @@ namespace TestProject1.TestFolder.TriangulationOperations
             Assert.AreNotEqual(verts[1], verts[2]);
             Assert.AreNotEqual(verts[0], verts[2]);
 
-            // Optional: check that superTriangle roughly encloses all input vertices
-            float minX = Math.Min(Math.Min(verts[0].Position.X, verts[1].Position.X), verts[2].Position.X);
-            float maxX = Math.Max(Math.Max(verts[0].Position.X, verts[1].Position.X), verts[2].Position.X);
-            float minY = Math.Min(Math.Min(verts[0].Position.Y, verts[1].Position.Y), verts[2].Position.Y);
-            float maxY = Math.Max(Math.Max(verts[0].Position.Y, verts[1].Position.Y), verts[2].Position.Y);
+            // Check that the supertriangle roughly encloses all input vertices
+            float minX = verts.Min(v => v.Position.X);
+            float maxX = verts.Max(v => v.Position.X);
+            float minY = verts.Min(v => v.Position.Y);
+            float maxY = verts.Max(v => v.Position.Y);
 
             foreach (var v in vertices)
             {
@@ -53,7 +53,19 @@ namespace TestProject1.TestFolder.TriangulationOperations
                 Assert.IsTrue(v.Position.Y >= minY && v.Position.Y <= maxY,
                     $"Vertex Y {v.Position.Y} should be within superTriangle bounds ({minY}-{maxY})");
             }
+
+            foreach (var edge in superTriangle.GetEdges())
+            {
+                if (edge.Twin != null)
+                {
+                    Assert.Fail($"SuperTriangle edge twin should be null.\n" +
+                                $"Edge: {edge}\n" +
+                                $"Twin: {edge.Twin}\n" +
+                                $"Face: {edge.Face}\n" +
+                                $"Twin.Face: {edge.Twin.Face}");
+                }
+            }
+
         }
     }
-
 }

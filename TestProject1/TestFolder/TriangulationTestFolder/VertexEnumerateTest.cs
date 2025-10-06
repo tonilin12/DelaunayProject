@@ -22,9 +22,9 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
         [TestInitialize]
         public void Setup()
         {
-            vA = new Vertex(new Vector2(0, 0));
-            vB = new Vertex(new Vector2(1, 0));
-            vC = new Vertex(new Vector2(0, 1));
+            vA = new Vertex(0, 0);
+            vB = new Vertex(1, 0);
+            vC = new Vertex(0, 1);
 
             // Create half-edge pairs
             (eAB, eBA) = HalfEdge.CreateHalfEdgePair(vA, vB);
@@ -62,7 +62,7 @@ namespace UnitTestProject1.TestFolder.TriangulationOperations
             {
                 var expectedEdges = edgesByOrigin[vertex];
 
-                var actualEdges = vertex.EnumerateEdges(e => e).ToList();
+                var actualEdges = vertex.GetVertexEdges().ToList();
 
                 CollectionAssert.AreEquivalent(expectedEdges, actualEdges,
                     $"Vertex {vertex} EnumerateEdges did not match edges from faces.");

@@ -49,6 +49,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "DocumentFormat.OpenXml": {
+              "target": "Package",
+              "version": "[3.3.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -133,10 +139,6 @@
               "target": "Package",
               "version": "[3.6.4, )",
               "versionOverride": "[3.6.4, )"
-            },
-            "MathNet.Numerics": {
-              "target": "Package",
-              "version": "[5.0.0, )"
             },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
