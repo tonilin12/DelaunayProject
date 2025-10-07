@@ -8,9 +8,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinFormsApp2.FormFolder;
 
 namespace WindowsFormsApp1
 {
@@ -32,7 +32,7 @@ namespace WindowsFormsApp1
         private ToolStripMenuItem showTrianglesMenuItem;
         private ToolStripMenuItem showVoronoiMenuItem;
 
-        private Face hoveredFace = null;
+        private Face hoveredFace = null!;
         private bool hasError = false;
 
         private bool showTriangles = true;
@@ -40,11 +40,9 @@ namespace WindowsFormsApp1
 
         private const int VertexProcessTimeoutMs = 500;
 
-
         private bool isProcessingVertex = false;
 
         private bool isStepByStepMode = false; // default: step-by-step animation
-
 
         #endregion
 
@@ -133,12 +131,9 @@ namespace WindowsFormsApp1
             this.Controls.Add(menuStrip);
         }
 
-
-
         #endregion
 
         #region TriangInitialization
-
 
         private void InitializeTriangulation()
         {
@@ -149,8 +144,8 @@ namespace WindowsFormsApp1
                 triangulation?.Clear();
                 triangulation = null;
                 triangulator = null;
-                hoveredFace = null;
-                superTriangle = null;
+                hoveredFace = null!;
+                superTriangle = null!;
                 insertedVertices.Clear();
 
                 int screenWidth = Screen.PrimaryScreen.Bounds.Width;
@@ -179,8 +174,6 @@ namespace WindowsFormsApp1
         }
 
         #endregion
-
-
 
         #region Reset
 
@@ -211,7 +204,7 @@ namespace WindowsFormsApp1
                 triangulation?.Clear();
                 triangulation = null;
 
-                hoveredFace = null;
+                hoveredFace = null!;
                 triangulator = null;
                 insertedVertices.Clear();
                 hasError = false;
@@ -222,8 +215,8 @@ namespace WindowsFormsApp1
         }
 
         #endregion
-        #region Vertex Processing
 
+        #region Vertex Processing
 
         private async Task ProcessVertexStepByStepAsync(Vertex vertex)
         {
@@ -232,17 +225,18 @@ namespace WindowsFormsApp1
             isProcessingVertex = true;  // lock input
             try
             {
+                // Enqueue the vertex in triangulator regardless of mode
                 triangulator.AddVertices(vertex);
-
-                bool vertexAdded = false;
-                var actions = triangulator.ProcessSingleVertexStepByStep();
 
                 if (isStepByStepMode)
                 {
-                    // Animated step-by-step mode
+                    // Animated step-by-step mode: use the stepwise enumerable
+                    bool vertexAdded = false;
+                    var actions = triangulator.ProcessSingleVertexStepByStep();
+
                     foreach (var action in actions)
                     {
-                        HashSet<Face>? snapshot;
+                        HashSet<Face>? snapshot = null;
 
                         await Task.Run(() =>
                         {
@@ -261,20 +255,22 @@ namespace WindowsFormsApp1
                             }
                         });
 
+                        // update UI and delay for animation
                         this.BeginInvoke(() => Invalidate());
-                        await Task.Delay(200);
+                        await Task.Delay(300);
                     }
                 }
                 else
                 {
-                    // Normal/instant mode: execute all actions immediately
+                    // Instant (non-stepwise) mode: call the fast, direct API once
                     await Task.Run(() =>
                     {
                         lock (_lock)
                         {
-                            foreach (var action in actions)
-                                action();
+                            // Process single vertex using the fast path (no per-action delegates)
+                            triangulator.ProcessSingleVertex();
 
+                            // record insertion and snapshot
                             insertedVertices.Add(vertex);
                             triangulation = triangulator.GetInternalTriangles().ToHashSet();
                         }
@@ -288,8 +284,6 @@ namespace WindowsFormsApp1
                 isProcessingVertex = false; // unlock input
             }
         }
-
-
 
         #endregion
 
@@ -318,18 +312,41 @@ namespace WindowsFormsApp1
             if (hasError || triangulation == null) return;
 
             var p = new Vector2(e.X, e.Y);
+            Face newHovered = null!;
 
             lock (_lock)
             {
-                hoveredFace = triangulation.FirstOrDefault(face => GeometryUtils.IsPointInsideTriangle(face, p));
+                newHovered = triangulation.FirstOrDefault(face => GeometryUtils.IsPointInsideTriangle(face, p));
             }
 
-            Invalidate();
+            if (newHovered != hoveredFace)
+            {
+                // Compute old & new hover regions
+                RectangleF oldRegion = hoveredFace != null ? GetHoverRegion(hoveredFace) : RectangleF.Empty;
+                RectangleF newRegion = newHovered != null ? GetHoverRegion(newHovered) : RectangleF.Empty;
+
+                hoveredFace = newHovered;
+
+                // Invalidate only the changed areas
+                if (!oldRegion.IsEmpty) Invalidate(Rectangle.Ceiling(oldRegion));
+                if (!newRegion.IsEmpty) Invalidate(Rectangle.Ceiling(newRegion));
+            }
         }
 
         #endregion
 
         #region Paint
+
+        private RectangleF GetHoverRegion(Face face)
+        {
+            if (face == null) return RectangleF.Empty;
+
+            Vector2 center = face.Circumcenter;
+            float r = Vector2.Distance(center, face.GetVertices().First().Position);
+            float diameter = r * 2f;
+
+            return new RectangleF(center.X - r - 2, center.Y - r - 2, diameter + 4, diameter + 4);
+        }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
@@ -349,64 +366,79 @@ namespace WindowsFormsApp1
                 hoveredSnapshot = hoveredFace;
             }
 
+            // ---- Draw main elements ----
+            if (showTriangles)
+                DrawTriangles(g, trianglesSnapshot);
+
+            DrawVertices(g, verticesSnapshot);
+
+            if (showVoronoi && triangulator != null)
+                DrawVoronoi(g, triangulator);
+
+            // ---- Hover overlay ----
+            if (showTriangles && hoveredSnapshot != null)
+                DrawHoveredFace(g, hoveredSnapshot);
+        }
+
+        #endregion
+
+        #region Drawing Helpers
+
+        private void DrawTriangles(Graphics g, HashSet<Face> triangles)
+        {
             using (var edgePen = new Pen(Color.Blue, 2))
-            using (var pointBrush = new SolidBrush(Color.Red))
-            using (var circlePen = new Pen(Color.Green, 1))
-            using (var voronoiPen = new Pen(Color.DarkOrange, 2))
             {
-                // Draw triangles
-                if (showTriangles)
+                foreach (var face in triangles)
                 {
-                    foreach (var face in trianglesSnapshot)
-                    {
-                        var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
-                        if (verts.Length < 3) continue;
+                    var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
+                    if (verts.Length < 3) break;
 
-                        for (int i = 0; i < verts.Length; i++)
-                            g.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
-                    }
-                }
-
-                // Draw vertices
-                float radius = 3;
-                foreach (var v in verticesSnapshot)
-                    g.FillEllipse(pointBrush, v.Position.X - radius, v.Position.Y - radius, radius * 2, radius * 2);
-
-                // Highlight hovered triangle
-                if (showTriangles && hoveredSnapshot != null)
-                {
-                    Vector2 center = hoveredSnapshot.Circumcenter;
-                    float r = Vector2.Distance(center, hoveredSnapshot.GetVertices().First().Position);
-                    if (r > 0f)
-                        g.DrawEllipse(circlePen, center.X - r, center.Y - r, r * 2, r * 2);
-                }
-
-                // Draw Voronoi
-                if (showVoronoi && triangulator != null)
-                {
-                    var voronoiCells = VoronoiBuilder.BuildDiagram(triangulator);
-                    foreach (var cell in voronoiCells)
-                    {
-                        var polygon = cell.Polygon;
-                        if (polygon == null || polygon.Count < 2) continue;
-
-                        for (int i = 0; i < polygon.Count; i++)
-                        {
-                            var p1 = polygon[i];
-                            var p2 = polygon[(i + 1) % polygon.Count];
-                            g.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
-                        }
-                    }
+                    for (int i = 0; i < verts.Length; i++)
+                        g.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
                 }
             }
         }
-    
 
-
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void DrawVertices(Graphics g, List<Vertex> vertices)
         {
-            // optional initialization
+            using (var pointBrush = new SolidBrush(Color.Red))
+            {
+                float radius = 3;
+                foreach (var v in vertices)
+                    g.FillEllipse(pointBrush, v.Position.X - radius, v.Position.Y - radius, radius * 2, radius * 2);
+            }
+        }
+
+        private void DrawHoveredFace(Graphics g, Face hoveredFace)
+        {
+            using (var circlePen = new Pen(Color.Green, 1))
+            {
+                Vector2 center = hoveredFace.Circumcenter;
+                float r = Vector2.Distance(center, hoveredFace.GetVertices().First().Position);
+
+                if (r > 0f)
+                    g.DrawEllipse(circlePen, center.X - r, center.Y - r, r * 2, r * 2);
+            }
+        }
+
+        private void DrawVoronoi(Graphics g, TriangulationBuilder triangulator)
+        {
+            using (var voronoiPen = new Pen(Color.DarkOrange, 2))
+            {
+                var voronoiCells = VoronoiBuilder.BuildDiagram(triangulator);
+                foreach (var cell in voronoiCells)
+                {
+                    var polygon = cell.Polygon;
+                    if (polygon == null || polygon.Count < 2) continue;
+
+                    for (int i = 0; i < polygon.Count; i++)
+                    {
+                        var p1 = polygon[i];
+                        var p2 = polygon[(i + 1) % polygon.Count];
+                        g.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
+                    }
+                }
+            }
         }
 
         #endregion
@@ -531,5 +563,10 @@ namespace WindowsFormsApp1
         }
 
         #endregion
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // optional initialization
+        }
     }
 }

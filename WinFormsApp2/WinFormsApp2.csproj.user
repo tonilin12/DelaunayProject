@@ -4,5 +4,8 @@
     <Compile Update="FormFolder\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FormFolder\HoverOverlay.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
 </Project>
