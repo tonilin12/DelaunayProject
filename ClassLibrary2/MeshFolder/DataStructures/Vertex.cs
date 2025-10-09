@@ -43,26 +43,25 @@ public class Vertex
     /// <summary>
     /// Enumerates all outgoing half-edges around this vertex in CCW order.
     /// </summary>
-    public IEnumerable<HalfEdge> GetVertexEdges()
+    public IEnumerable<HalfEdge> GetVertexEdges(HalfEdge? startEdge = null)
     {
-        if (OutgoingHalfEdge == null)
+        // Use the provided start edge, or default to OutgoingHalfEdge
+        HalfEdge? start = startEdge ?? OutgoingHalfEdge;
+
+        if (start == null || start.Origin == null || !start.Origin.PositionsEqual(this))
             yield break;
 
-        HalfEdge current = OutgoingHalfEdge;
-        var visited = new HashSet<HalfEdge>();
+        HalfEdge current = start;
 
-        // Walk around the vertex counter-clockwise
         do
         {
-            if (!visited.Add(current))
-                yield break;  // stop if we loop back or detect a cycle
-
             yield return current;
-
-            current = current.Twin?.Next;
+            current = current.Twin?.Next!;
         }
-        while (current != null && current != OutgoingHalfEdge);
+        while (current != null && current != start);
     }
+
+
 
 
 

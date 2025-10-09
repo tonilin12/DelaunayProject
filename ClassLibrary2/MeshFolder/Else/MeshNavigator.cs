@@ -119,6 +119,30 @@ public static class MeshNavigator
     }
 
     // ===========================
+    // Public API: TraverseEdges enumerable
+    // ===========================
+    public static IEnumerable<(HalfEdge Edge, PointLocation Location)> TraverseEdges(HalfEdge startEdge, Vertex point)
+    {
+        var edgesBuffer = new List<(HalfEdge, PointLocation)>();
+
+        TraverseEdgesCore(startEdge, point,
+            (edge, loc) =>
+            {
+                edgesBuffer.Add((edge, loc));
+
+                // Stop if point is on vertex, on edge, or inside face
+                if (loc.DestinationEdge != null && loc.DestinationEdge.Origin.PositionsEqual(point))
+                    return false;
+
+                return !(loc.IsOnEdge || loc.IsInside);
+            });
+
+        return edgesBuffer;
+    }
+
+
+
+    // ===========================
     // Public API: LocatePointInMesh
     // ===========================
     public static (HalfEdge destinationEdge, bool isOnEdge) LocatePointInMesh(HalfEdge startEdge, Vertex point)
@@ -156,27 +180,6 @@ public static class MeshNavigator
         return (finalDestination, finalIsOnEdge);
     }
 
-    // ===========================
-    // Public API: TraverseEdges enumerable
-    // ===========================
-    public static IEnumerable<(HalfEdge Edge, PointLocation Location)> TraverseEdges(HalfEdge startEdge, Vertex point)
-    {
-        var edgesBuffer = new List<(HalfEdge, PointLocation)>();
-
-        TraverseEdgesCore(startEdge, point,
-            (edge, loc) =>
-            {
-                edgesBuffer.Add((edge, loc));
-
-                // Stop if point is on vertex, on edge, or inside face
-                if (loc.DestinationEdge != null && loc.DestinationEdge.Origin.PositionsEqual(point))
-                    return false;
-
-                return !(loc.IsOnEdge || loc.IsInside);
-            });
-
-        return edgesBuffer;
-    }
 
     // ===========================
     // Overload for starting from a face

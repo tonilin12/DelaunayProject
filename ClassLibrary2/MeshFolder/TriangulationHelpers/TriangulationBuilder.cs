@@ -1,6 +1,7 @@
 ﻿using ClassLibrary2.GeometryFolder;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 public class TriangulationBuilder
@@ -8,14 +9,10 @@ public class TriangulationBuilder
     private readonly Queue<Vertex> _vertexQueue;
     private readonly Vertex[] _superTriangleVertices;
     private readonly HashSet<Face> _meshTriangles;
-
     private Face _lastInsertedTriangle;
     private readonly Stack<HalfEdge> _reusableStack = new Stack<HalfEdge>();
 
-
-    // No-op action for initialization
     private static readonly Action NoOpAction = () => { };
-
 
     public TriangulationBuilder(Face supertriangle, params Vertex[] initialVertices)
     {
@@ -49,10 +46,10 @@ public class TriangulationBuilder
             .Where(tri => !tri.GetVertices().Any(v => _superTriangleVertices.Contains(v)));
     }
 
-    public IEnumerable<Vertex> GetInternalVertices()
+    public IEnumerable<Vertex> GetVertices()
     {
         var superSet = new HashSet<Vertex>(_superTriangleVertices);
-        return GetInternalTriangles()
+        return _meshTriangles
             .SelectMany(f => f.GetVertices())
             .Where(v => !superSet.Contains(v))
             .Distinct();
@@ -71,16 +68,15 @@ public class TriangulationBuilder
         LegalizeEdges(vertex);
     }
 
-    public IEnumerable<Action> ProcessSingleVertexStepByStep()
+    public IEnumerable<object> ProcessSingleVertexStepByStep()
     {
         if (!HasMoreVerticesToProcess) yield break;
 
         Vertex vertex = _vertexQueue.Dequeue();
-
         InsertSingleVertex(vertex);
 
-        foreach (var flip in EnumerateFlips(vertex))
-            yield return flip;
+        foreach (var step in EnumerateFlips(vertex))
+            yield return step;
     }
 
     public void ProcessAllVertices()
@@ -129,28 +125,17 @@ public class TriangulationBuilder
         }
     }
 
+    #region EdgeLegalization
 
+    private delegate void EdgeFlipHandler(ref HalfEdge twin);
 
-    #region  EdgeLegalization
-    private IEnumerable<Action> EnumerateFlips(Vertex vertex)
+    /// <summary>
+    /// Core loop for flipping edges. Supports stepwise (pausable) or direct execution.
+    /// </summary>
+    private IEnumerable<object> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
     {
-        return ProcessEdges(vertex, executeImmediately: false);
-    }
-
-    private void LegalizeEdges(Vertex vertex)
-    {
-        // Consume the iterator without creating Actions
-        foreach (var _ in ProcessEdges(vertex, executeImmediately: true)) { }
-    }
-
-    private IEnumerable<Action> ProcessEdges(Vertex vertex, bool executeImmediately)
-    {
-        int iterationLimit = 1_000_000;
+        const int iterationLimit = 1_000_000;
         int iterationCount = 0;
-
-        // Optional initialization marker
-        if (!executeImmediately)
-            yield return NoOpAction;
 
         while (_reusableStack.Count > 0 && iterationCount++ < iterationLimit)
         {
@@ -158,43 +143,49 @@ public class TriangulationBuilder
             if (edge?.Twin == null)
                 continue;
 
-            if (TryFlipEdgeIfNeeded(edge, vertex, executeImmediately, out var postFlipAction))
-            {
-                // Push new edges for further legalization
-                _reusableStack.Push(edge.Next!);
-                _reusableStack.Push(edge.Twin?.Next?.Next!);
+            var twin = edge.Twin!;
+            if (!GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
+                continue;
 
-                // Yield post-flip action if not executed immediately
-                if (!executeImmediately && postFlipAction != null)
-                    yield return postFlipAction;
-            }
+            // Stepwise mode: yield before executing flip
+            if (stepwise)
+                yield return new object();
+
+            // Perform the flip
+            flipHandler(ref twin);
+
+            // Push edges for further legalization
+            _reusableStack.Push(edge.Next!);
+            _reusableStack.Push(twin.Next?.Next!);
         }
     }
 
-    // Encapsulate the flip logic
-    private bool TryFlipEdgeIfNeeded(HalfEdge edge, Vertex vertex, bool executeImmediately, out Action? postFlipAction)
+    /// <summary>
+    /// Fast direct legalization (all at once, no pausing)
+    /// </summary>
+    private void LegalizeEdges(Vertex vertex)
     {
-        postFlipAction = null;
-
-        var twin = edge.Twin!;
-        if (!GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
-            return false;
-
-        if (executeImmediately)
+        EdgeFlipHandler immediateFlip = (ref HalfEdge twin) =>
         {
             TriangulationOperation.FlipEdge(ref twin);
-        }
-        else
+        };
+
+        foreach (var _ in ProcessEdges(vertex, immediateFlip, stepwise: false)) { }
+    }
+
+    /// <summary>
+    /// Stepwise legalization (yields placeholder before each flip)
+    /// </summary>
+    private IEnumerable<object> EnumerateFlips(Vertex vertex)
+    {
+        EdgeFlipHandler deferredFlip = (ref HalfEdge twin) =>
         {
-            var capturedTwin = twin;
-            TriangulationOperation.FlipEdge(ref capturedTwin);
+            Debug.WriteLine("Edge to flip " + twin);
+            TriangulationOperation.FlipEdge(ref twin);
+        };
 
-            postFlipAction = () => { /* Post-flip marker or refresh */ };
-        }
-
-        return true;
+        return ProcessEdges(vertex, deferredFlip, stepwise: true);
     }
 
     #endregion
-
 }

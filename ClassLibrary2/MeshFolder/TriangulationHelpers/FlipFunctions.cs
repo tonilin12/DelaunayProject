@@ -11,11 +11,24 @@ public class FlipHelper
     /// <param name="edge">The half-edge to flip (passed by reference).</param>
     public void FlipEdge(ref HalfEdge edge)
     {
+
+        var twin = edge.Twin;
         // Ensure the edge and its twin are valid.
-        if (edge == null || edge.Twin == null)
+        if (edge == null || twin == null)
         {
             throw new InvalidOperationException("The provided half-edge must have a valid twin.");
         }
+
+        if (edge.Origin.OutgoingHalfEdge.Equals(edge))
+        {
+            edge.Origin.OutgoingHalfEdge = twin.Next;
+        }
+        if (twin.Origin.OutgoingHalfEdge.Equals(twin))
+        {
+            twin.Origin.OutgoingHalfEdge= edge.Next;
+        }
+
+
 
         // Retrieve the two adjacent faces.
         Face face1 = edge.Face;
@@ -76,12 +89,6 @@ public class FlipHelper
         e0.Twin = f0;
         f0.Twin = e0;
 
-        // Update the outgoing half-edge pointer for each vertex in the affected faces.
-        foreach (var e in face1.GetEdges())
-            e.Origin.OutgoingHalfEdge = e;
-
-        foreach (var e in face2.GetEdges())
-            e.Origin.OutgoingHalfEdge = e;
 
 
         // Ensure the reference points to the flipped edge.

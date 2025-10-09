@@ -52,7 +52,17 @@ namespace WindowsFormsApp1
         {
             this.Text = "Interactive Incremental Triangulation";
             this.DoubleBuffered = true;
-            this.ClientSize = new Size(800, 600);
+
+            // ---- Set initial form size relative to the screen containing this form ----
+            var currentScreen = Screen.FromControl(this);
+            int screenWidth = currentScreen.Bounds.Width;
+            int screenHeight = currentScreen.Bounds.Height;
+
+            // For example, 80% of the screen size
+            this.ClientSize = new Size(
+                (int)(screenWidth * 0.8f),
+                (int)(screenHeight * 0.8f)
+            );
 
             InitializeMenu();
             InitializeTriangulation();
@@ -68,6 +78,7 @@ namespace WindowsFormsApp1
                 hasError = true;
             };
         }
+
 
         #endregion
 
@@ -148,8 +159,9 @@ namespace WindowsFormsApp1
                 superTriangle = null!;
                 insertedVertices.Clear();
 
-                int screenWidth = Screen.PrimaryScreen.Bounds.Width;
-                int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+                var currentScreen = Screen.FromControl(this);
+                int screenWidth = currentScreen.Bounds.Width;
+                int screenHeight = currentScreen.Bounds.Height;
 
                 var borderPoints = new Vertex[]
                 {
@@ -172,6 +184,7 @@ namespace WindowsFormsApp1
                 }
             }
         }
+
 
         #endregion
 
@@ -242,7 +255,6 @@ namespace WindowsFormsApp1
                         {
                             lock (_lock)
                             {
-                                action();
 
                                 if (!vertexAdded)
                                 {
@@ -566,7 +578,7 @@ namespace WindowsFormsApp1
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // optional initialization
+           
         }
     }
 }
