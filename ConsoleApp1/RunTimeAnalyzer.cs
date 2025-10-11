@@ -9,7 +9,7 @@ public static class RuntimeAnalyzer
 {
     public static void Run()
     {
-        int[] testSizes = { 100, 500, 1000, 5000, 10000, 50000, 100000 };
+        int[] testSizes = { 100, 500, 1000, 5000, 10000,20000, 50000, 100000 };
         int trialsPerSize = 3;
         string outputFile = "runtime_analysis.csv";
 
@@ -39,7 +39,7 @@ public static class RuntimeAnalyzer
                     new Vertex(0, 1000)
                 };
                 Face superTriangle;
-                TriangulationOperation.getSuperTriangle(ref borderPoints, out superTriangle);
+                TriangulationOperation.GetSuperTriangle( borderPoints, out superTriangle);
 
                 // ---------------------------
                 // SpatialGrid version (always tested)
@@ -56,7 +56,7 @@ public static class RuntimeAnalyzer
                 // ---------------------------
                 // Raw array version (only for n <= 10k)
                 // ---------------------------
-                if (n <= 10000)
+                if (n <= 20000)
                 {
                     sw.Restart();
                     var triangulatorRaw = new TriangulationBuilder(superTriangle, verticesArray);

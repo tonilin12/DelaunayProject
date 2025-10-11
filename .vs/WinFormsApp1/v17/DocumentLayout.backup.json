@@ -3,43 +3,76 @@
   "WorkspaceRootPath": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\triangulationtestfolder\\triangulationtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\triangulationtestfolder\\triangulationtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\triangulationtestfolder\\vertexenumeratetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\triangulationtestfolder\\vertexenumeratetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\triangulationtestfolder\\trianglesplittertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\triangulationtestfolder\\trianglesplittertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\winformsapp2\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Toni Lin\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\winformsapp2\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\formfolder\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\winformsapp2\\formfolder\\hoveroverlay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\formfolder\\hoveroverlay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\triangulationtestfolder\\trianglesplittertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\triangulationtestfolder\\trianglesplittertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\else\\meshnavigator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\else\\meshnavigator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5B68813F-23C2-8DF2-1B1F-9033A2893F62}|ConsoleApp1\\ConsoleApp1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\consoleapp1\\runtimeanalyzer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5B68813F-23C2-8DF2-1B1F-9033A2893F62}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\runtimeanalyzer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\else\\spatialgrid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\else\\spatialgrid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\geometryfolder\\geometryutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\geometryfolder\\geometryutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\datastructuretestfolder\\vertexenumeratetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\datastructuretestfolder\\vertexenumeratetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\winformsapp2\\winformsapp2.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\winformsapp2.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\winformsapp2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\datastructures\\face.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\datastructures\\face.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationhelpers\\trianglesplitter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationhelpers\\triangulationbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\datastructuretestfolder\\voronoitest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\datastructuretestfolder\\voronoitest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationoperation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\datastructures\\vertex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -50,12 +83,23 @@
       "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\datastructures\\halfedge.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\triangulationhelpers\\supertrianglegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testproject1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testproject1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\classlibrary2\\meshfolder\\else\\meshnavigator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A17CC4C-0117-4591-B8EA-99E2F262F789}|ClassLibrary2\\ClassLibrary2.csproj|solutionrelative:classlibrary2\\meshfolder\\else\\meshnavigator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\else\\geometryutilstest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\else\\geometryutilstest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\triangulationtestfolder\\fliptest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\triangulationtestfolder\\fliptest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\testproject1\\testfolder\\triangulationtestfolder\\supertrianglegeneratortests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCEC50C9-00C1-44A0-9998-7E15D1B9E067}|TestProject1\\TestProject1.csproj|solutionrelative:testproject1\\testfolder\\triangulationtestfolder\\supertrianglegeneratortests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Toni Lin\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5B68813F-23C2-8DF2-1B1F-9033A2893F62}|ConsoleApp1\\ConsoleApp1.csproj|c:\\users\\toni lin\\desktop\\temp\\program00\\delaunayproject\\consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -69,140 +113,60 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "VertexEnumerateTest.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\VertexEnumerateTest.cs",
-              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\TriangulationTestFolder\\VertexEnumerateTest.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\VertexEnumerateTest.cs",
-              "RelativeToolTip": "TestProject1\\TestFolder\\TriangulationTestFolder\\VertexEnumerateTest.cs",
+              "DocumentIndex": 3,
+              "Title": "HoverOverlay.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\FormFolder\\HoverOverlay.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\FormFolder\\HoverOverlay.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\FormFolder\\HoverOverlay.cs",
+              "RelativeToolTip": "WinFormsApp2\\FormFolder\\HoverOverlay.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-09T18:10:11.82Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-11T13:07:49.591Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "TriangleSplitter.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
-              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
-              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "MeshNavigator.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
+              "ViewState": "AgIAAFYAAAAAAAAAAAAqwF8AAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-09T16:53:27.375Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-07T10:16:45.489Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "TriangulationOperation.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
-              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
-              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "TriangleSplitterTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
+              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
+              "RelativeToolTip": "TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-09T16:50:27.068Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-09T16:29:35.72Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "TriangulationTest.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\TriangulationTest.cs",
               "RelativeDocumentMoniker": "TestProject1\\TestFolder\\TriangulationTestFolder\\TriangulationTest.cs",
               "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\TriangulationTest.cs",
               "RelativeToolTip": "TestProject1\\TestFolder\\TriangulationTestFolder\\TriangulationTest.cs",
-              "ViewState": "AgIAAFwAAAAAAAAAAAAQwGQAAABWAAAAAAAAAA==",
+              "ViewState": "AgIAALQAAAAAAAAAAAAuwL0AAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-09T11:04:31.653Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\Program.cs",
-              "RelativeDocumentMoniker": "WinFormsApp2\\Program.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\Program.cs",
-              "RelativeToolTip": "WinFormsApp2\\Program.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAA6wAkAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-08T19:48:23.622Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\Program.cs",
-              "RelativeDocumentMoniker": "ConsoleApp1\\Program.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\Program.cs",
-              "RelativeToolTip": "ConsoleApp1\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-08T18:26:21.02Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "TriangulationBuilder.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
-              "ViewState": "AgIAALQAAAAAAAAAAAAAAL8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-05T16:49:52.429Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "SuperTriangleGenerator.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
-              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
-              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-09T11:04:46.445Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Assert.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs",
-              "RelativeDocumentMoniker": "..\\..\\..\\..\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs [Read Only]",
-              "RelativeToolTip": "..\\..\\..\\..\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs [Read Only]",
-              "ViewState": "AgIAADQAAAAAAAAAAAArwD4AAAARAAAAAQAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-09T15:25:09.126Z",
-              "EditorCaption": " [Read Only]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "TriangleSplitterTest.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
-              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
-              "RelativeToolTip": "TestProject1\\TestFolder\\TriangulationTestFolder\\TriangleSplitterTest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-09T16:29:35.72Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 2,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\FormFolder\\Form1.cs",
               "RelativeDocumentMoniker": "WinFormsApp2\\FormFolder\\Form1.cs",
@@ -214,55 +178,257 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\FormFolder\\Form1.cs",
               "RelativeDocumentMoniker": "WinFormsApp2\\FormFolder\\Form1.cs",
               "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\FormFolder\\Form1.cs",
               "RelativeToolTip": "WinFormsApp2\\FormFolder\\Form1.cs",
-              "ViewState": "AgIAAAgBAAAAAAAAAAAAAAEBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFcCAAAAAAAAAAAAANwCAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-05T13:17:20.879Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "MeshNavigator.cs",
-              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
-              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
-              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
-              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\Else\\MeshNavigator.cs",
-              "ViewState": "AgIAALcAAAAAAAAAAAAAwL4AAAASAAAAAAAAAA==",
+              "DocumentIndex": 6,
+              "Title": "RunTimeAnalyzer.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\RunTimeAnalyzer.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\RunTimeAnalyzer.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\RunTimeAnalyzer.cs",
+              "RelativeToolTip": "ConsoleApp1\\RunTimeAnalyzer.cs",
+              "ViewState": "AgIAAIAAAAAAAAAAAAAuwIoAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T10:16:45.489Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-10T12:30:27.552Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "GeometryUtils.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\GeometryFolder\\GeometryUtils.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\GeometryFolder\\GeometryUtils.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\GeometryFolder\\GeometryUtils.cs",
+              "RelativeToolTip": "ClassLibrary2\\GeometryFolder\\GeometryUtils.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAF4AAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T11:12:43.327Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "WinFormsApp2.csproj",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\WinFormsApp2.csproj",
+              "RelativeDocumentMoniker": "WinFormsApp2\\WinFormsApp2.csproj",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\WinFormsApp2.csproj",
+              "RelativeToolTip": "WinFormsApp2\\WinFormsApp2.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-10T12:37:49.369Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "VertexEnumerateTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\DataStructureTestFolder\\VertexEnumerateTest.cs",
+              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\DataStructureTestFolder\\VertexEnumerateTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\DataStructureTestFolder\\VertexEnumerateTest.cs",
+              "RelativeToolTip": "TestProject1\\TestFolder\\DataStructureTestFolder\\VertexEnumerateTest.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAYAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-09T18:10:11.82Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "SpatialGrid.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\Else\\SpatialGrid.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\Else\\SpatialGrid.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\Else\\SpatialGrid.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\Else\\SpatialGrid.cs",
+              "ViewState": "AgIAADQAAAAAAAAAAAAwwF4AAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T21:05:36.175Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 11,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\Program.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\Program.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\WinFormsApp2\\Program.cs",
+              "RelativeToolTip": "WinFormsApp2\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-08T19:48:23.622Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Face.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\DataStructures\\Face.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\DataStructures\\Face.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\DataStructures\\Face.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\DataStructures\\Face.cs",
+              "ViewState": "AgIAAJcAAAAAAAAAAAA6wKYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T11:18:12.472Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "VoronoiTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\DataStructureTestFolder\\VoronoiTest.cs",
+              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\DataStructureTestFolder\\VoronoiTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\DataStructureTestFolder\\VoronoiTest.cs",
+              "RelativeToolTip": "TestProject1\\TestFolder\\DataStructureTestFolder\\VoronoiTest.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAWwCUAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T16:04:37.46Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "SuperTriangleGenerator.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\SuperTriangleGenerator.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAwwC4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-09T11:04:46.445Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "TriangulationBuilder.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangulationBuilder.cs",
+              "ViewState": "AgIAAKUAAAAAAAAAAAAuwLIAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-05T16:49:52.429Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "TriangleSplitter.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationHelpers\\TriangleSplitter.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAF4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-09T16:53:27.375Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "TriangulationOperation.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
+              "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
+              "RelativeToolTip": "ClassLibrary2\\MeshFolder\\TriangulationOperation.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAQwCAAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-09T16:50:27.068Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
               "Title": "HalfEdge.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\DataStructures\\HalfEdge.cs",
               "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\DataStructures\\HalfEdge.cs",
               "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\DataStructures\\HalfEdge.cs",
               "RelativeToolTip": "ClassLibrary2\\MeshFolder\\DataStructures\\HalfEdge.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAiwE4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAD0AAAAAAAAAAAAuwE4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-08T08:56:39.577Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-08T08:56:39.577Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 18,
               "Title": "Vertex.cs",
               "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\DataStructures\\Vertex.cs",
               "RelativeDocumentMoniker": "ClassLibrary2\\MeshFolder\\DataStructures\\Vertex.cs",
               "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\MeshFolder\\DataStructures\\Vertex.cs",
               "RelativeToolTip": "ClassLibrary2\\MeshFolder\\DataStructures\\Vertex.cs",
-              "ViewState": "AgIAADwAAAAAAAAAAIAwwEoAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAEoAAAAAAAAAAAAqwFoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-05T16:06:05.059Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-05T16:06:05.059Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "TestProject1.csproj",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestProject1.csproj",
+              "RelativeDocumentMoniker": "TestProject1\\TestProject1.csproj",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestProject1.csproj",
+              "RelativeToolTip": "TestProject1\\TestProject1.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-10T12:37:56.952Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "GeometryUtilsTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "RelativeToolTip": "TestProject1\\TestFolder\\Else\\GeometryUtilsTest.cs",
+              "ViewState": "AgIAAGcAAAAAAAAAAIA2wGwAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T11:45:18.726Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "FlipTest.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\FlipTest.cs",
+              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\TriangulationTestFolder\\FlipTest.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\FlipTest.cs",
+              "RelativeToolTip": "TestProject1\\TestFolder\\TriangulationTestFolder\\FlipTest.cs",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAewKsAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T11:02:01.013Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "SuperTriangleGeneratorTests.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\SuperTriangleGeneratorTests.cs",
+              "RelativeDocumentMoniker": "TestProject1\\TestFolder\\TriangulationTestFolder\\SuperTriangleGeneratorTests.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\TestProject1\\TestFolder\\TriangulationTestFolder\\SuperTriangleGeneratorTests.cs",
+              "RelativeToolTip": "TestProject1\\TestFolder\\TriangulationTestFolder\\SuperTriangleGeneratorTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T11:02:07.636Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\Program.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\Program.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\Program.cs",
+              "RelativeToolTip": "ConsoleApp1\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-08T18:26:21.02Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Assert.cs",
+              "DocumentMoniker": "C:\\Users\\Toni Lin\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs",
+              "ToolTip": "C:\\Users\\Toni Lin\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs [Read Only]",
+              "RelativeToolTip": "..\\..\\..\\..\\AppData\\Local\\SourceServer\\318fd514b1dcd7f0e4770cdb914cf2f227f55a4868b63f3cb010dcf0c24b0c54\\src\\TestFramework\\TestFramework\\Assertions\\Assert.cs [Read Only]",
+              "ViewState": "AgIAADQAAAAAAAAAAAArwD4AAAARAAAAAQAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-09T15:25:09.126Z",
+              "EditorCaption": " [Read Only]"
             }
           ]
         }

@@ -36,13 +36,33 @@ namespace WindowsFormsApp1
         private bool hasError = false;
 
         private bool showTriangles = true;
-        private bool showVoronoi = true;
+        private bool showVoronoi = false;
 
-        private const int VertexProcessTimeoutMs = 500;
+        
+        private const int VertexProcessTimeoutMs = 1000;
 
         private bool isProcessingVertex = false;
 
         private bool isStepByStepMode = false; // default: step-by-step animation
+
+
+
+        // --- Step-by-step animation speed control ---
+        private int baseDelayMs = 400; // default base speed (1x = 250 ms)
+        private float speedMultiplier = 1.0f; // 1x speed by default
+        private int CurrentDelayMs => (int)(baseDelayMs * speedMultiplier);
+
+        // UI controls
+        private ToolStrip? stepControlToolStrip;
+        private ToolStripLabel? stepSpeedLabel;
+        private ToolStripComboBox? stepSpeedComboBox;
+
+
+        private Face? flippingFace = null; // only for drawing circumcircle during step animation
+
+
+        private bool showHoverHighlight = false; // default: off
+
 
         #endregion
 
@@ -86,11 +106,15 @@ namespace WindowsFormsApp1
 
         private void InitializeMenu()
         {
-            menuStrip = new MenuStrip();
-            menuStrip.Font = new Font("Segoe UI", 14, FontStyle.Regular);
+            // ---------------- Menu Strip ----------------
+            menuStrip = new MenuStrip
+            {
+                Font = new Font("Segoe UI", 14, FontStyle.Regular)
+            };
 
-            // ----- File Menu -----
+            // ---------------- File Menu ----------------
             fileMenu = new ToolStripMenuItem("File");
+
             resetMenu = new ToolStripMenuItem("Reset Everything");
             resetMenu.Click += ResetMenu_Click;
 
@@ -100,29 +124,46 @@ namespace WindowsFormsApp1
             fileMenu.DropDownItems.Add(resetMenu);
             fileMenu.DropDownItems.Add(exportObjMenu);
 
-            // ----- View Menu -----
+            // ---------------- View Menu ----------------
             viewMenu = new ToolStripMenuItem("View");
 
-            showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles", null, (s, e) =>
+            // Show triangles toggle
+            showTrianglesMenuItem = new ToolStripMenuItem("Show Triangles")
+            {
+                Checked = showTriangles
+            };
+            showTrianglesMenuItem.Click += (s, e) =>
             {
                 showTriangles = !showTriangles;
                 showTrianglesMenuItem.Checked = showTriangles;
                 Invalidate();
-            })
-            { Checked = showTriangles };
+            };
 
-            showVoronoiMenuItem = new ToolStripMenuItem("Show Voronoi", null, (s, e) =>
+            // Show Voronoi toggle
+            showVoronoiMenuItem = new ToolStripMenuItem("Show Voronoi")
+            {
+                Checked = showVoronoi
+            };
+            showVoronoiMenuItem.Click += (s, e) =>
             {
                 showVoronoi = !showVoronoi;
                 showVoronoiMenuItem.Checked = showVoronoi;
                 Invalidate();
-            })
-            { Checked = showVoronoi };
+            };
 
-            viewMenu.DropDownItems.Add(showTrianglesMenuItem);
-            viewMenu.DropDownItems.Add(showVoronoiMenuItem);
+            // Hover highlight toggle (default off)
+            var hoverHighlightMenuItem = new ToolStripMenuItem("Highlight Hovered Triangle")
+            {
+                Checked = showHoverHighlight
+            };
+            hoverHighlightMenuItem.Click += (s, e) =>
+            {
+                showHoverHighlight = !showHoverHighlight;
+                hoverHighlightMenuItem.Checked = showHoverHighlight;
+                Invalidate();
+            };
 
-            // ----- Step-by-Step Mode Menu Item -----
+            // Step-by-step mode toggle
             var stepModeMenuItem = new ToolStripMenuItem("Step-by-Step Mode")
             {
                 Checked = isStepByStepMode
@@ -131,16 +172,70 @@ namespace WindowsFormsApp1
             {
                 isStepByStepMode = !isStepByStepMode;
                 stepModeMenuItem.Checked = isStepByStepMode;
+                if (stepControlToolStrip != null)
+                    stepControlToolStrip.Visible = isStepByStepMode;
             };
+
+            // Add menu items to View
+            viewMenu.DropDownItems.Add(showTrianglesMenuItem);
+            viewMenu.DropDownItems.Add(showVoronoiMenuItem);
+            viewMenu.DropDownItems.Add(hoverHighlightMenuItem);
             viewMenu.DropDownItems.Add(stepModeMenuItem);
 
-            // ----- Add menus to menuStrip -----
+            // ---------------- Step Speed Control ----------------
+            stepControlToolStrip = new ToolStrip
+            {
+                GripStyle = ToolStripGripStyle.Hidden,
+                Dock = DockStyle.Top,
+                Padding = new Padding(4, 2, 4, 2),
+                Visible = isStepByStepMode
+            };
+
+            stepSpeedLabel = new ToolStripLabel("Speed:");
+            stepSpeedComboBox = new ToolStripComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 80
+            };
+
+            var speedOptions = new Dictionary<string, float>
+            {
+                { "0.5x (Faster)", 0.5f },
+                { "1x (Normal)", 1.0f },
+                { "2x (Slower)", 2.0f },
+                { "3x (Much Slower)", 3.0f },
+                { "4x (Very Slow)", 4.0f }
+            };
+
+            foreach (var label in speedOptions.Keys)
+                stepSpeedComboBox.Items.Add(label);
+
+            stepSpeedComboBox.SelectedItem = "1x (Normal)";
+            stepSpeedComboBox.SelectedIndexChanged += (s, e) =>
+            {
+                var selectedLabel = stepSpeedComboBox.SelectedItem?.ToString();
+                if (selectedLabel != null && speedOptions.TryGetValue(selectedLabel, out var mult))
+                {
+                    lock (_lock)
+                    {
+                        speedMultiplier = mult;
+                    }
+                }
+            };
+
+            stepControlToolStrip.Items.Add(stepSpeedLabel);
+            stepControlToolStrip.Items.Add(stepSpeedComboBox);
+
+            // ---------------- Add menus to form ----------------
             menuStrip.Items.Add(fileMenu);
             menuStrip.Items.Add(viewMenu);
 
             this.MainMenuStrip = menuStrip;
             this.Controls.Add(menuStrip);
+            this.Controls.Add(stepControlToolStrip);
         }
+
+
 
         #endregion
 
@@ -173,7 +268,7 @@ namespace WindowsFormsApp1
 
                 try
                 {
-                    TriangulationOperation.getSuperTriangle(ref borderPoints, out superTriangle);
+                    TriangulationOperation.GetSuperTriangle(borderPoints, out superTriangle);
                     triangulator = new TriangulationBuilder(superTriangle);
                 }
                 catch (Exception ex)
@@ -214,14 +309,22 @@ namespace WindowsFormsApp1
         {
             lock (_lock)
             {
+        
+
+                // 2️⃣ Fully break reference graphs
                 triangulation?.Clear();
                 triangulation = null;
 
-                hoveredFace = null!;
-                triangulator = null;
                 insertedVertices.Clear();
+                insertedVertices = new List<Vertex>();
+
+                hoveredFace = null!;
+                superTriangle = null!;
+                triangulator = null;
                 hasError = false;
 
+
+                // 4️⃣ Reinitialize new state
                 InitializeTriangulation();
                 Invalidate();
             }
@@ -231,58 +334,81 @@ namespace WindowsFormsApp1
 
         #region Vertex Processing
 
+        private HalfEdge? FindNextExpectedFlipEdge(Vertex vertex)
+        {
+            foreach (var edge in vertex.GetVertexEdges().Reverse())
+            {
+                var twinNext = edge.Next?.Twin;
+                if (twinNext != null && GeometryUtils.IsInsideOrOnCircumcircle(twinNext.Face, vertex))
+                    return twinNext;
+
+            }
+
+            return null;
+        }
+
         private async Task ProcessVertexStepByStepAsync(Vertex vertex)
         {
             if (triangulator == null || isProcessingVertex) return;
 
-            isProcessingVertex = true;  // lock input
+            isProcessingVertex = true;
             try
             {
-                // Enqueue the vertex in triangulator regardless of mode
                 triangulator.AddVertices(vertex);
 
                 if (isStepByStepMode)
                 {
-                    // Animated step-by-step mode: use the stepwise enumerable
-                    bool vertexAdded = false;
-                    var actions = triangulator.ProcessSingleVertexStepByStep();
+                    var enumerator = triangulator.ProcessSingleVertexStepByStep().GetEnumerator();
+                    bool hasNext;
 
-                    foreach (var action in actions)
+                    do
                     {
-                        HashSet<Face>? snapshot = null;
-
-                        await Task.Run(() =>
+                        HalfEdge? edgeToFlip;
+                        lock (_lock)
                         {
-                            lock (_lock)
-                            {
+                            hasNext = enumerator.MoveNext();
 
-                                if (!vertexAdded)
-                                {
-                                    insertedVertices.Add(vertex);
-                                    vertexAdded = true;
-                                }
+                            // Update main triangulation
+                            triangulation = triangulator.GetInternalTriangles().ToHashSet();
 
-                                snapshot = triangulator.GetInternalTriangles().ToHashSet();
-                                triangulation = snapshot;
-                            }
-                        });
+                            // Determine current face to highlight
+                            edgeToFlip = FindNextExpectedFlipEdge(vertex);
+                            flippingFace = edgeToFlip?.Face;
 
-                        // update UI and delay for animation
+                            // Add vertex to list if not already
+                            if (!insertedVertices.Contains(vertex))
+                                insertedVertices.Add(vertex);
+                        }
+
+                        // Full redraw
                         this.BeginInvoke(() => Invalidate());
-                        await Task.Delay(300);
-                    }
+
+                        // Short delay before overlay
+                        await Task.Delay(CurrentDelayMs / 3);
+
+                        // Overlay circle is drawn automatically via Paint
+                        // so we just call Invalidate again to ensure it's painted
+                        if (flippingFace != null)
+                            this.BeginInvoke(() => Invalidate());
+
+                        // Step delay
+                        if (hasNext)
+                            await Task.Delay(CurrentDelayMs);
+
+                    } while (hasNext);
+
+                    // Clear overlay after finishing
+                    flippingFace = null;
+                    this.BeginInvoke(() => Invalidate());
                 }
                 else
                 {
-                    // Instant (non-stepwise) mode: call the fast, direct API once
+                    // Instant mode
                     await Task.Run(() =>
                     {
                         lock (_lock)
                         {
-                            // Process single vertex using the fast path (no per-action delegates)
                             triangulator.ProcessSingleVertex();
-
-                            // record insertion and snapshot
                             insertedVertices.Add(vertex);
                             triangulation = triangulator.GetInternalTriangles().ToHashSet();
                         }
@@ -293,9 +419,10 @@ namespace WindowsFormsApp1
             }
             finally
             {
-                isProcessingVertex = false; // unlock input
+                isProcessingVertex = false;
             }
         }
+
 
         #endregion
 
@@ -388,8 +515,14 @@ namespace WindowsFormsApp1
                 DrawVoronoi(g, triangulator);
 
             // ---- Hover overlay ----
-            if (showTriangles && hoveredSnapshot != null)
-                DrawHoveredFace(g, hoveredSnapshot);
+            if (showTriangles && hoveredSnapshot != null && showHoverHighlight)
+                DrawHoveredTriangle(g, hoveredSnapshot);
+
+
+            if (flippingFace != null)
+            {
+                DrawHoveredTriangle(g,flippingFace); // reuse hover circle drawing
+            }
         }
 
         #endregion
@@ -420,18 +553,33 @@ namespace WindowsFormsApp1
                     g.FillEllipse(pointBrush, v.Position.X - radius, v.Position.Y - radius, radius * 2, radius * 2);
             }
         }
-
-        private void DrawHoveredFace(Graphics g, Face hoveredFace)
+        private void DrawHoveredTriangle(Graphics g, Face face)
         {
-            using (var circlePen = new Pen(Color.Green, 1))
-            {
-                Vector2 center = hoveredFace.Circumcenter;
-                float r = Vector2.Distance(center, hoveredFace.GetVertices().First().Position);
+            var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
+            if (verts.Length < 3) return;
 
-                if (r > 0f)
+            // ---- Draw triangle edges in black ----
+            using (var pen = new Pen(Color.Black, 3)) // black edges
+            {
+                for (int i = 0; i < verts.Length; i++)
+                    g.DrawLine(pen, verts[i], verts[(i + 1) % verts.Length]);
+            }
+
+            // ---- Draw circumcircle ----
+            Vector2 center = face.Circumcenter;
+            float r = Vector2.Distance(center, face.GetVertices().First().Position);
+            if (r > 0f)
+            {
+                using (var circlePen = new Pen(Color.Green, 2)) // bright green circumcircle
+                {
                     g.DrawEllipse(circlePen, center.X - r, center.Y - r, r * 2, r * 2);
+                }
             }
         }
+
+
+
+
 
         private void DrawVoronoi(Graphics g, TriangulationBuilder triangulator)
         {

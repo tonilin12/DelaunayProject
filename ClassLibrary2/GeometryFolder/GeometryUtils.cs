@@ -1,120 +1,186 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace ClassLibrary2.GeometryFolder
 {
     public static class GeometryUtils
     {
-        // Single precision constant for floating-point tolerance
         private const float EPSILON = 1e-6f;
         public static float GetEpsilon => EPSILON;
 
+        #region Signed Area
 
-        /// <summary>
-        /// Computes signed area (determinant) of a triangle.
-        /// Positive = CCW, Negative = CW, Zero = Collinear
-        /// </summary>
-        public static float GetSignedArea(params object[] inputs)
+        // Single point version
+        public static float GetSignedArea(Vector2 p0, Vector2 p1, Vector2 p2)
         {
-            if (inputs == null || inputs.Length != 3)
-                throw new ArgumentException("Triangle must have exactly 3 vertices.", nameof(inputs));
-
-            Vector2[] positions = inputs.Select(v =>
-            {
-                if (v is Vector2 vec) return vec;
-                else if (v is Vertex vert) return vert.Position;
-                else if (v is HalfEdge he) return he.Origin.Position;
-                else throw new ArgumentException(
-                    "Each element must be Vector2, Vertex, or HalfEdge.", nameof(inputs));
-            }).ToArray();
-
-            Vector2 p0 = positions[0];
-            Vector2 p1 = positions[1];
-            Vector2 p2 = positions[2];
-
             float det = (p1.X - p0.X) * (p2.Y - p0.Y) - (p1.Y - p0.Y) * (p2.X - p0.X);
-
-            // Treat extremely small numbers as zero
-            if (Math.Abs(det) < EPSILON)
-                det = 0f;
-
-            return det;
+            return Math.Abs(det) < EPSILON ? 0f : det;
         }
 
-        /// <summary>
-        /// Determines if a point is inside or on the circumcircle of a triangle.
-        /// </summary>
-        public static bool IsInsideOrOnCircumcircle(Face triangle, Vertex p)
+        public static float GetSignedArea(Vertex v0, Vertex v1, Vertex v2)
+            => GetSignedArea(v0.Position, v1.Position, v2.Position);
+
+        public static float GetSignedArea(HalfEdge h0, HalfEdge h1, HalfEdge h2)
+            => GetSignedArea(h0.Origin.Position, h1.Origin.Position, h2.Origin.Position);
+
+        // Array versions
+        public static float GetSignedArea(Vector2[] points)
         {
-            if (triangle == null) throw new ArgumentNullException(nameof(triangle));
-            if (p == null) throw new ArgumentNullException(nameof(p));
+            if (points == null || points.Length != 3)
+                throw new ArgumentException("Array must contain exactly 3 Vector2 points.", nameof(points));
 
-            var vertices = triangle.GetVertices().ToList();
-            if (vertices.Count != 3)
-                throw new ArgumentException("Face must be a triangle with 3 vertices.", nameof(triangle));
+            return GetSignedArea(points[0], points[1], points[2]);
+        }
 
-            Vector2 a = vertices[0].Position;
-            Vector2 b = vertices[1].Position;
-            Vector2 c = vertices[2].Position;
-            Vector2 pt = p.Position;
+        public static float GetSignedArea(Vertex[] vertices)
+        {
+            if (vertices == null || vertices.Length != 3)
+                throw new ArgumentException("Array must contain exactly 3 Vertex objects.", nameof(vertices));
 
-            // Translate points so pt is origin
-            Vector2 u = a - pt;
-            Vector2 v = b - pt;
-            Vector2 w = c - pt;
+            return GetSignedArea(vertices[0].Position, vertices[1].Position, vertices[2].Position);
+        }
 
-            float uz = u.X * u.X + u.Y * u.Y;
-            float vz = v.X * v.X + v.Y * v.Y;
-            float wz = w.X * w.X + w.Y * w.Y;
+        public static float GetSignedArea(HalfEdge[] edges)
+        {
+            if (edges == null || edges.Length != 3)
+                throw new ArgumentException("Array must contain exactly 3 HalfEdge objects.", nameof(edges));
 
-            // Determinant for circumcircle test
-            float det = u.X * (v.Y * wz - vz * w.Y)
-                      - u.Y * (v.X * wz - vz * w.X)
-                      + uz * (v.X * w.Y - v.Y * w.X);
+            return GetSignedArea(edges[0].Origin.Position, edges[1].Origin.Position, edges[2].Origin.Position);
+        }
+
+        #endregion
+
+        #region Point Inside Triangle
+
+        public static bool IsPointInsideTriangle(Vector2 p, Vertex v0, Vertex v1, Vertex v2)
+        {
+            float d1 = GetSignedArea(p, v0.Position, v1.Position);
+            float d2 = GetSignedArea(p, v1.Position, v2.Position);
+            float d3 = GetSignedArea(p, v2.Position, v0.Position);
+
+            return (d1 >= 0f && d2 >= 0f && d3 >= 0f) || (d1 <= 0f && d2 <= 0f && d3 <= 0f);
+        }
+
+
+        public static bool IsPointInsideTriangle(Face face, Vector2 p)
+        {
+            if (face == null)
+                throw new ArgumentNullException(nameof(face));
+
+            var vertices = face.GetVertices();
+            if (vertices == null)
+                throw new InvalidOperationException("Face returned null vertices.");
+
+            // Convert to array for fast indexed access
+            Vertex[] vArray = vertices as Vertex[] ?? new Vertex[3];
+
+            int count = 0;
+            foreach (var v in vertices)
+            {
+                if (count < 3)
+                    vArray[count++] = v;
+                else
+                    break;
+            }
+
+            if (count != 3)
+                throw new ArgumentException("Face must have exactly 3 vertices.", nameof(face));
+
+            return IsPointInsideTriangle(p, vArray[0], vArray[1], vArray[2]);
+        }
+
+
+        #endregion
+
+        #region Circumcircle
+
+        public static bool IsInsideOrOnCircumcircle(Vertex a, Vertex b, Vertex c, Vertex p)
+        {
+            float ax = a.Position.X - p.Position.X;
+            float ay = a.Position.Y - p.Position.Y;
+            float bx = b.Position.X - p.Position.X;
+            float by = b.Position.Y - p.Position.Y;
+            float cx = c.Position.X - p.Position.X;
+            float cy = c.Position.Y - p.Position.Y;
+
+            float az2 = ax * ax + ay * ay;
+            float bz2 = bx * bx + by * by;
+            float cz2 = cx * cx + cy * cy;
+
+            float det = ax * (by * cz2 - bz2 * cy)
+                      - ay * (bx * cz2 - bz2 * cx)
+                      + az2 * (bx * cy - by * cx);
 
             return det >= -EPSILON;
         }
-       
-        /// <summary>
-        /// Checks if a point is inside a triangle.
-        /// </summary>
-        public static bool IsPointInsideTriangle(Face face, Vector2 p)
+
+
+        public static bool IsInsideOrOnCircumcircle(Face triangle, Vertex p)
         {
-            var v = face.GetVertices().ToArray();
-            if (v.Length != 3)
-                return false;
+            if (triangle == null)
+                throw new ArgumentNullException(nameof(triangle));
+            if (p == null)
+                throw new ArgumentNullException(nameof(p));
 
-            float d1 = GetSignedArea(p, v[0], v[1]);
-            float d2 = GetSignedArea(p, v[1], v[2]);
-            float d3 = GetSignedArea(p, v[2], v[0]);
+            var vertices = triangle.GetVertices();
+            if (vertices == null)
+                throw new InvalidOperationException("Face returned null vertices.");
 
-            bool hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-            bool hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+            // Convert to array for fast index access
+            Vertex[] vArray = vertices as Vertex[] ?? new Vertex[3];
 
-            return !(hasNeg && hasPos);
+            int count = 0;
+            foreach (var v in vertices)
+            {
+                if (count < 3)
+                    vArray[count++] = v;
+                else
+                    break;
+            }
+
+            if (count != 3)
+                throw new ArgumentException("Face must be a triangle with exactly 3 vertices.", nameof(triangle));
+
+            return IsInsideOrOnCircumcircle(vArray[0], vArray[1], vArray[2], p);
         }
 
-        /// <summary>
-        /// Computes the circumcircle of a triangle.
-        /// </summary>
+        // Array version
+
+
+        #endregion
+
+        #region Circumcenter
+
         public static Vector2 Circumcenter(Vertex a, Vertex b, Vertex c)
         {
-            float d = 2 * (a.Position.X * (b.Position.Y - c.Position.Y) +
-                           b.Position.X * (c.Position.Y - a.Position.Y) +
-                           c.Position.X * (a.Position.Y - b.Position.Y));
+            float ax = a.Position.X, ay = a.Position.Y;
+            float bx = b.Position.X, by = b.Position.Y;
+            float cx = c.Position.X, cy = c.Position.Y;
 
-            float ux = ((a.Position.LengthSquared() * (b.Position.Y - c.Position.Y)) +
-                        (b.Position.LengthSquared() * (c.Position.Y - a.Position.Y)) +
-                        (c.Position.LengthSquared() * (a.Position.Y - b.Position.Y))) / d;
+            float d = 2f * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
+            if (Math.Abs(d) < EPSILON)
+                throw new InvalidOperationException("Triangle vertices are collinear, circumcenter undefined.");
 
-            float uy = ((a.Position.LengthSquared() * (c.Position.X - b.Position.X)) +
-                        (b.Position.LengthSquared() * (a.Position.X - c.Position.X)) +
-                        (c.Position.LengthSquared() * (b.Position.X - a.Position.X))) / d;
+            float a2 = ax * ax + ay * ay;
+            float b2 = bx * bx + by * by;
+            float c2 = cx * cx + cy * cy;
+
+            float ux = (a2 * (by - cy) + b2 * (cy - ay) + c2 * (ay - by)) / d;
+            float uy = (a2 * (cx - bx) + b2 * (ax - cx) + c2 * (bx - ax)) / d;
 
             return new Vector2(ux, uy);
         }
 
+
+        // Array version
+        public static Vector2 Circumcenter(Vertex[] triangle)
+        {
+            if (triangle == null || triangle.Length != 3)
+                throw new ArgumentException("Triangle array must have exactly 3 vertices.", nameof(triangle));
+
+            return Circumcenter(triangle[0], triangle[1], triangle[2]);
+        }
+
+        #endregion
     }
 }

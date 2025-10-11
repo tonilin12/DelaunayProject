@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace UnitTestProject1.TestFolder.TriangulationOperations
+namespace TestProject1.TestFolder.DataStructureTestFolder
 {
     [TestClass]
     public class VertexEnumerateTest

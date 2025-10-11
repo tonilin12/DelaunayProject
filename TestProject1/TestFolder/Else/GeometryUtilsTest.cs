@@ -63,12 +63,7 @@ namespace TestProject1.TestFolder.Else
             Assert.AreEqual(0, orientation, "Triangle is collinear, should return 0.");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TriangleOrientation_InvalidCount_ThrowsException()
-        {
-            GeometryUtils.GetSignedArea(vA, vB); // only 2 vertices
-        }
+
 
         #endregion
 

@@ -1,14 +1,13 @@
 ﻿using ClassLibrary2.GeometryFolder;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 public class TriangulationBuilder
 {
     private readonly Queue<Vertex> _vertexQueue;
     private readonly Vertex[] _superTriangleVertices;
-    private readonly HashSet<Face> _meshTriangles;
+    private readonly Dictionary<int, Face> _meshTriangles; // ID-based
     private Face _lastInsertedTriangle;
     private readonly Stack<HalfEdge> _reusableStack = new Stack<HalfEdge>();
 
@@ -27,7 +26,7 @@ public class TriangulationBuilder
 
         _superTriangleVertices = vertices;
         _vertexQueue = new Queue<Vertex>(initialVertices ?? Array.Empty<Vertex>());
-        _meshTriangles = new HashSet<Face> { supertriangle };
+        _meshTriangles = new Dictionary<int, Face> { { supertriangle.Id, supertriangle } };
         _lastInsertedTriangle = supertriangle;
     }
 
@@ -42,14 +41,15 @@ public class TriangulationBuilder
 
     public IEnumerable<Face> GetInternalTriangles()
     {
-        return _meshTriangles
-            .Where(tri => !tri.GetVertices().Any(v => _superTriangleVertices.Contains(v)));
+        var superSet = new HashSet<Vertex>(_superTriangleVertices);
+        return _meshTriangles.Values
+            .Where(tri => !tri.GetVertices().Any(v => superSet.Contains(v)));
     }
 
     public IEnumerable<Vertex> GetVertices()
     {
         var superSet = new HashSet<Vertex>(_superTriangleVertices);
-        return _meshTriangles
+        return _meshTriangles.Values
             .SelectMany(f => f.GetVertices())
             .Where(v => !superSet.Contains(v))
             .Distinct();
@@ -90,7 +90,7 @@ public class TriangulationBuilder
     // -----------------------------------------------------------
     private void InsertSingleVertex(Vertex vertex)
     {
-        var startingTriangle = _lastInsertedTriangle ?? _meshTriangles.First();
+        var startingTriangle = _lastInsertedTriangle ?? _meshTriangles.Values.First();
         var pointData = MeshNavigator.LocatePointInMesh(startingTriangle, vertex);
         var edge = pointData.destinationEdge;
         bool isOnEdge = pointData.isOnEdge;
@@ -103,14 +103,14 @@ public class TriangulationBuilder
         if (isOnEdge)
         {
             TriangulationOperation.SplitTriangle_VertexOnEdge(edge, vertex);
-            _meshTriangles.Remove(edge.Face);
+            _meshTriangles.Remove(edge.Face.Id);
             if (edge.Twin?.Face != null)
-                _meshTriangles.Remove(edge.Twin.Face);
+                _meshTriangles.Remove(edge.Twin.Face.Id);
         }
         else
         {
             TriangulationOperation.SplitTriangle(containingFace, vertex);
-            _meshTriangles.Remove(containingFace);
+            _meshTriangles.Remove(containingFace.Id);
         }
 
         _lastInsertedTriangle = vertex.OutgoingHalfEdge?.Face!;
@@ -120,7 +120,7 @@ public class TriangulationBuilder
 
         foreach (var e in vertex.GetVertexEdges())
         {
-            _meshTriangles.Add(e.Face);
+            _meshTriangles[e.Face.Id] = e.Face; // Add or update
             _reusableStack.Push(e.Next!);
         }
     }
@@ -129,9 +129,6 @@ public class TriangulationBuilder
 
     private delegate void EdgeFlipHandler(ref HalfEdge twin);
 
-    /// <summary>
-    /// Core loop for flipping edges. Supports stepwise (pausable) or direct execution.
-    /// </summary>
     private IEnumerable<object> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
     {
         const int iterationLimit = 1_000_000;
@@ -147,22 +144,20 @@ public class TriangulationBuilder
             if (!GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
                 continue;
 
-            // Stepwise mode: yield before executing flip
             if (stepwise)
                 yield return new object();
 
-            // Perform the flip
             flipHandler(ref twin);
 
-            // Push edges for further legalization
             _reusableStack.Push(edge.Next!);
             _reusableStack.Push(twin.Next?.Next!);
+
+            // Ensure updated faces are in the dictionary
+            _meshTriangles[edge.Face.Id] = edge.Face;
+            _meshTriangles[twin.Face.Id] = twin.Face;
         }
     }
 
-    /// <summary>
-    /// Fast direct legalization (all at once, no pausing)
-    /// </summary>
     private void LegalizeEdges(Vertex vertex)
     {
         EdgeFlipHandler immediateFlip = (ref HalfEdge twin) =>
@@ -173,14 +168,10 @@ public class TriangulationBuilder
         foreach (var _ in ProcessEdges(vertex, immediateFlip, stepwise: false)) { }
     }
 
-    /// <summary>
-    /// Stepwise legalization (yields placeholder before each flip)
-    /// </summary>
     private IEnumerable<object> EnumerateFlips(Vertex vertex)
     {
         EdgeFlipHandler deferredFlip = (ref HalfEdge twin) =>
         {
-            Debug.WriteLine("Edge to flip " + twin);
             TriangulationOperation.FlipEdge(ref twin);
         };
 

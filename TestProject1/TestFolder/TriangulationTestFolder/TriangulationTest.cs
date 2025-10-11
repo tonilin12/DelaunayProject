@@ -37,7 +37,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 vertexArray[i] = new Vertex(points[i, 0], points[i, 1]);
             }
 
-            TriangulationOperation.getSuperTriangle(ref vertexArray, out superTriangle!);
+            TriangulationOperation.GetSuperTriangle(vertexArray, out superTriangle!);
             triangulator = new TriangulationBuilder(superTriangle!);
         }
 
@@ -72,6 +72,110 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 }
             }
         }
+        [TestMethod]
+
+        private (Vertex origin, Vertex dest)? FindNextExpectedFlipEdge(Vertex vertex)
+        {
+            foreach (var edge in vertex.GetVertexEdges().Reverse())
+            {
+                var twinNext = edge.Next?.Twin;
+                if (twinNext != null && GeometryUtils.IsInsideOrOnCircumcircle(twinNext.Face, vertex))
+                    return (twinNext.Origin, twinNext.Dest);
+            }
+
+            return null;
+        }
+
+
+        private void ProcessVertexFlipEdges(Vertex vertex)
+        {
+            var actions = triangulator!.ProcessSingleVertexStepByStep();
+            var enumerator = actions.GetEnumerator();
+            enumerator.MoveNext();
+
+            (Vertex origin, Vertex dest)? expectedFlipEdge = null;
+
+            do
+            {
+                // Verify previous expected flip edge
+                if (expectedFlipEdge.HasValue)
+                    VerifyFlipEdge(vertex, expectedFlipEdge.Value);
+
+                // Find next expected flip edge
+                expectedFlipEdge = FindNextExpectedFlipEdge(vertex);
+
+                // Optional logging
+                if (expectedFlipEdge.HasValue)
+                {
+                    var (origin, dest) = expectedFlipEdge.Value;
+                    //Debug.WriteLine($"Expected flip edge: Origin({origin.Position.X}, {origin.Position.Y}) -> Dest({dest.Position.X}, {dest.Position.Y})");
+                }
+
+            } while (enumerator.MoveNext());
+        }
+
+        private void VerifyFlipEdge(Vertex vertex, (Vertex origin, Vertex dest) expectedFlipEdge)
+        {
+            var edgeList = vertex.GetVertexEdges().Reverse().ToList();
+            int count = edgeList.Count;
+            int verifyIndex = -1;
+
+            for (int i = 0; i < count; i++)
+            {
+                var nextEdge = edgeList[(i + 1) % count];
+                var v1 = nextEdge.Dest;
+                var currentEdge = edgeList[i];
+                var v2 = currentEdge.Twin?.Next?.Dest;
+
+                if (v1.PositionsEqual(expectedFlipEdge.origin) && v2.PositionsEqual(expectedFlipEdge.dest))
+                {
+                    verifyIndex = i;
+                    break;
+                }
+            }
+
+            Assert.AreNotEqual(
+                -1,
+                verifyIndex,
+                $"Flip verification failed — expected edge ({expectedFlipEdge.origin}, {expectedFlipEdge.dest}) not found."
+            );
+
+
+            for (int j = 0; j < verifyIndex; j++)
+            {
+                var currentedge = edgeList[j].Next.Twin;
+
+                // Verify Delaunay condition
+                if (GeometryUtils.IsInsideOrOnCircumcircle(currentedge.Face, vertex))
+                {
+                    var vertexDesc = vertex?.ToString() ?? "UnknownVertex";
+
+                    Assert.Fail(
+                        $"[Delaunay Verification Failed] " +
+                        $"Previously processed region violated at edge index {j}: " +
+                        $"Vertex {vertexDesc} lies inside circumcircle of {currentedge.Face}."
+                    );
+                }
+            }
+
+            var flippededge= edgeList[verifyIndex];
+
+            TriangulationOperation.FlipEdge(ref flippededge);
+
+
+            if (!GeometryUtils.IsInsideOrOnCircumcircle(flippededge.Face, vertex))
+            {
+                Assert.Fail(
+                    $"[Delaunay Flip Validation Failed] " +
+                    $"Edge flip produced a non-Delaunay configuration. " +
+                    $"Flipped edge: {flippededge}. " +
+                    $"Vertex {vertex} should lie inside the circumcircle of {flippededge.Face}."
+                );
+            }
+            TriangulationOperation.FlipEdge(ref flippededge);
+
+
+        }
 
         [TestMethod]
         public void TestDelaunay1()
@@ -79,54 +183,14 @@ namespace TestProject1.TestFolder.TriangulationFolder
             Assert.IsNotNull(triangulator, "Triangulator should not be null.");
             Assert.IsNotNull(vertexArray, "Vertex array should not be null.");
 
-            foreach (var vertex_current in vertexArray)
+            foreach (var vertex in vertexArray)
             {
-                // Add vertex to the triangulator
-                triangulator.AddVertices(vertex_current);
-
-                // Get the step-by-step Delaunay operations
-                var actions = triangulator.ProcessSingleVertexStepByStep();
-                var enumerator = actions.GetEnumerator();
-                enumerator.MoveNext();
+                triangulator.AddVertices(vertex);
+                ProcessVertexFlipEdges(vertex);
+                AssertVertexDelaunay(vertex);
+            }
 
 
-   
-                    do
-                    {
-                        Debug.WriteLine("------------------------");
-
-                        // --- Pre-action: store previous edge info for validation ---
-                        (Vertex origin, Vertex dest)? expected_flipedge = null;
-
-                        foreach (var edge in vertex_current.GetVertexEdges().Reverse())
-                        {
-                            var e0 = edge.Next?.Twin;
-                            if (e0 == null)
-                                continue;
-
-                            if (GeometryUtils.IsInsideOrOnCircumcircle(e0.Face, vertex_current))
-                            {
-                                expected_flipedge = (origin: e0.Origin, dest: e0.Dest);
-                                break; // store only the first matching edge
-                            }
-                        }
-
-                        // --- Iterate edges and perform flips, check for expected edge ---
-                        var edges = vertex_current.GetVertexEdges().Reverse().ToList();
-                        int count = edges.Count;
-                        int matchIndex = -1; // initialize to -1 meaning no match found
-
-                        if (!expected_flipedge.HasValue)
-                            continue;
-
-                        if (expected_flipedge.HasValue)
-                        {
-                            Debug.WriteLine($"Expected flip edge: Origin({expected_flipedge.Value.origin.Position.X}, {expected_flipedge.Value.origin.Position.Y}) " +
-                                            $"-> Dest({expected_flipedge.Value.dest.Position.X}, {expected_flipedge.Value.dest.Position.Y})");
-                        }
-
-                    } while (enumerator.MoveNext());
-                }
         }
     }
 }

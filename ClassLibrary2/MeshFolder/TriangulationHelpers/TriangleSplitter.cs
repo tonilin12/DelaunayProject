@@ -93,8 +93,5 @@ public class TriangleSplitter
         var face4 = new Face(newToY, twinAdjacentEdge2, bToNew);
 
 
-
-
-
     }
 }

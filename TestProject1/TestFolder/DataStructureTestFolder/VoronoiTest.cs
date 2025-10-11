@@ -35,7 +35,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
 
             // Arrange
             Face superTriangle;
-            TriangulationOperation.getSuperTriangle(ref _vertices, out superTriangle);
+            TriangulationOperation.GetSuperTriangle( _vertices, out superTriangle);
             var triangulator = new TriangulationBuilder(superTriangle);
 
             // Act

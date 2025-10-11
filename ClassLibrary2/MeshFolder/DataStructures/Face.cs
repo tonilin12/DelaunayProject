@@ -8,6 +8,11 @@ public class Face
 {
     private HalfEdge _edge;
 
+
+    private static int _nextFaceId = 0; // global counter for all faces
+    public int Id { get; private set; } // unique ID for this face
+
+
     public HalfEdge Edge
     {
         get => _edge;
@@ -66,8 +71,8 @@ public class Face
         if (vertices == null || vertices.Length != 3)
             throw new ArgumentException("Exactly 3 vertices are required.");
 
-        var edges = MakeCycle(vertices, this, v => new HalfEdge(v)).ToList();
-        Edge = edges[0];
+        var edge = MakeCycle(vertices, this, v => new HalfEdge(v));
+        Edge = edge;
     }
 
     public Face(params HalfEdge[] halfEdges)
@@ -75,47 +80,58 @@ public class Face
         if (halfEdges == null || halfEdges.Length != 3)
             throw new ArgumentException("Exactly 3 half-edges are required.");
 
-        var edges = MakeCycle(halfEdges, this, e => e).ToList();
-        Edge = edges[0];
+        var edge = MakeCycle(halfEdges, this, e => e);
+        Edge = edge;
     }
+
+
+
+
 
     // -----------------------------
     // Helper: create cycle of half-edges
     // -----------------------------
-    private IEnumerable<HalfEdge> MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
+    private HalfEdge MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
     {
         if (items == null)
             throw new ArgumentException("Input items cannot be null");
 
-        var edges = new List<HalfEdge>();
+        var edges = new HalfEdge[3];
+        int index = 0;
 
-        foreach (var item in items.Distinct())
+        // Convert items to edges
+        foreach (var item in items)
         {
+            if (index >= 3)
+                throw new ArgumentException("Exactly 3 items required");
+
             var e = toHalfEdge(item);
             e.Face = face;
-            edges.Add(e);
+            edges[index++] = e;
         }
 
-        if (edges.Count != 3)
-            throw new ArgumentException("Exactly 3 vertices/edges required for a triangular face.");
+        if (index != 3)
+            throw new ArgumentException("Exactly 3 items required");
 
-        if (GeometryUtils.GetSignedArea(edges.ToArray()) == 0)
+        // Check for collinearity
+        if (GeometryUtils.GetSignedArea(edges) == 0)
             throw new ArgumentException("Degenerate face: the three vertices are collinear.");
 
-        for (int i = 0; i < edges.Count; i++)
-        {
-            var curr = edges[i];
-            var next = edges[(i + 1) % 3];
+        // Link edges in a cycle
+        for (int i = 0; i < 3; i++)
+            edges[i].Next = edges[(i + 1) % 3];
 
-            curr.Next = next;
-
-        }
-
-        // Invalidate cached circumcircle after linking edges
         InvalidateCircumcircle();
 
-        return edges;
+
+        Id = _nextFaceId++; // assign unique ID
+
+
+        return edges[0];
     }
+
+
+
 
     // -----------------------------
     // Enumerators
