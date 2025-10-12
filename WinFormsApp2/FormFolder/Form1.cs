@@ -38,7 +38,7 @@ namespace WindowsFormsApp1
         private bool showTriangles = true;
         private bool showVoronoi = false;
 
-        
+
         private const int VertexProcessTimeoutMs = 1000;
 
         private bool isProcessingVertex = false;
@@ -200,11 +200,8 @@ namespace WindowsFormsApp1
 
             var speedOptions = new Dictionary<string, float>
             {
-                { "0.5x (Faster)", 0.5f },
                 { "1x (Normal)", 1.0f },
-                { "2x (Slower)", 2.0f },
-                { "3x (Much Slower)", 3.0f },
-                { "4x (Very Slow)", 4.0f }
+                { "(Very Slow)", 3.0f }
             };
 
             foreach (var label in speedOptions.Keys)
@@ -254,10 +251,14 @@ namespace WindowsFormsApp1
                 superTriangle = null!;
                 insertedVertices.Clear();
 
-                var currentScreen = Screen.FromControl(this);
-                int screenWidth = currentScreen.Bounds.Width;
-                int screenHeight = currentScreen.Bounds.Height;
+                // Get the screen that currently contains the active form
+                Screen activeScreen = Screen.FromControl(this);
 
+                // Get its width and height
+                int screenWidth = activeScreen.Bounds.Width;
+                int screenHeight = activeScreen.Bounds.Height;
+
+                // Create border points in bottom-left coordinate system (0,0 at bottom-left)
                 var borderPoints = new Vertex[]
                 {
                     new Vertex(0, 0),
@@ -309,9 +310,6 @@ namespace WindowsFormsApp1
         {
             lock (_lock)
             {
-        
-
-                // 2️⃣ Fully break reference graphs
                 triangulation?.Clear();
                 triangulation = null;
 
@@ -323,8 +321,6 @@ namespace WindowsFormsApp1
                 triangulator = null;
                 hasError = false;
 
-
-                // 4️⃣ Reinitialize new state
                 InitializeTriangulation();
                 Invalidate();
             }
@@ -341,7 +337,6 @@ namespace WindowsFormsApp1
                 var twinNext = edge.Next?.Twin;
                 if (twinNext != null && GeometryUtils.IsInsideOrOnCircumcircle(twinNext.Face, vertex))
                     return twinNext;
-
             }
 
             return null;
@@ -368,42 +363,32 @@ namespace WindowsFormsApp1
                         {
                             hasNext = enumerator.MoveNext();
 
-                            // Update main triangulation
                             triangulation = triangulator.GetInternalTriangles().ToHashSet();
 
-                            // Determine current face to highlight
                             edgeToFlip = FindNextExpectedFlipEdge(vertex);
                             flippingFace = edgeToFlip?.Face;
 
-                            // Add vertex to list if not already
                             if (!insertedVertices.Contains(vertex))
                                 insertedVertices.Add(vertex);
                         }
 
-                        // Full redraw
                         this.BeginInvoke(() => Invalidate());
 
-                        // Short delay before overlay
                         await Task.Delay(CurrentDelayMs / 3);
 
-                        // Overlay circle is drawn automatically via Paint
-                        // so we just call Invalidate again to ensure it's painted
                         if (flippingFace != null)
                             this.BeginInvoke(() => Invalidate());
 
-                        // Step delay
                         if (hasNext)
                             await Task.Delay(CurrentDelayMs);
 
                     } while (hasNext);
 
-                    // Clear overlay after finishing
                     flippingFace = null;
                     this.BeginInvoke(() => Invalidate());
                 }
                 else
                 {
-                    // Instant mode
                     await Task.Run(() =>
                     {
                         lock (_lock)
@@ -430,10 +415,12 @@ namespace WindowsFormsApp1
 
         private async void Form1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (hasError || isProcessingVertex) return; // prevent click during animation
+            if (hasError || isProcessingVertex) return;
             if (menuStrip.Bounds.Contains(e.Location)) return;
 
-            var vertex = new Vertex(e.X, e.Y);
+            // Convert from Windows Forms (top-left) to internal (bottom-left) coordinates
+            int formHeight = this.ClientSize.Height;
+            var vertex = new Vertex(e.X, formHeight - e.Y);
 
             try
             {
@@ -450,7 +437,10 @@ namespace WindowsFormsApp1
         {
             if (hasError || triangulation == null) return;
 
-            var p = new Vector2(e.X, e.Y);
+            // Convert to internal coordinate system (bottom-left origin)
+            int formHeight = this.ClientSize.Height;
+            var p = new Vector2(e.X, formHeight - e.Y);
+
             Face newHovered = null!;
 
             lock (_lock)
@@ -460,13 +450,11 @@ namespace WindowsFormsApp1
 
             if (newHovered != hoveredFace)
             {
-                // Compute old & new hover regions
-                RectangleF oldRegion = hoveredFace != null ? GetHoverRegion(hoveredFace) : RectangleF.Empty;
-                RectangleF newRegion = newHovered != null ? GetHoverRegion(newHovered) : RectangleF.Empty;
+                RectangleF oldRegion = hoveredFace != null ? GetHoverRegion(hoveredFace, formHeight) : RectangleF.Empty;
+                RectangleF newRegion = newHovered != null ? GetHoverRegion(newHovered, formHeight) : RectangleF.Empty;
 
                 hoveredFace = newHovered;
 
-                // Invalidate only the changed areas
                 if (!oldRegion.IsEmpty) Invalidate(Rectangle.Ceiling(oldRegion));
                 if (!newRegion.IsEmpty) Invalidate(Rectangle.Ceiling(newRegion));
             }
@@ -476,7 +464,7 @@ namespace WindowsFormsApp1
 
         #region Paint
 
-        private RectangleF GetHoverRegion(Face face)
+        private RectangleF GetHoverRegion(Face face, int formHeight)
         {
             if (face == null) return RectangleF.Empty;
 
@@ -484,7 +472,14 @@ namespace WindowsFormsApp1
             float r = Vector2.Distance(center, face.GetVertices().First().Position);
             float diameter = r * 2f;
 
-            return new RectangleF(center.X - r - 2, center.Y - r - 2, diameter + 4, diameter + 4);
+            // Convert from internal (bottom-left) to form (top-left) coordinates:
+            // y_form = formHeight - (center.Y + r) - 2 (top of circle in form coordinates)
+            float x = center.X - r - 2;
+            float y = formHeight - (center.Y + r) - 2;
+            float width = diameter + 4;
+            float height = diameter + 4;
+
+            return new RectangleF(x, y, width, height);
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -493,6 +488,9 @@ namespace WindowsFormsApp1
 
             var g = e.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            // Get current form height for coordinate conversion
+            int formHeight = this.ClientSize.Height;
 
             HashSet<Face> trianglesSnapshot;
             List<Vertex> verticesSnapshot;
@@ -507,21 +505,20 @@ namespace WindowsFormsApp1
 
             // ---- Draw main elements ----
             if (showTriangles)
-                DrawTriangles(g, trianglesSnapshot);
+                DrawTriangles(g, trianglesSnapshot, formHeight);
 
-            DrawVertices(g, verticesSnapshot);
+            DrawVertices(g, verticesSnapshot, formHeight);
 
             if (showVoronoi && triangulator != null)
-                DrawVoronoi(g, triangulator);
+                DrawVoronoi(g, triangulator, formHeight);
 
             // ---- Hover overlay ----
             if (showTriangles && hoveredSnapshot != null && showHoverHighlight)
-                DrawHoveredTriangle(g, hoveredSnapshot);
-
+                DrawHoveredTriangle(g, hoveredSnapshot, formHeight);
 
             if (flippingFace != null)
             {
-                DrawHoveredTriangle(g,flippingFace); // reuse hover circle drawing
+                DrawHoveredTriangle(g, flippingFace, formHeight);
             }
         }
 
@@ -529,14 +526,19 @@ namespace WindowsFormsApp1
 
         #region Drawing Helpers
 
-        private void DrawTriangles(Graphics g, HashSet<Face> triangles)
+        private void DrawTriangles(Graphics g, HashSet<Face> triangles, int formHeight)
         {
             using (var edgePen = new Pen(Color.Blue, 2))
             {
                 foreach (var face in triangles)
                 {
-                    var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
-                    if (verts.Length < 3) break;
+                    var verts = face.GetVertices().Select(v =>
+                        new PointF(
+                            v.Position.X,
+                            formHeight - v.Position.Y // Convert to form coordinates
+                        )).ToArray();
+
+                    if (verts.Length < 3) continue;
 
                     for (int i = 0; i < verts.Length; i++)
                         g.DrawLine(edgePen, verts[i], verts[(i + 1) % verts.Length]);
@@ -544,22 +546,33 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void DrawVertices(Graphics g, List<Vertex> vertices)
+        private void DrawVertices(Graphics g, List<Vertex> vertices, int formHeight)
         {
             using (var pointBrush = new SolidBrush(Color.Red))
             {
-                float radius = 3;
+                float radius = 4;
                 foreach (var v in vertices)
-                    g.FillEllipse(pointBrush, v.Position.X - radius, v.Position.Y - radius, radius * 2, radius * 2);
+                {
+                    float x = v.Position.X;
+                    float y = formHeight - v.Position.Y; // Convert to form coordinates
+
+                    g.FillEllipse(pointBrush, x - radius, y - radius, radius * 2, radius * 2);
+                }
             }
         }
-        private void DrawHoveredTriangle(Graphics g, Face face)
+
+        private void DrawHoveredTriangle(Graphics g, Face face, int formHeight)
         {
-            var verts = face.GetVertices().Select(v => new PointF(v.Position.X, v.Position.Y)).ToArray();
+            var verts = face.GetVertices().Select(v =>
+                new PointF(
+                    v.Position.X,
+                    formHeight - v.Position.Y // Convert to form coordinates
+                )).ToArray();
+
             if (verts.Length < 3) return;
 
             // ---- Draw triangle edges in black ----
-            using (var pen = new Pen(Color.Black, 3)) // black edges
+            using (var pen = new Pen(Color.Black, 3))
             {
                 for (int i = 0; i < verts.Length; i++)
                     g.DrawLine(pen, verts[i], verts[(i + 1) % verts.Length]);
@@ -570,18 +583,18 @@ namespace WindowsFormsApp1
             float r = Vector2.Distance(center, face.GetVertices().First().Position);
             if (r > 0f)
             {
-                using (var circlePen = new Pen(Color.Green, 2)) // bright green circumcircle
+                // Convert circle center to form coordinates
+                float centerX = center.X;
+                float centerY = formHeight - center.Y;
+
+                using (var circlePen = new Pen(Color.Green, 2))
                 {
-                    g.DrawEllipse(circlePen, center.X - r, center.Y - r, r * 2, r * 2);
+                    g.DrawEllipse(circlePen, centerX - r, centerY - r, r * 2, r * 2);
                 }
             }
         }
 
-
-
-
-
-        private void DrawVoronoi(Graphics g, TriangulationBuilder triangulator)
+        private void DrawVoronoi(Graphics g, TriangulationBuilder triangulator, int formHeight)
         {
             using (var voronoiPen = new Pen(Color.DarkOrange, 2))
             {
@@ -595,7 +608,14 @@ namespace WindowsFormsApp1
                     {
                         var p1 = polygon[i];
                         var p2 = polygon[(i + 1) % polygon.Count];
-                        g.DrawLine(voronoiPen, p1.X, p1.Y, p2.X, p2.Y);
+
+                        // Convert to form coordinates
+                        float x1 = p1.X;
+                        float y1 = formHeight - p1.Y;
+                        float x2 = p2.X;
+                        float y2 = formHeight - p2.Y;
+
+                        g.DrawLine(voronoiPen, x1, y1, x2, y2);
                     }
                 }
             }
@@ -675,6 +695,7 @@ namespace WindowsFormsApp1
                             var key = (v.Position.X, v.Position.Y);
                             vertexIndices[key] = i + 1;
 
+                            // In OBJ format, we use the internal coordinate system (bottom-left origin)
                             writer.WriteLine(
                                 $"v {v.Position.X.ToString("F6", CultureInfo.InvariantCulture)} " +
                                 $"{v.Position.Y.ToString("F6", CultureInfo.InvariantCulture)} " +
@@ -716,6 +737,7 @@ namespace WindowsFormsApp1
                     for (int i = 0; i < insertedVertices.Count; i++)
                     {
                         var v = insertedVertices[i];
+                        // Store in internal coordinate system (bottom-left origin)
                         writer.WriteLine($"{i + 1} {v.Position.X:F6} {v.Position.Y:F6}");
                     }
                 }
@@ -726,7 +748,7 @@ namespace WindowsFormsApp1
 
         private void Form1_Load(object sender, EventArgs e)
         {
-           
+
         }
     }
 }

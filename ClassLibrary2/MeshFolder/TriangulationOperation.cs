@@ -46,9 +46,9 @@ public static class TriangulationOperation
     /// <param name="face1">First adjacent face.</param>
     /// <param name="face2">Second adjacent face.</param>
     /// <returns>Nothing, the method modifies the faces directly.</returns>
-    public static void FlipEdge(ref HalfEdge edge)
+    public static void FlipEdge( HalfEdge edge)
     {
-        _flipHelper.FlipEdge(ref edge);
+        _flipHelper.FlipEdge( edge);
     }
 
 }

@@ -68,7 +68,7 @@ public class TriangulationBuilder
         LegalizeEdges(vertex);
     }
 
-    public IEnumerable<object> ProcessSingleVertexStepByStep()
+    public IEnumerable<bool> ProcessSingleVertexStepByStep()
     {
         if (!HasMoreVerticesToProcess) yield break;
 
@@ -76,7 +76,7 @@ public class TriangulationBuilder
         InsertSingleVertex(vertex);
 
         foreach (var step in EnumerateFlips(vertex))
-            yield return step;
+            yield return step; // each step is now a bool
     }
 
     public void ProcessAllVertices()
@@ -127,9 +127,9 @@ public class TriangulationBuilder
 
     #region EdgeLegalization
 
-    private delegate void EdgeFlipHandler(ref HalfEdge twin);
+    private delegate void EdgeFlipHandler( HalfEdge twin);
 
-    private IEnumerable<object> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
+    private IEnumerable<bool> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
     {
         const int iterationLimit = 1_000_000;
         int iterationCount = 0;
@@ -145,14 +145,13 @@ public class TriangulationBuilder
                 continue;
 
             if (stepwise)
-                yield return new object();
+                yield return true; // signal a flip-step
 
-            flipHandler(ref twin);
+            flipHandler(twin);
 
             _reusableStack.Push(edge.Next!);
             _reusableStack.Push(twin.Next?.Next!);
 
-            // Ensure updated faces are in the dictionary
             _meshTriangles[edge.Face.Id] = edge.Face;
             _meshTriangles[twin.Face.Id] = twin.Face;
         }
@@ -160,23 +159,22 @@ public class TriangulationBuilder
 
     private void LegalizeEdges(Vertex vertex)
     {
-        EdgeFlipHandler immediateFlip = (ref HalfEdge twin) =>
+        EdgeFlipHandler immediateFlip = ( HalfEdge twin) =>
         {
-            TriangulationOperation.FlipEdge(ref twin);
+            TriangulationOperation.FlipEdge( twin);
         };
 
         foreach (var _ in ProcessEdges(vertex, immediateFlip, stepwise: false)) { }
     }
 
-    private IEnumerable<object> EnumerateFlips(Vertex vertex)
+    private IEnumerable<bool> EnumerateFlips(Vertex vertex)
     {
-        EdgeFlipHandler deferredFlip = (ref HalfEdge twin) =>
+        EdgeFlipHandler deferredFlip = (HalfEdge twin) =>
         {
-            TriangulationOperation.FlipEdge(ref twin);
+            TriangulationOperation.FlipEdge(twin);
         };
 
         return ProcessEdges(vertex, deferredFlip, stepwise: true);
-    }
-
+    }   
     #endregion
 }

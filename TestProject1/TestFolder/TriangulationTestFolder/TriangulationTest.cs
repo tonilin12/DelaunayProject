@@ -160,7 +160,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
 
             var flippededge= edgeList[verifyIndex];
 
-            TriangulationOperation.FlipEdge(ref flippededge);
+            TriangulationOperation.FlipEdge(flippededge);
 
 
             if (!GeometryUtils.IsInsideOrOnCircumcircle(flippededge.Face, vertex))
@@ -172,7 +172,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                     $"Vertex {vertex} should lie inside the circumcircle of {flippededge.Face}."
                 );
             }
-            TriangulationOperation.FlipEdge(ref flippededge);
+            TriangulationOperation.FlipEdge(flippededge);
 
 
         }

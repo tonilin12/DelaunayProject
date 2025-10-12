@@ -4,20 +4,21 @@ using System.Numerics;
 public static class MeshNavigator
 {
     private const int MAX_ITERATIONS = 10_000_000;
+    private static readonly float tolerance = GeometryUtils.GetEpsilon;
 
     // ===========================
     // Lightweight result wrapper
     // ===========================
     public readonly struct PointLocation
     {
-        public readonly bool IsInside;
+        public readonly bool DestinationReached;
         public readonly bool IsOnEdge;
         public readonly HalfEdge? DestinationEdge;
         public readonly HalfEdge? NextHalfEdge;
 
-        public PointLocation(bool isInside, bool isOnEdge, HalfEdge? destinationEdge, HalfEdge? nextHalfEdge)
+        public PointLocation(bool destinationReached, bool isOnEdge, HalfEdge? destinationEdge, HalfEdge? nextHalfEdge)
         {
-            IsInside = isInside;
+            DestinationReached = destinationReached;
             IsOnEdge = isOnEdge;
             DestinationEdge = destinationEdge;
             NextHalfEdge = nextHalfEdge;
@@ -53,47 +54,49 @@ public static class MeshNavigator
         HalfEdge? nextHalfEdge = null;
 
         bool IsExactVertex(Vertex v) => v.PositionsEqual(point);
-        bool IsPointOnEdge(HalfEdge e)
-        {
-            float orientation = GeometryUtils.GetSignedArea(e.Origin, e.Dest, point);
-            return Math.Abs(orientation) < GeometryUtils.GetEpsilon && IsOnSegment(e.Origin, e.Dest, point);
-        }
 
-        // Traverse the three edges of the triangle
-        HalfEdge? current = edge;
+        HalfEdge current = edge;
         for (int i = 0; i < 3; i++)
         {
-            if (IsExactVertex(current.Origin))
-                exactVertexEdge = current;
+            float orientationValue = GeometryUtils.GetSignedArea(current.Origin, current.Dest, point);
 
-            bool onEdge = IsPointOnEdge(current);
+            bool onEdge = Math.Abs(orientationValue) < tolerance && IsOnSegment(current.Origin, current.Dest, point);
+
             if (onEdge)
             {
+                if (IsExactVertex(current.Origin))
+                    exactVertexEdge = current;
+
                 anyOnEdge = true;
                 if (firstEdgeOnSegment == null && exactVertexEdge == null)
                     firstEdgeOnSegment = current;
             }
 
-            float orientationValue = GeometryUtils.GetSignedArea(current.Origin, current.Dest, point);
             if (orientationValue <= 0) allPositive = false;
 
             if (orientationValue < 0 && nextHalfEdge == null)
                 nextHalfEdge = current.Twin;
 
-            current = current.Next;
+            current = current.Next!;
         }
 
-        var destination = exactVertexEdge ?? firstEdgeOnSegment;
-        var nextEdge = (!allPositive && !anyOnEdge) ? nextHalfEdge : null;
+        // Determine destination edge safely
+        HalfEdge? destinationEdge = null;
+        if (anyOnEdge)
+            destinationEdge = exactVertexEdge ?? firstEdgeOnSegment;
+        else if (allPositive)
+            destinationEdge = edge;
 
-        return new PointLocation(!anyOnEdge && allPositive, anyOnEdge, destination, nextEdge);
+        HalfEdge? nextEdge = (!allPositive && !anyOnEdge) ? nextHalfEdge : null;
+
+        return new PointLocation(destinationEdge != null, anyOnEdge, destinationEdge, nextEdge);
     }
 
-
     // ===========================
-    // Core traversal logic
+    // Locate point from edge
     // ===========================
-    private static void TraverseEdgesCore(HalfEdge startEdge, Vertex point, Func<HalfEdge, PointLocation, bool> onEdge)
+    public static (HalfEdge destinationEdge, bool isOnEdge)
+        LocatePointInMesh(HalfEdge startEdge, Vertex point, Action<PointLocation>? onPointLocation = null)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
@@ -103,86 +106,57 @@ public static class MeshNavigator
 
         while (iterations++ < MAX_ITERATIONS)
         {
-            var location = ComputePointLocation(current, point);
+            var loc = ComputePointLocation(current, point);
 
-            if (!onEdge(current, location))
-                break;
 
-            if (location.NextHalfEdge == null)
+            // Destination reached
+            if (loc.DestinationReached)
+                return (loc.DestinationEdge!, loc.IsOnEdge);
+
+            // Cannot continue
+            if (loc.NextHalfEdge == null)
                 throw new InvalidOperationException("Point outside face but no adjacent twin found.");
 
-            current = location.NextHalfEdge;
+
+
+            // Invoke optional callback for every step
+            onPointLocation?.Invoke(loc);
+
+            current = loc.NextHalfEdge;
         }
 
-        if (iterations >= MAX_ITERATIONS)
-            throw new InvalidOperationException($"Max iterations ({MAX_ITERATIONS}) reached while searching for point.");
+        throw new InvalidOperationException($"Max iterations ({MAX_ITERATIONS}) reached while searching for point.");
     }
 
-    // ===========================
-    // Public API: TraverseEdges enumerable
-    // ===========================
-    public static IEnumerable<(HalfEdge Edge, PointLocation Location)> TraverseEdges(HalfEdge startEdge, Vertex point)
+
+    public static (HalfEdge destinationEdge, bool isOnEdge, List<HalfEdge> allNextTwins)
+    LocatePointAndLogTraverse(Face startFace, Vertex point)
     {
-        var edgesBuffer = new List<(HalfEdge, PointLocation)>();
+        if (startFace == null) throw new ArgumentNullException(nameof(startFace));
+        if (point == null) throw new ArgumentNullException(nameof(point));
 
-        TraverseEdgesCore(startEdge, point,
-            (edge, loc) =>
-            {
-                edgesBuffer.Add((edge, loc));
 
-                // Stop if point is on vertex, on edge, or inside face
-                if (loc.DestinationEdge != null && loc.DestinationEdge.Origin.PositionsEqual(point))
-                    return false;
+        var startEdge = startFace.Edge ?? throw new ArgumentException("Face must have a valid edge.", nameof(startFace));
+        var allNextTwins = new List<HalfEdge>();
 
-                return !(loc.IsOnEdge || loc.IsInside);
-            });
+        // Call the existing LocatePointInMesh with a callback
+        var (destinationEdge, isOnEdge) = LocatePointInMesh(startEdge, point, loc =>
+        {
+            // Collect the NextHalfEdge twin if it exists
+            if (loc.NextHalfEdge != null)
+                allNextTwins.Add(loc.NextHalfEdge.Twin!);
+        });
 
-        return edgesBuffer;
+
+
+
+        return (destinationEdge, isOnEdge, allNextTwins);
     }
 
 
 
     // ===========================
-    // Public API: LocatePointInMesh
-    // ===========================
-    public static (HalfEdge destinationEdge, bool isOnEdge) LocatePointInMesh(HalfEdge startEdge, Vertex point)
-    {
-        HalfEdge? lastEdge = null;
-        HalfEdge? finalDestination = null;
-        bool finalIsOnEdge = false;
-
-        TraverseEdgesCore(startEdge, point,
-            (edge, loc) =>
-            {
-                lastEdge = edge;
-
-                if (loc.DestinationEdge != null && loc.DestinationEdge.Origin.PositionsEqual(point))
-                {
-                    finalDestination = loc.DestinationEdge;
-                    finalIsOnEdge = true;
-                    return false;
-                }
-
-                if (loc.IsOnEdge || loc.IsInside)
-                {
-                    finalDestination = loc.DestinationEdge ?? edge;
-                    finalIsOnEdge = loc.IsOnEdge;
-                    return false;
-                }
-
-                return true;
-            });
-
-        if (finalDestination == null)
-            finalDestination = lastEdge
-                ?? throw new InvalidOperationException("No valid edge found.");
-
-        return (finalDestination, finalIsOnEdge);
-    }
-
-
-    // ===========================
-    // Overload for starting from a face
+    // Locate point from face
     // ===========================
     public static (HalfEdge destinationEdge, bool isOnEdge) LocatePointInMesh(Face startFace, Vertex point)
     {

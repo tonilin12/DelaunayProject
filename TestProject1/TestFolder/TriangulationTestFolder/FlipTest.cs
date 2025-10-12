@@ -49,7 +49,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
                 var twin = face2.Edge;
 
 
-                TriangulationOperation.FlipEdge(ref edge);
+                TriangulationOperation.FlipEdge(edge);
 
 
                 // Assert twin references
@@ -69,7 +69,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
             {
                 // Arrange: take a shared edge and flip it
                 var edge = face1.Edge;
-                TriangulationOperation.FlipEdge(ref edge);
+                TriangulationOperation.FlipEdge(edge);
 
 
                 var faces = new[] { (face1, "face1"), (face2, "face2") };
@@ -130,7 +130,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
 
-                TriangulationOperation.FlipEdge(ref edge);
+                TriangulationOperation.FlipEdge(edge);
 
 
                 // After flip, edge should connect the two opposite vertices
@@ -199,8 +199,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
                 // Act: flip the edge twice
-                TriangulationOperation.FlipEdge(ref edge); // first flip
-                TriangulationOperation.FlipEdge(ref edge); // first flip
+                TriangulationOperation.FlipEdge(edge); // first flip
+                TriangulationOperation.FlipEdge(edge); // first flip
 
                 bool edge_swapped =
                 edge.Origin.PositionsEqual(originalEdgeDest) &&

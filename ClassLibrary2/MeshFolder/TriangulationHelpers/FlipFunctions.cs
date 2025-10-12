@@ -9,7 +9,7 @@ public class FlipHelper
     /// After the flip, the two faces will have their opposite vertices swapped while preserving consistency.
     /// </summary>
     /// <param name="edge">The half-edge to flip (passed by reference).</param>
-    public void FlipEdge(ref HalfEdge edge)
+    public void FlipEdge( HalfEdge edge)
     {
 
         var twin = edge.Twin;
