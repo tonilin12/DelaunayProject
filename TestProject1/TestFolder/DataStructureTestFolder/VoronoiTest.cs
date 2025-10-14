@@ -45,7 +45,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
                 triangulator.ProcessSingleVertex();
             }
 
-            var internalVertices = triangulator.GetVertices();
+            var internalVertices = triangulator.GetInternalVertices();
             var voronoiCells = VoronoiBuilder.BuildDiagram(triangulator);
 
             // Assert

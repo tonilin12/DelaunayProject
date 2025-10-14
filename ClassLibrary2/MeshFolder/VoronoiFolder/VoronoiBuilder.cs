@@ -37,7 +37,7 @@ namespace ClassLibrary2.HalfEdgeFolder.VoronoiFolder
         {
             var cells = new List<VoronoiCell>();
 
-            foreach (var v in triangulation.GetVertices())
+            foreach (var v in triangulation.GetInternalVertices())
             {
                 var cell = BuildCell(v);
                 if (cell.Polygon.Count > 0)

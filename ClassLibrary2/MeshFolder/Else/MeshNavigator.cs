@@ -96,7 +96,7 @@ public static class MeshNavigator
     // Locate point from edge
     // ===========================
     public static (HalfEdge destinationEdge, bool isOnEdge)
-        LocatePointInMesh(HalfEdge startEdge, Vertex point, Action<PointLocation>? onPointLocation = null)
+    LocatePointInMesh(HalfEdge startEdge, Vertex point, Action<PointLocation>? onPointLocation = null)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));
@@ -146,7 +146,6 @@ public static class MeshNavigator
             if (loc.NextHalfEdge != null)
                 allNextTwins.Add(loc.NextHalfEdge.Twin!);
         });
-
 
 
 

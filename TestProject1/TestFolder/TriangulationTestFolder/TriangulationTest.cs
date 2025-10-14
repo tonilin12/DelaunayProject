@@ -72,47 +72,39 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 }
             }
         }
+
+
         [TestMethod]
-
-        private (Vertex origin, Vertex dest)? FindNextExpectedFlipEdge(Vertex vertex)
-        {
-            foreach (var edge in vertex.GetVertexEdges().Reverse())
-            {
-                var twinNext = edge.Next?.Twin;
-                if (twinNext != null && GeometryUtils.IsInsideOrOnCircumcircle(twinNext.Face, vertex))
-                    return (twinNext.Origin, twinNext.Dest);
-            }
-
-            return null;
-        }
-
-
         private void ProcessVertexFlipEdges(Vertex vertex)
         {
-            var actions = triangulator!.ProcessSingleVertexStepByStep();
-            var enumerator = actions.GetEnumerator();
-            enumerator.MoveNext();
-
+            var enumerator = triangulator!.ProcessSingleVertexStepByStep().GetEnumerator();
             (Vertex origin, Vertex dest)? expectedFlipEdge = null;
 
-            do
+            while (true)
             {
-                // Verify previous expected flip edge
+                bool hasNext = enumerator.MoveNext();
+                if (!hasNext) break;
+
+                // Perform verification against previous expected edge
                 if (expectedFlipEdge.HasValue)
                     VerifyFlipEdge(vertex, expectedFlipEdge.Value);
 
-                // Find next expected flip edge
-                expectedFlipEdge = FindNextExpectedFlipEdge(vertex);
+                // Current edge being flipped
+                HalfEdge? currentEdge = enumerator.Current;
 
-                // Optional logging
-                if (expectedFlipEdge.HasValue)
+                // Update expected flip edge for validation
+                if (currentEdge != null && GeometryUtils.IsInsideOrOnCircumcircle(currentEdge.Face, vertex))
                 {
-                    var (origin, dest) = expectedFlipEdge.Value;
-                    //Debug.WriteLine($"Expected flip edge: Origin({origin.Position.X}, {origin.Position.Y}) -> Dest({dest.Position.X}, {dest.Position.Y})");
+                    expectedFlipEdge = (currentEdge.Origin, currentEdge.Dest!);
                 }
-
-            } while (enumerator.MoveNext());
+                else
+                {
+                    continue;
+                }
+            }
         }
+
+
 
         private void VerifyFlipEdge(Vertex vertex, (Vertex origin, Vertex dest) expectedFlipEdge)
         {
@@ -143,7 +135,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
 
             for (int j = 0; j < verifyIndex; j++)
             {
-                var currentedge = edgeList[j].Next.Twin;
+                var currentedge = edgeList[j].Next?.Twin;
 
                 // Verify Delaunay condition
                 if (GeometryUtils.IsInsideOrOnCircumcircle(currentedge.Face, vertex))

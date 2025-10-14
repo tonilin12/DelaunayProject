@@ -46,7 +46,7 @@ public class TriangulationBuilder
             .Where(tri => !tri.GetVertices().Any(v => superSet.Contains(v)));
     }
 
-    public IEnumerable<Vertex> GetVertices()
+    public IEnumerable<Vertex> GetInternalVertices()
     {
         var superSet = new HashSet<Vertex>(_superTriangleVertices);
         return _meshTriangles.Values
@@ -68,7 +68,7 @@ public class TriangulationBuilder
         LegalizeEdges(vertex);
     }
 
-    public IEnumerable<bool> ProcessSingleVertexStepByStep()
+    public IEnumerable<HalfEdge> ProcessSingleVertexStepByStep()
     {
         if (!HasMoreVerticesToProcess) yield break;
 
@@ -76,7 +76,7 @@ public class TriangulationBuilder
         InsertSingleVertex(vertex);
 
         foreach (var step in EnumerateFlips(vertex))
-            yield return step; // each step is now a bool
+            yield return step; // each step now returns the flipped HalfEdge
     }
 
     public void ProcessAllVertices()
@@ -127,9 +127,9 @@ public class TriangulationBuilder
 
     #region EdgeLegalization
 
-    private delegate void EdgeFlipHandler( HalfEdge twin);
+    private delegate void EdgeFlipHandler(HalfEdge twin);
 
-    private IEnumerable<bool> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
+    private IEnumerable<HalfEdge> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
     {
         const int iterationLimit = 1_000_000;
         int iterationCount = 0;
@@ -137,37 +137,41 @@ public class TriangulationBuilder
         while (_reusableStack.Count > 0 && iterationCount++ < iterationLimit)
         {
             var edge = _reusableStack.Pop();
-            if (edge?.Twin == null)
-                continue;
+            var twin = edge.Twin;
 
-            var twin = edge.Twin!;
-            if (!GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
-                continue;
+
 
             if (stepwise)
-                yield return true; // signal a flip-step
+                yield return twin; // previously yielded 'true'; logic unchanged
 
-            flipHandler(twin);
 
-            _reusableStack.Push(edge.Next!);
-            _reusableStack.Push(twin.Next?.Next!);
 
-            _meshTriangles[edge.Face.Id] = edge.Face;
-            _meshTriangles[twin.Face.Id] = twin.Face;
+            if (twin!=null && GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
+            {
+
+                flipHandler(twin);
+
+                _reusableStack.Push(edge.Next!);
+                _reusableStack.Push(twin.Next?.Next!);
+            }
+
+
+      
+
         }
     }
 
     private void LegalizeEdges(Vertex vertex)
     {
-        EdgeFlipHandler immediateFlip = ( HalfEdge twin) =>
+        EdgeFlipHandler immediateFlip = (HalfEdge twin) =>
         {
-            TriangulationOperation.FlipEdge( twin);
+            TriangulationOperation.FlipEdge(twin);
         };
 
         foreach (var _ in ProcessEdges(vertex, immediateFlip, stepwise: false)) { }
     }
 
-    private IEnumerable<bool> EnumerateFlips(Vertex vertex)
+    private IEnumerable<HalfEdge> EnumerateFlips(Vertex vertex)
     {
         EdgeFlipHandler deferredFlip = (HalfEdge twin) =>
         {
@@ -175,6 +179,7 @@ public class TriangulationBuilder
         };
 
         return ProcessEdges(vertex, deferredFlip, stepwise: true);
-    }   
+    }
+
     #endregion
 }
