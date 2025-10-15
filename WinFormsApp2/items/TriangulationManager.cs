@@ -2,12 +2,10 @@
 using ClassLibrary2.HalfEdgeFolder.VoronoiFolder;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormsApp2.items
@@ -26,6 +24,7 @@ namespace WinFormsApp2.items
         }
 
         public Face? CurrentFace { get; private set; } = null;
+        public Vertex? CurrentVertex { get; private set; } = null;
 
         public TriangulationBuilder? Triangulator
         {
@@ -36,30 +35,37 @@ namespace WinFormsApp2.items
         public event Action? ProcessingStarted;
         public event Action? ProcessingFinished;
 
-        // Step-by-step control
-        private int baseDelayMs = 500;
-        private float speedMultiplier = 1.0f;
-        public int CurrentDelayMs => (int)(baseDelayMs * speedMultiplier);
+        // --- Step-by-step control ---
+        private const int StepDelayMs = 1000; // normal delay per step
         public bool IsStepByStepMode { get; set; } = false;
+
+        // --- New: immediate (fast-forward) flag ---
+        private volatile bool immediateMode = false;
+        public bool ImmediateMode
+        {
+            get { lock (_lock) { return immediateMode; } }
+            set { lock (_lock) { immediateMode = value; } }
+        }
+
+        public void FastForward() => ImmediateMode = true;
 
         public bool flip_happen = false;
 
-        public List<HalfEdge> CurrentEdgesToHighlight { get; private set; } = new List<HalfEdge>();
-
-
-        public void SetSpeedMultiplier(float m)
-        {
-            lock (_lock) speedMultiplier = m;
-        }
-
+        // ---------------------
+        // --- Initialization ---
+        // ---------------------
         public void InitializeFromScreen(Screen screen)
         {
+            // Fast-forward any ongoing step mode
+            ImmediateMode = true;
+
             lock (_lock)
             {
                 triangulation?.Clear();
                 triangulation = null;
                 triangulator = null;
                 CurrentFace = null;
+                CurrentVertex = null;
 
                 int screenWidth = screen.Bounds.Width;
                 int screenHeight = screen.Bounds.Height;
@@ -79,18 +85,22 @@ namespace WinFormsApp2.items
             StateChanged?.Invoke();
         }
 
+        // ---------------------
+        // --- Snapshot helper ---
+        // ---------------------
         public (HashSet<Face> triangles, List<Vertex> inserted) GetSnapshot()
         {
             lock (_lock)
             {
                 var triCopy = triangulation != null ? new HashSet<Face>(triangulation) : new HashSet<Face>();
                 var vertCopy = triangulator?.GetInternalVertices()?.ToList() ?? new List<Vertex>();
-
                 return (triCopy, vertCopy);
             }
         }
 
-
+        // ---------------------
+        // --- Vertex Insertion ---
+        // ---------------------
         public async Task AddVertexAsync(Vertex vertex)
         {
             if (triangulator == null) return;
@@ -106,6 +116,7 @@ namespace WinFormsApp2.items
             try
             {
                 triangulator.AddVertices(vertex);
+                CurrentVertex = vertex;
 
                 if (IsStepByStepMode)
                 {
@@ -118,7 +129,7 @@ namespace WinFormsApp2.items
                         lock (_lock)
                         {
                             if (!enumerator.MoveNext())
-                                break; // Exit loop when no more steps
+                                break; // no more steps
 
                             triangulation = triangulator.GetInternalTriangles().ToHashSet();
                             edgeToFlip = enumerator.Current;
@@ -126,19 +137,30 @@ namespace WinFormsApp2.items
 
                             flip_happen = edgeToFlip != null &&
                                           GeometryUtils.IsInsideOrOnCircumcircle(CurrentFace!, vertex);
-
-                            // Highlight edges connected to this vertex
-                            CurrentEdgesToHighlight = vertex.GetVertexEdges()
-                                                            .Select(e => e.Next!)
-                                                            .Where(e => e != null)
-                                                            .ToList();
                         }
 
-                        // Trigger UI repaint
-                        if (CurrentFace != null || CurrentEdgesToHighlight.Count > 0)
+                        // --- Trigger repaint ---
+                        if (CurrentFace != null || CurrentVertex != null)
                         {
                             StateChanged?.Invoke();
-                            await Task.Delay(CurrentDelayMs);
+
+                            // --- Adaptive delay: skip if immediate mode ---
+                            int delay;
+                            lock (_lock)
+                                delay = (IsStepByStepMode && !ImmediateMode) ? StepDelayMs : 0;
+
+                            if (delay > 0)
+                                await Task.Delay(delay);
+                            else
+                                await Task.Yield(); // yield to UI thread quickly
+                        }
+
+                        // --- If immediate mode is activated mid-way, fast-finish ---
+                        if (ImmediateMode)
+                        {
+                            // drain remaining steps fast
+                            while (enumerator.MoveNext()) { }
+                            break;
                         }
                     }
 
@@ -146,14 +168,15 @@ namespace WinFormsApp2.items
                     lock (_lock)
                     {
                         CurrentFace = null;
-                        CurrentEdgesToHighlight.Clear();
                         flip_happen = false;
+                        CurrentVertex = null;
                     }
 
                     StateChanged?.Invoke();
                 }
                 else
                 {
+                    // Normal instant triangulation mode
                     await Task.Run(() =>
                     {
                         lock (_lock)
@@ -168,14 +191,14 @@ namespace WinFormsApp2.items
             }
             finally
             {
-                lock (_lock) isProcessingVertex = false;
+                lock (_lock)
+                {
+                    isProcessingVertex = false;
+                    // reset fast-forward after completion
+                    ImmediateMode = false;
+                }
                 ProcessingFinished?.Invoke();
             }
         }
-
     }
-
-
-
-
 }

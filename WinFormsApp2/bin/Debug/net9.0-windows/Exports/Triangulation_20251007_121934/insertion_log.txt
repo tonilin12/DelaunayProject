@@ -1,7 +1,0 @@
-# Point Insertion Log
-# Each line represents a vertex in the order it was inserted
-# Format: Index X Y
-1 300,000000 165,000000
-2 292,000000 317,000000
-3 206,000000 252,000000
-4 440,000000 248,000000

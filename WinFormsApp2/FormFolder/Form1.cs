@@ -49,10 +49,13 @@ namespace WindowsFormsApp1
             manager = new TriangulationManager();
             manager.StateChanged += OnManagerStateChanged;
 
-            menuBuilder = new MenuBuilder(stepSpeedLabel, stepSpeedComboBox, speedOptions);
+
             renderer = new Renderer();
             exporter = new TriangulationExporter();
 
+            menuBuilder = new MenuBuilder(manager);
+
+            // when building the menu, remove onSpeedSelected and related logic:
             menuStrip = menuBuilder.BuildMenu(
                 onReset: ResetEverything,
                 onExport: ExportCurrent,
@@ -63,12 +66,7 @@ namespace WindowsFormsApp1
                 getHoverHighlight: () => showHoverHighlight,
                 setHoverHighlight: val => { showHoverHighlight = val; Invalidate(); },
                 getStepMode: () => manager.IsStepByStepMode,
-                setStepMode: val => manager.IsStepByStepMode = val,
-                onSpeedSelected: label =>
-                {
-                    if (speedOptions.TryGetValue(label, out var m))
-                        manager.SetSpeedMultiplier(m);
-                }
+                setStepMode: val => manager.IsStepByStepMode = val
             );
 
             this.MainMenuStrip = menuStrip;
@@ -169,17 +167,20 @@ namespace WindowsFormsApp1
                 renderer.DrawHoveredTriangle(g, hoveredFace, formHeight);
 
 
-            if (showTriangles&&manager.CurrentEdgesToHighlight != null && manager.CurrentEdgesToHighlight.Count > 0)
+            var currentVertex = manager.CurrentVertex;
+ 
+
+            if (showTriangles&& stack_face!=null && currentVertex != null)
             {
-                renderer.DrawEdges(g, manager.CurrentEdgesToHighlight, formHeight, Color.SeaGreen, 3);
-            }
 
 
-            if (showTriangles && stack_face != null)
-            {
+
+                renderer.DrawEdgesForVertex(g, currentVertex, formHeight, Color.SeaGreen, 3f);
+
                 // If a flip happened, draw circumcircle in red; otherwise normal green
                 Color circleColor = manager.flip_happen ? Color.Red : Color.Green;
                 renderer.DrawHoveredTriangle(g, stack_face, formHeight, circleColor);
+
             }
 
         }

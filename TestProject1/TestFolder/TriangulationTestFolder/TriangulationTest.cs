@@ -150,7 +150,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 }
             }
 
-            var flippededge= edgeList[verifyIndex];
+            var flippededge = edgeList[verifyIndex];
 
             TriangulationOperation.FlipEdge(flippededge);
 

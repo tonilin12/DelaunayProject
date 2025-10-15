@@ -155,9 +155,6 @@ public class TriangulationBuilder
                 _reusableStack.Push(twin.Next?.Next!);
             }
 
-
-      
-
         }
     }
 

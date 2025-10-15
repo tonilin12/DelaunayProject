@@ -11,8 +11,8 @@ namespace WinFormsApp2.items
     // Renderer (instance-based)
     public class Renderer
     {
-        public Color TriangleColor { get; set; } = Color.Blue;
-        public Color VertexColor { get; set; } = Color.Brown;
+        public Color TriangleColor { get; set; } = Color.RoyalBlue;
+        public Color VertexColor { get; set; } = Color.MidnightBlue;
         public Color HoverColor { get; set; } = Color.DarkSeaGreen;
         public Color VoronoiColor { get; set; } = Color.DarkOrange;
 
@@ -32,15 +32,33 @@ namespace WinFormsApp2.items
 
         public void DrawVertices(Graphics g, List<Vertex> vertices, int formHeight)
         {
-            using var pointBrush = new SolidBrush(VertexColor);
             float radius = 4;
+
             foreach (var v in vertices)
             {
                 float x = v.Position.X;
                 float y = formHeight - v.Position.Y;
-                g.FillEllipse(pointBrush, x - radius, y - radius, radius * 2, radius * 2);
+
+                // --- Glow effect (larger, transparent circle) ---
+                using (var glowBrush = new SolidBrush(Color.FromArgb(100, VertexColor)))
+                {
+                    g.FillEllipse(glowBrush, x - radius * 2, y - radius * 2, radius * 4, radius * 4);
+                }
+
+                // --- Main solid point ---
+                using (var pointBrush = new SolidBrush(VertexColor))
+                {
+                    g.FillEllipse(pointBrush, x - radius, y - radius, radius * 2, radius * 2);
+                }
+
+                // --- Optional outline ---
+                using (var outlinePen = new Pen(Color.White, 1))
+                {
+                    g.DrawEllipse(outlinePen, x - radius, y - radius, radius * 2, radius * 2);
+                }
             }
         }
+
 
         public void DrawHoveredTriangle(Graphics g, Face face, int formHeight, Color? circleColor = null)
         {
@@ -104,17 +122,38 @@ namespace WinFormsApp2.items
         }
 
 
-        public void DrawEdges(Graphics g, IEnumerable<HalfEdge> edges, int formHeight, Color color, float width = 3)
+        public void DrawEdgesForVertex(Graphics g, Vertex vertex, int formHeight, Color color, float width = 3f)
         {
-            using var pen = new Pen(color, width);
-            foreach (var e in edges)
+            if (vertex == null) return;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            using var highlightPen = new Pen(Color.FromArgb(128, Color.Yellow), width * 2.5f)
             {
-                if (e?.Origin == null || e?.Next?.Origin == null) continue;
+                LineJoin = System.Drawing.Drawing2D.LineJoin.Round,
+                StartCap = System.Drawing.Drawing2D.LineCap.Round,
+                EndCap = System.Drawing.Drawing2D.LineCap.Round
+            };
+
+            using var mainPen = new Pen(color, width)
+            {
+                LineJoin = System.Drawing.Drawing2D.LineJoin.Round,
+                StartCap = System.Drawing.Drawing2D.LineCap.Round,
+                EndCap = System.Drawing.Drawing2D.LineCap.Round
+            };
+
+            // Iterate incident edges without LINQ to avoid extra allocations
+            foreach (var e in vertex.GetVertexEdges().Select(x=>x.Next))
+            {
+
                 var p1 = new PointF(e.Origin.Position.X, formHeight - e.Origin.Position.Y);
-                var p2 = new PointF(e.Next.Origin.Position.X, formHeight - e.Next.Origin.Position.Y);
-                g.DrawLine(pen, p1, p2);
+                var p2 = new PointF(e.Dest.Position.X, formHeight - e.Dest.Position.Y);
+
+                g.DrawLine(highlightPen, p1, p2);
+                g.DrawLine(mainPen, p1, p2);
             }
         }
+
+
 
     }
 }
