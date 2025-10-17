@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ClassLibrary2;
-using ClassLibrary2.GeometryFolder;
 using ClassLibrary2.HalfEdgeFolder.VoronoiFolder;
+using ClassLibrary2.MeshFolder.Else;
 
 namespace TestProject1.TestFolder.DataStructureTestFolder
 {
@@ -36,7 +36,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
             // Arrange
             Face superTriangle;
             TriangulationOperation.GetSuperTriangle( _vertices, out superTriangle);
-            var triangulator = new TriangulationBuilder(superTriangle);
+            var triangulator = new DelaunayBuilder(superTriangle);
 
             // Act
             foreach (var v in _vertices)

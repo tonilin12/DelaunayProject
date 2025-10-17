@@ -48,7 +48,7 @@ public static class RuntimeAnalyzer
                 var grid = new SpatialGrid(verticesArray);        // Pass array directly
                 Vertex[] gridPoints = grid.Points;  // Direct access to internal array
 
-                var triangulatorGrid = new TriangulationBuilder(superTriangle, gridPoints);
+                var triangulatorGrid = new DelaunayBuilder(superTriangle, gridPoints);
                 triangulatorGrid.ProcessAllVertices();
                 sw.Stop();
                 Log(outputFile, n, trial, "SpatialGrid", sw.ElapsedMilliseconds, verticesArray.Length);
@@ -59,7 +59,7 @@ public static class RuntimeAnalyzer
                 if (n <= 20000)
                 {
                     sw.Restart();
-                    var triangulatorRaw = new TriangulationBuilder(superTriangle, verticesArray);
+                    var triangulatorRaw = new DelaunayBuilder(superTriangle, verticesArray);
                     triangulatorRaw.ProcessAllVertices();
                     sw.Stop();
                     Log(outputFile, n, trial, "Raw", sw.ElapsedMilliseconds, verticesArray.Length);

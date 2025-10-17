@@ -1,4 +1,4 @@
-using ClassLibrary2.GeometryFolder;
+using ClassLibrary2.MeshFolder.Else;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +8,8 @@ public class Face
 {
     private HalfEdge _edge;
 
-
     private static int _nextFaceId = 0; // global counter for all faces
     public int Id { get; private set; } // unique ID for this face
-
 
     public HalfEdge Edge
     {
@@ -21,8 +19,6 @@ public class Face
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
             _edge = value;
-
-            // Invalidate cached circumcircle and mark Voronoi dirty
             InvalidateCircumcircle();
         }
     }
@@ -35,14 +31,17 @@ public class Face
     private void ComputeCircumcircle()
     {
         if (_cachedCircumcenter.HasValue)
-            return; // Already computed
+            return;
 
-        var v0 = Edge.Origin;
-        var v1 = Edge?.Next?.Origin;
-        var v2 = Edge?.Next?.Next?.Origin;
+        var e0 = Edge;
+        var e1 = e0?.Next;
+        var e2 = e1?.Next;
+
+        var v0 = e0.Origin;
+        var v1 = e1.Origin;
+        var v2 = e2.Origin;
 
         _cachedCircumcenter = GeometryUtils.Circumcenter(v0, v1, v2);
-
     }
 
     public Vector2 Circumcenter
@@ -54,10 +53,6 @@ public class Face
         }
     }
 
-
-    /// <summary>
-    /// Invalidate cached circumcircle (call if vertices or edges move)
-    /// </summary>
     public void InvalidateCircumcircle()
     {
         _cachedCircumcenter = null;
@@ -71,8 +66,7 @@ public class Face
         if (vertices == null || vertices.Length != 3)
             throw new ArgumentException("Exactly 3 vertices are required.");
 
-        var edge = MakeCycle(vertices, this, v => new HalfEdge(v));
-        Edge = edge;
+        Edge = MakeCycle(vertices, this, v => new HalfEdge(v));
     }
 
     public Face(params HalfEdge[] halfEdges)
@@ -80,13 +74,8 @@ public class Face
         if (halfEdges == null || halfEdges.Length != 3)
             throw new ArgumentException("Exactly 3 half-edges are required.");
 
-        var edge = MakeCycle(halfEdges, this, e => e);
-        Edge = edge;
+        Edge = MakeCycle(halfEdges, this, e => e);
     }
-
-
-
-
 
     // -----------------------------
     // Helper: create cycle of half-edges
@@ -99,7 +88,6 @@ public class Face
         var edges = new HalfEdge[3];
         int index = 0;
 
-        // Convert items to edges
         foreach (var item in items)
         {
             if (index >= 3)
@@ -113,52 +101,46 @@ public class Face
         if (index != 3)
             throw new ArgumentException("Exactly 3 items required");
 
-        // Check for collinearity
         if (GeometryUtils.GetSignedArea(edges) == 0)
             throw new ArgumentException("Degenerate face: the three vertices are collinear.");
 
-        // Link edges in a cycle
         for (int i = 0; i < 3; i++)
             edges[i].Next = edges[(i + 1) % 3];
 
         InvalidateCircumcircle();
-
-
-        Id = _nextFaceId++; // assign unique ID
-
+        Id = _nextFaceId++;
 
         return edges[0];
     }
 
 
-
-
-    // -----------------------------
-    // Enumerators
-    // -----------------------------
-    private IEnumerable<HalfEdge> EnumerateEdges()
+    public EdgeIterator GetEdgeIterator()
     {
-        if (Edge == null) yield break;
-
-        var start = Edge;
-        var current = start;
-        do
-        {
-            yield return current;
-            current = current.Next;
-        } while (current != null && current != start);
+        return EdgeIterator.AroundFace(this);
     }
 
-    public IEnumerable<HalfEdge> GetEdges() => EnumerateEdges();
+    // -----------------------------
+    // Enumerators using EdgeIterator
+    // -----------------------------
+    public IEnumerable<HalfEdge> GetEdges()
+    {
+        var it =GetEdgeIterator();
+        while (it.MoveNext())
+        {
+            yield return it.Current!;
+        }
+    }
 
     public IEnumerable<Vertex> GetVertices()
     {
-        foreach (var e in EnumerateEdges())
-            yield return e.Origin;
+        var it = EdgeIterator.AroundFace(this);
+        while (it.MoveNext())
+        {
+            yield return it.Current!.Origin;
+        }
     }
 
 
- 
     public override string ToString()
     {
         return string.Join(" → ", GetVertices().Select(v => v.ToString()));

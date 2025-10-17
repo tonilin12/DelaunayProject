@@ -1,9 +1,9 @@
-﻿using ClassLibrary2.GeometryFolder;
+﻿using ClassLibrary2.MeshFolder.Else;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class TriangulationBuilder
+public class DelaunayBuilder
 {
     private readonly Queue<Vertex> _vertexQueue;
     private readonly Vertex[] _superTriangleVertices;
@@ -13,7 +13,7 @@ public class TriangulationBuilder
 
     private static readonly Action NoOpAction = () => { };
 
-    public TriangulationBuilder(Face supertriangle, params Vertex[] initialVertices)
+    public DelaunayBuilder(Face supertriangle, params Vertex[] initialVertices)
     {
         if (supertriangle == null)
             throw new ArgumentNullException(nameof(supertriangle));
@@ -95,7 +95,7 @@ public class TriangulationBuilder
         var edge = pointData.destinationEdge;
         bool isOnEdge = pointData.isOnEdge;
 
-        if (edge.Origin.PositionsEqual(vertex))
+        if (edge.Origin.PositionsEqual(vertex) || edge.Dest!.PositionsEqual(vertex))
             return;
 
         var containingFace = edge.Face;
@@ -118,11 +118,14 @@ public class TriangulationBuilder
         // Fill the reusable stack for edge legalization
         _reusableStack.Clear();
 
-        foreach (var e in vertex.GetVertexEdges())
+        var it = vertex.GetEdgeIterator();
+        while (it.MoveNext())
         {
+            var e = it.Current!;
             _meshTriangles[e.Face.Id] = e.Face; // Add or update
             _reusableStack.Push(e.Next!);
         }
+
     }
 
     #region EdgeLegalization

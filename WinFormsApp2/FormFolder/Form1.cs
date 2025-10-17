@@ -1,10 +1,10 @@
-﻿using ClassLibrary2.GeometryFolder;
-using ClassLibrary2.HalfEdgeFolder.VoronoiFolder;
+﻿using ClassLibrary2.HalfEdgeFolder.VoronoiFolder;
 using System.Globalization;
 using System.Numerics;
 using WinFormsApp2.items;
 using System.Drawing;
 using System.Windows.Forms;
+using ClassLibrary2.MeshFolder.Else;
 
 namespace WindowsFormsApp1
 {

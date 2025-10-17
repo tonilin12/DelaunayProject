@@ -33,7 +33,7 @@ namespace ClassLibrary2.HalfEdgeFolder.VoronoiFolder
         /// Build full Voronoi diagram from triangulation.
         /// Only internal vertices (excluding supertriangle vertices).
         /// </summary>
-        public static List<VoronoiCell> BuildDiagram(TriangulationBuilder triangulation)
+        public static List<VoronoiCell> BuildDiagram(DelaunayBuilder triangulation)
         {
             var cells = new List<VoronoiCell>();
 

@@ -102,7 +102,7 @@ namespace WinFormsApp2.items
 
 
 
-        public void DrawVoronoi(Graphics g, TriangulationBuilder triangulator, int formHeight)
+        public void DrawVoronoi(Graphics g, DelaunayBuilder triangulator, int formHeight)
         {
             using var voronoiPen = new Pen(VoronoiColor, 2);
             var cells = VoronoiBuilder.BuildDiagram(triangulator);

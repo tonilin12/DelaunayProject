@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
-using ClassLibrary2.GeometryFolder;
+using ClassLibrary2.MeshFolder.Else;
 
 namespace TestProject1.TestFolder.Else
 {

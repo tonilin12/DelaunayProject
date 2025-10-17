@@ -28,7 +28,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
 
             var parsedVertex = new Vertex(x, y);
 
-            Assert.IsTrue(v.PositionsEqual(parsedVertex, 1e-6f), "Vertex round-trip via ToString failed.");
+            Assert.IsTrue(v.PositionsEqual(parsedVertex), "Vertex round-trip via ToString failed.");
         }
 
         [TestMethod]

@@ -1,13 +1,13 @@
-﻿using ClassLibrary2.GeometryFolder;
+﻿using ClassLibrary2.MeshFolder.Else;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Numerics;
-    using System.Text;
-    using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
 
-    namespace TestProject1.TestFolder.TriangulationOperations
+namespace TestProject1.TestFolder.TriangulationOperations
     {
 
         [TestClass]

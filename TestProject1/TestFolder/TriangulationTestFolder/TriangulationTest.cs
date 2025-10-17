@@ -1,4 +1,4 @@
-﻿using ClassLibrary2.GeometryFolder;
+﻿using ClassLibrary2.MeshFolder.Else;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
     public class TriangulationTest
     {
         private Vertex[]? vertexArray;
-        private TriangulationBuilder? triangulator;
+        private DelaunayBuilder? triangulator;
         private Face? superTriangle;
 
         [TestInitialize]
@@ -38,7 +38,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
             }
 
             TriangulationOperation.GetSuperTriangle(vertexArray, out superTriangle!);
-            triangulator = new TriangulationBuilder(superTriangle!);
+            triangulator = new DelaunayBuilder(superTriangle!);
         }
 
         /// <summary>

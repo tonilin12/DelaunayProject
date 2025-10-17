@@ -1,33 +1,22 @@
-using ClassLibrary2.GeometryFolder;
+using ClassLibrary2.MeshFolder.Else;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 public class Vertex
 {
-    /// <summary>
-    /// Position of the vertex in 2D space.
-    /// </summary>
     public Vector2 Position { get; set; }
-
     private HalfEdge? _outgoingHalfEdge;
 
-    /// <summary>
-    /// Optional outgoing half-edge from this vertex.
-    /// </summary>
     public HalfEdge? OutgoingHalfEdge
     {
         get => _outgoingHalfEdge;
         set => _outgoingHalfEdge = value;
     }
 
-    /// <summary>
-    /// Default tolerance for approximate comparisons.
-    /// </summary>
     private readonly float Tolerance = GeometryUtils.GetEpsilon;
-
- 
 
     public Vertex(float x, float y)
     {
@@ -35,56 +24,52 @@ public class Vertex
         OutgoingHalfEdge = null;
     }
 
-
+    // ===========================================================
+    //  EDGE ITERATION (USING NEW EDGEITERATOR)
+    // ===========================================================
 
     /// <summary>
-    /// Enumerates half-edges originating from this vertex in CCW order, safely avoiding infinite loops.
+    /// Returns a lightweight iterator for traversing outgoing half-edges around this vertex.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public EdgeIterator GetEdgeIterator()
+    {
+        return EdgeIterator.AroundVertex(this);
+    }
+
     /// <summary>
     /// Enumerates all outgoing half-edges around this vertex in CCW order.
+    /// Uses the lightweight EdgeIterator internally.
     /// </summary>
-    public IEnumerable<HalfEdge> GetVertexEdges(HalfEdge? startEdge = null)
+    public IEnumerable<HalfEdge> GetVertexEdges()
     {
-        // Use the provided start edge, or default to OutgoingHalfEdge
-        HalfEdge? start = startEdge ?? OutgoingHalfEdge;
-
-        if (start == null || start.Origin == null || !start.Origin.PositionsEqual(this))
-            yield break;
-
-        HalfEdge current = start;
-
-        do
+        var iterator = GetEdgeIterator();
+        while (iterator.MoveNext())
         {
-            yield return current;
-            current = current.Twin?.Next!;
+            var edge = iterator.Current;
+            if (edge == null) yield break;
+            yield return edge;
         }
-        while (current != null && current != start);
     }
 
 
+    // ===========================================================
+    //  OTHER METHODS
+    // ===========================================================
 
-
-
-    /// <summary>
-    /// Returns a string representation of the vertex.
-    /// </summary>
     public override string ToString()
     {
         return string.Format(CultureInfo.InvariantCulture,
             "Vertex({0:F6}, {1:F6})", Position.X, Position.Y);
     }
 
-    /// <summary>
-    /// Checks if this vertex is approximately equal to another vertex using Euclidean distance.
-    /// Float-only version.
-    /// </summary>
-    public bool PositionsEqual(Vertex? other, float epsilon = 1e-6f)
+    public bool PositionsEqual(Vertex? other)
     {
         if (other is null) return false;
 
         float dx = Position.X - other.Position.X;
         float dy = Position.Y - other.Position.Y;
 
-        return dx * dx + dy * dy <= epsilon * epsilon;
+        return dx * dx + dy * dy <= Tolerance * Tolerance;
     }
 }

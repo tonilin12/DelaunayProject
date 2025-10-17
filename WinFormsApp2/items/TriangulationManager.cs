@@ -1,5 +1,4 @@
-﻿using ClassLibrary2.GeometryFolder;
-using ClassLibrary2.HalfEdgeFolder.VoronoiFolder;
+﻿using ClassLibrary2.HalfEdgeFolder.VoronoiFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Numerics;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ClassLibrary2.MeshFolder.Else;
 
 namespace WinFormsApp2.items
 {
@@ -15,7 +15,7 @@ namespace WinFormsApp2.items
         private readonly object _lock = new object();
         private HashSet<Face>? triangulation;
         private Face superTriangle = null!;
-        private TriangulationBuilder? triangulator;
+        private DelaunayBuilder? triangulator;
 
         private bool isProcessingVertex = false;
         public bool IsProcessingVertex
@@ -26,7 +26,7 @@ namespace WinFormsApp2.items
         public Face? CurrentFace { get; private set; } = null;
         public Vertex? CurrentVertex { get; private set; } = null;
 
-        public TriangulationBuilder? Triangulator
+        public DelaunayBuilder? Triangulator
         {
             get { lock (_lock) { return triangulator; } }
         }
@@ -79,7 +79,7 @@ namespace WinFormsApp2.items
                 };
 
                 TriangulationOperation.GetSuperTriangle(borderPoints, out superTriangle);
-                triangulator = new TriangulationBuilder(superTriangle);
+                triangulator = new DelaunayBuilder(superTriangle);
             }
 
             StateChanged?.Invoke();

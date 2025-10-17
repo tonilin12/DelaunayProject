@@ -1,6 +1,7 @@
+using ClassLibrary2.MeshFolder.Else;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 public class TriangleSplitter
@@ -13,29 +14,37 @@ public class TriangleSplitter
     /// <returns>A list containing the three smaller faces resulting from the split.</returns>
     public void SplitTriangle(Face triangle, Vertex newVertex)
     {
-        // Split the triangle into three smaller triangles
-        var originalEdges = triangle.GetEdges().ToArray();
-        var originalVertices = triangle.GetVertices().ToList();
+        // Use the EdgeIterator directly
+        var it = triangle.GetEdgeIterator();
 
-        // Extract triangle vertices.
-        var (A, B, C) =
-            (originalEdges[0].Origin,
-            originalEdges[1].Origin,
-            originalEdges[2].Origin);
+        // Collect the 3 vertices and edges
+        HalfEdge[] edges = new HalfEdge[3];
+        Vertex[] vertices = new Vertex[3];
+        int index = 0;
 
+        while (it.MoveNext())
+        {
+            edges[index] = it.Current!;
+            vertices[index] = it.Current!.Origin;
+            index++;
+        }
 
+        if (index != 3)
+            throw new InvalidOperationException("Face does not have exactly 3 edges.");
 
-        // Create new half-edge pairs (twins) connecting the new vertex to each triangle vertex.
+        var (A, B, C) = (vertices[0], vertices[1], vertices[2]);
+
+        // Create new half-edge pairs connecting the new vertex to each triangle vertex
         var (dToA, aToD) = HalfEdge.CreateHalfEdgePair(newVertex, A);
         var (dToB, bToD) = HalfEdge.CreateHalfEdgePair(newVertex, B);
         var (dToC, cToD) = HalfEdge.CreateHalfEdgePair(newVertex, C);
 
-        // Create the 3 new faces.
-        var face1 = new Face(dToA, originalEdges[0], bToD);
-        var face2 = new Face(dToB, originalEdges[1], cToD);
-        var face3 = new Face(dToC, originalEdges[2], aToD);
+        // Create the 3 new faces
+        var face1 = new Face(dToA, edges[0], bToD);
+        var face2 = new Face(dToB, edges[1], cToD);
+        var face3 = new Face(dToC, edges[2], aToD);
 
-        // Return the faces as a list
+        // Now face1, face2, face3 are the new triangles
     }
 
 

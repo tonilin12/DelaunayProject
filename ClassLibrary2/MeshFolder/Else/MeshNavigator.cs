@@ -1,4 +1,4 @@
-﻿using ClassLibrary2.GeometryFolder;
+﻿using ClassLibrary2.MeshFolder.Else;
 using System.Numerics;
 
 public static class MeshNavigator
@@ -11,14 +11,12 @@ public static class MeshNavigator
     // ===========================
     public readonly struct PointLocation
     {
-        public readonly bool DestinationReached;
         public readonly bool IsOnEdge;
         public readonly HalfEdge? DestinationEdge;
         public readonly HalfEdge? NextHalfEdge;
 
-        public PointLocation(bool destinationReached, bool isOnEdge, HalfEdge? destinationEdge, HalfEdge? nextHalfEdge)
+        public PointLocation( bool isOnEdge, HalfEdge? destinationEdge, HalfEdge? nextHalfEdge)
         {
-            DestinationReached = destinationReached;
             IsOnEdge = isOnEdge;
             DestinationEdge = destinationEdge;
             NextHalfEdge = nextHalfEdge;
@@ -47,50 +45,51 @@ public static class MeshNavigator
     // ===========================
     private static PointLocation ComputePointLocation(HalfEdge edge, Vertex point)
     {
-        bool anyOnEdge = false;
-        bool allPositive = true;
-        HalfEdge? exactVertexEdge = null;
-        HalfEdge? firstEdgeOnSegment = null;
+        HalfEdge? destinationEdge = null;
         HalfEdge? nextHalfEdge = null;
+        bool anyOnEdge = false;
 
-        bool IsExactVertex(Vertex v) => v.PositionsEqual(point);
+        HalfEdge startEdge = edge.Next!;
+        HalfEdge current =startEdge;
 
-        HalfEdge current = edge;
-        for (int i = 0; i < 3; i++)
+        do
         {
-            float orientationValue = GeometryUtils.GetSignedArea(current.Origin, current.Dest, point);
+            float orientationValue = GeometryUtils.GetSignedArea(current.Origin, current.Dest!, point);
 
-            bool onEdge = Math.Abs(orientationValue) < tolerance && IsOnSegment(current.Origin, current.Dest, point);
+            // Determine next half-edge if point is on the "outside" of current edge
+            if (orientationValue < -tolerance && nextHalfEdge == null)
+            {
+                nextHalfEdge = current.Twin;
+                break;
+            }
+
+            // Check if point is on the current edge
+            bool onEdge = Math.Abs(orientationValue) < tolerance && GeometryUtils.IsOnSegment(current.Origin, current.Dest, point);
 
             if (onEdge)
             {
-                if (IsExactVertex(current.Origin))
-                    exactVertexEdge = current;
-
                 anyOnEdge = true;
-                if (firstEdgeOnSegment == null && exactVertexEdge == null)
-                    firstEdgeOnSegment = current;
+
+                if (current.Dest.PositionsEqual(point))
+                    destinationEdge = current.Next;
+
+                if (destinationEdge == null)
+                    destinationEdge = current;
+
+                break;
             }
-
-            if (orientationValue <= 0) allPositive = false;
-
-            if (orientationValue < 0 && nextHalfEdge == null)
-                nextHalfEdge = current.Twin;
 
             current = current.Next!;
         }
+        while (current != startEdge); // Stop after one full cycle around the face
 
-        // Determine destination edge safely
-        HalfEdge? destinationEdge = null;
-        if (anyOnEdge)
-            destinationEdge = exactVertexEdge ?? firstEdgeOnSegment;
-        else if (allPositive)
-            destinationEdge = edge;
+        // Fallback if no destination or nextHalfEdge found
+        if (nextHalfEdge == null && destinationEdge == null)
+            destinationEdge = startEdge;
 
-        HalfEdge? nextEdge = (!allPositive && !anyOnEdge) ? nextHalfEdge : null;
-
-        return new PointLocation(destinationEdge != null, anyOnEdge, destinationEdge, nextEdge);
+        return new PointLocation(anyOnEdge, destinationEdge, nextHalfEdge);
     }
+
 
     // ===========================
     // Locate point from edge
@@ -110,7 +109,7 @@ public static class MeshNavigator
 
 
             // Destination reached
-            if (loc.DestinationReached)
+            if (loc.DestinationEdge!=null)
                 return (loc.DestinationEdge!, loc.IsOnEdge);
 
             // Cannot continue

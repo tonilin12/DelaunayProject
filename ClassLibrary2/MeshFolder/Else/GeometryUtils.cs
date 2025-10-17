@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace ClassLibrary2.GeometryFolder
+namespace ClassLibrary2.MeshFolder.Else
 {
     public static class GeometryUtils
     {
@@ -58,7 +58,7 @@ namespace ClassLibrary2.GeometryFolder
             float d2 = GetSignedArea(p, v1.Position, v2.Position);
             float d3 = GetSignedArea(p, v2.Position, v0.Position);
 
-            return (d1 >= 0f && d2 >= 0f && d3 >= 0f) || (d1 <= 0f && d2 <= 0f && d3 <= 0f);
+            return d1 >= 0f && d2 >= 0f && d3 >= 0f || d1 <= 0f && d2 <= 0f && d3 <= 0f;
         }
 
 
@@ -149,6 +149,8 @@ namespace ClassLibrary2.GeometryFolder
 
         #endregion
 
+
+
         #region Circumcenter
 
         public static Vector2 Circumcenter(Vertex a, Vertex b, Vertex c)
@@ -182,5 +184,29 @@ namespace ClassLibrary2.GeometryFolder
         }
 
         #endregion
+
+
+       public static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
+        {
+            return IsOnSegment(a.Position, b.Position, p.Position);
+        }
+
+        public static bool IsOnSegment(Vector2 a, Vector2 b, Vector2 p)
+        {
+            Vector2 ap = p - a;
+            Vector2 ab = b - a;
+            float dot = Vector2.Dot(ap, ab);
+
+            if (dot < 0) return false;
+
+            float lenSq = ab.LengthSquared();
+            if (dot > lenSq) return false;
+
+            return true;
+        }
+
+
+
+
     }
 }
