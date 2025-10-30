@@ -28,7 +28,7 @@ namespace TestProject1.TestFolder.TriangulationOperations
             SuperTriangleGenerator generator = new SuperTriangleGenerator();
 
             // Act: generate supertriangle
-            generator.GetSuperTriangle(vertices, out Face superTriangle);
+            Face superTriangle = generator.GetSuperTriangle(vertices);
 
             // Assert: superTriangle is not null
             Assert.IsNotNull(superTriangle, "SuperTriangle should not be null.");

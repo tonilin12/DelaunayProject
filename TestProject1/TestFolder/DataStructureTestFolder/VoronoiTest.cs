@@ -34,8 +34,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
             Assert.IsTrue(_vertices.Length > 0, "No vertices to process.");
 
             // Arrange
-            Face superTriangle;
-            TriangulationOperation.GetSuperTriangle( _vertices, out superTriangle);
+            var superTriangle = TriangulationOperation.GetSuperTriangle(_vertices);
             var triangulator = new DelaunayBuilder(superTriangle);
 
             // Act
@@ -74,7 +73,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
                     var a = actualPolygon[i];
                     var b = expectedPolygon[i];
 
-                    if (Vector2.DistanceSquared(a, b) > GeometryUtils.GetEpsilon)
+                    if (Vector2.DistanceSquared(a, b) > GeometryUtils.EPSILON)
                     {
                         Assert.Fail(
                             $"Voronoi vertex mismatch for site {site.Position}, polygon index {i}:\n" +

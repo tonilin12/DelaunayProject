@@ -1,168 +1,137 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ClassLibrary2.MeshFolder.Else;
 
 namespace TestProject1.TestFolder.Else
 {
-
-
     [TestClass]
     public class GeometryUtilsTests
     {
-        private Vertex? vA;
-        private Vertex? vB;
-        private Vertex? vC;
-        private Vertex? vInside;
-        private Vertex? vOutside;
+        private Vertex vA;
+        private Vertex vB;
+        private Vertex vC;
+        private Vertex vInside;
+        private Vertex vOnCircle;
+        private Vertex vOutside;
 
         private Face triangle;
 
         [TestInitialize]
         public void Setup()
         {
-            // Triangle vertices
+            // Define a right triangle at (0,0), (1,0), (0,1)
             vA = new Vertex(0, 0);
             vB = new Vertex(1, 0);
             vC = new Vertex(0, 1);
 
-            // Create triangle face
             triangle = new Face(vA, vB, vC);
 
-            // Points to test inside/outside circumcircle
-            vInside = new Vertex(0.25f, 0.25f);
-            vOutside = new Vertex(2f, 2f);
+            // Circumcenter is (0.5, 0.5), radius ≈ 0.7071
+            vInside = new Vertex(0.4f, 0.4f);       // clearly inside
+            vOnCircle = new Vertex(0.5f + 0.7071f, 0.5f); // approximately on circumcircle
+            vOutside = new Vertex(1.5f, 0.5f);      // outside the circumcircle
         }
 
-        #region TriangleOrientation Tests
+        #region Triangle Orientation Tests
 
         [TestMethod]
-        public void TriangleOrientation_CCW_Returns1()
+        public void TriangleOrientation_CCW_ReturnsPositive()
         {
-            var orientation = GeometryUtils.GetSignedArea(vA, vB, vC);
-            Assert.AreEqual(1, orientation, "Triangle should be counterclockwise (CCW).");
-        }
-
-        [TestMethod]
-        public void TriangleOrientation_CW_ReturnsMinus1()
-        {
-            var orientation = GeometryUtils.GetSignedArea(vA, vC, vB);
-            Assert.AreEqual(-1, orientation, "Triangle should be clockwise (CW).");
+            float area = GeometryUtils.GetSignedArea(vA, vB, vC);
+            Assert.IsTrue(area > 0, "Triangle should be counterclockwise (CCW).");
         }
 
         [TestMethod]
-        public void TriangleOrientation_Collinear_Returns0()
+        public void TriangleOrientation_CW_ReturnsNegative()
         {
-            Vertex v1 = new Vertex(0, 0);
-            Vertex v2 = new Vertex(1, 1);
-            Vertex v3 = new Vertex(2, 2);
-
-            var orientation = GeometryUtils.GetSignedArea(v1, v2, v3);
-            Assert.AreEqual(0, orientation, "Triangle is collinear, should return 0.");
+            float area = GeometryUtils.GetSignedArea(vA, vC, vB);
+            Assert.IsTrue(area < 0, "Triangle should be clockwise (CW).");
         }
 
+        [TestMethod]
+        public void TriangleOrientation_Collinear_ReturnsZero()
+        {
+            var v1 = new Vertex(0, 0);
+            var v2 = new Vertex(1, 1);
+            var v3 = new Vertex(2, 2);
 
+            float area = GeometryUtils.GetSignedArea(v1, v2, v3);
+            Assert.AreEqual(0, area, 1e-6, "Collinear points should return zero area.");
+        }
 
         #endregion
 
-        #region IsInsideCircumcircle Tests
+        #region InCircumcircle Tests
 
         [TestMethod]
-        public void IsInsideOrOnCircumcircle_PointInside_ReturnsTrue()
+        public void InCircumcircle_PointInside_ReturnsTrue()
         {
-            bool result = GeometryUtils.IsInsideOrOnCircumcircle(triangle, vInside);
-            Assert.IsTrue(result, "Point inside circumcircle should return true.");
+            bool result = GeometryUtils.InCircumcircle(triangle, vInside);
+            Assert.IsTrue(result, "Point strictly inside circumcircle should return true.");
         }
 
         [TestMethod]
-        public void IsInsideOrOnCircumcircle_PointOutside_ReturnsFalse()
+        public void InCircumcircle_PointOnCircumcircle_ReturnsFalse()
         {
-            bool result = GeometryUtils.IsInsideOrOnCircumcircle(triangle, vOutside);
+            // Compute exact radius of the circumcircle for the triangle
+            Vector2 center = GeometryUtils.Circumcenter(vA, vB, vC);
+            float radius = Vector2.Distance(center, vA.Position);
+
+            // Place point approximately on the circumcircle, but allow for floating-point epsilon
+            vOnCircle = new Vertex(center.X + radius - GeometryUtils.EPSILON / 2f, center.Y);
+
+            bool result = GeometryUtils.InCircumcircle(triangle, vOnCircle);
+
+            // It should return false, because the point is considered on the circle (not inside)
+            Assert.IsFalse(result,
+                $"Point on circumcircle (within epsilon {GeometryUtils.EPSILON}) should return false.");
+        }
+
+
+        [TestMethod]
+        public void InCircumcircle_PointOutside_ReturnsFalse()
+        {
+            bool result = GeometryUtils.InCircumcircle(triangle, vOutside);
             Assert.IsFalse(result, "Point outside circumcircle should return false.");
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IsInsideOrOnCircumcircle_NullTriangle_ThrowsException()
+        public void InCircumcircle_NullTriangle_ThrowsException()
         {
-            GeometryUtils.IsInsideOrOnCircumcircle(null, vInside);
+            GeometryUtils.InCircumcircle(null, vInside);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IsInsideOrOnCircumcircle_NullVertex_ThrowsException()
+        public void InCircumcircle_NullVertex_ThrowsException()
         {
-            GeometryUtils.IsInsideOrOnCircumcircle(triangle, null);
+            GeometryUtils.InCircumcircle(triangle, null);
         }
+
         #endregion
 
 
 
-        [TestMethod]
-        public void Test_IsPointInsideTriangle_PointInside_ReturnsTrue()
-        {
-            var a = new Vertex(0, 0);
-            var b = new Vertex(5, 0);
-            var c = new Vertex(2.5f, 5);
-            var face = new Face(a, b, c);
-
-            var pointInside = new Vector2(2.5f, 2);
-
-            bool result = GeometryUtils.IsPointInsideTriangle(face, pointInside);
-
-            Assert.IsTrue(result, "Point inside triangle should return true.");
-        }
+        #region Circumcenter Tests
 
         [TestMethod]
-        public void Test_IsPointInsideTriangle_PointOutside_ReturnsFalse()
-        {
-            var a = new Vertex(0, 0);
-            var b = new Vertex(5, 0);
-            var c = new Vertex(2.5f, 5);
-            var face = new Face(a, b, c);
-
-            var pointOutside = new Vector2(5, 5);
-
-            bool result = GeometryUtils.IsPointInsideTriangle(face, pointOutside);
-
-            Assert.IsFalse(result, "Point outside triangle should return false.");
-        }
-
-        [TestMethod]
-        public void Test_IsPointInsideTriangle_PointOnEdge_ReturnsTrue()
-        {
-            var a = new Vertex(0, 0);
-            var b = new Vertex(5, 0);
-            var c = new Vertex(2.5f, 5);
-            var face = new Face(a, b, c);
-
-            var pointOnEdge = new Vector2(2.5f, 0);
-
-            bool result = GeometryUtils.IsPointInsideTriangle(face, pointOnEdge);
-
-            Assert.IsTrue(result, "Point on triangle edge should be considered inside.");
-        }
-
-        [TestMethod]
-        public void Test_Circumcenter_ComputesCorrectCenter()
+        public void Circumcenter_RightTriangle_ComputesCorrectCenter()
         {
             var a = new Vertex(0, 0);
             var b = new Vertex(4, 0);
             var c = new Vertex(0, 3);
 
             Vector2 center = GeometryUtils.Circumcenter(a, b, c);
+            var expected = new Vector2(2, 1.5f);
 
-            // The circumcenter of this right triangle is at (2,1.5)
-            var expectedCenter = new Vector2(2, 1.5f);
-
-            Assert.AreEqual(expectedCenter.X, center.X, 0.0001f, "Circumcenter X mismatch.");
-            Assert.AreEqual(expectedCenter.Y, center.Y, 0.0001f, "Circumcenter Y mismatch.");
+            Assert.AreEqual(expected.X, center.X, 1e-4f, "Circumcenter X mismatch.");
+            Assert.AreEqual(expected.Y, center.Y, 1e-4f, "Circumcenter Y mismatch.");
         }
 
         [TestMethod]
-        public void Test_Circumcenter_PositionEquidistantFromVertices()
+        public void Circumcenter_PositionEquidistantFromVertices()
         {
             var a = new Vertex(1, 1);
             var b = new Vertex(4, 5);
@@ -170,14 +139,56 @@ namespace TestProject1.TestFolder.Else
 
             Vector2 center = GeometryUtils.Circumcenter(a, b, c);
 
-            float distA = Vector2.Distance(center, a.Position);
-            float distB = Vector2.Distance(center, b.Position);
-            float distC = Vector2.Distance(center, c.Position);
+            float dA = Vector2.Distance(center, a.Position);
+            float dB = Vector2.Distance(center, b.Position);
+            float dC = Vector2.Distance(center, c.Position);
 
-            // Distances from center to all vertices should be equal
-            Assert.AreEqual(distA, distB, 0.0001f, "Distance from center to A and B mismatch.");
-            Assert.AreEqual(distA, distC, 0.0001f, "Distance from center to A and C mismatch.");
+            Assert.AreEqual(dA, dB, 1e-4f, "Distance to A and B mismatch.");
+            Assert.AreEqual(dA, dC, 1e-4f, "Distance to A and C mismatch.");
         }
-    }
 
+        #endregion
+
+        #region IsOnSegment Tests (Vector2 overload)
+
+        [TestMethod]
+        public void IsOnSegment_Vector2_MidpointCollinear_ReturnsTrue()
+        {
+            Vector2 a = new(0, 0);
+            Vector2 b = new(10, 0);
+            Vector2 p = new(5, 0);
+
+            Assert.IsTrue(GeometryUtils.IsOnSegment(a, b, p),
+                "Point at the midpoint on the segment should be on the segment.");
+        }
+
+        [TestMethod]
+        public void IsOnSegment_Vector2_Endpoints_ReturnTrue()
+        {
+            Vector2 a = new(0, 0);
+            Vector2 b = new(10, 0);
+
+            Assert.IsTrue(GeometryUtils.IsOnSegment(a, b, a),
+                "Point at endpoint A should be on the segment.");
+            Assert.IsTrue(GeometryUtils.IsOnSegment(a, b, b),
+                "Point at endpoint B should be on the segment.");
+        }
+
+        [TestMethod]
+        public void IsOnSegment_Vector2_OutsideRange_ReturnsFalse()
+        {
+            Vector2 a = new(0, 0);
+            Vector2 b = new(10, 0);
+
+            Assert.IsFalse(GeometryUtils.IsOnSegment(a, b, new Vector2(-0.0001f, 0)),
+                "Slightly before A should not be on the segment.");
+            Assert.IsFalse(GeometryUtils.IsOnSegment(a, b, new Vector2(10.0001f, 0)),
+                "Slightly after B should not be on the segment.");
+        }
+
+        #endregion
+
+
+
+    }
 }

@@ -4,7 +4,7 @@ using System.Numerics;
 public static class MeshNavigator
 {
     private const int MAX_ITERATIONS = 10_000_000;
-    private static readonly float tolerance = GeometryUtils.GetEpsilon;
+    private static readonly float tolerance = GeometryUtils.EPSILON;
 
     // ===========================
     // Lightweight result wrapper
@@ -23,22 +23,7 @@ public static class MeshNavigator
         }
     }
 
-    // ===========================
-    // Utility for segment check
-    // ===========================
-    private static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
-    {
-        Vector2 ap = p.Position - a.Position;
-        Vector2 ab = b.Position - a.Position;
-        float dot = Vector2.Dot(ap, ab);
 
-        if (dot < 0) return false;
-
-        float lenSq = ab.LengthSquared();
-        if (dot > lenSq) return false;
-
-        return true;
-    }
 
     // ===========================
     // Core point location logic
@@ -64,13 +49,13 @@ public static class MeshNavigator
             }
 
             // Check if point is on the current edge
-            bool onEdge = Math.Abs(orientationValue) < tolerance && GeometryUtils.IsOnSegment(current.Origin, current.Dest, point);
+            bool onEdge = Math.Abs(orientationValue) < tolerance && GeometryUtils.IsOnSegment(current.Origin, current.Dest!, point);
 
             if (onEdge)
             {
                 anyOnEdge = true;
 
-                if (current.Dest.PositionsEqual(point))
+                if (current.Dest!.PositionsEqual(point))
                     destinationEdge = current.Next;
 
                 if (destinationEdge == null)

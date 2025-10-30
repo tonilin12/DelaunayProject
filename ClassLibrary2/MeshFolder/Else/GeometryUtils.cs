@@ -5,8 +5,8 @@ namespace ClassLibrary2.MeshFolder.Else
 {
     public static class GeometryUtils
     {
-        private const float EPSILON = 1e-6f;
-        public static float GetEpsilon => EPSILON;
+        public static readonly float EPSILON = 1e-6f;
+
 
         #region Signed Area
 
@@ -50,51 +50,12 @@ namespace ClassLibrary2.MeshFolder.Else
 
         #endregion
 
-        #region Point Inside Triangle
-
-        public static bool IsPointInsideTriangle(Vector2 p, Vertex v0, Vertex v1, Vertex v2)
-        {
-            float d1 = GetSignedArea(p, v0.Position, v1.Position);
-            float d2 = GetSignedArea(p, v1.Position, v2.Position);
-            float d3 = GetSignedArea(p, v2.Position, v0.Position);
-
-            return d1 >= 0f && d2 >= 0f && d3 >= 0f || d1 <= 0f && d2 <= 0f && d3 <= 0f;
-        }
 
 
-        public static bool IsPointInsideTriangle(Face face, Vector2 p)
-        {
-            if (face == null)
-                throw new ArgumentNullException(nameof(face));
-
-            var vertices = face.GetVertices();
-            if (vertices == null)
-                throw new InvalidOperationException("Face returned null vertices.");
-
-            // Convert to array for fast indexed access
-            Vertex[] vArray = vertices as Vertex[] ?? new Vertex[3];
-
-            int count = 0;
-            foreach (var v in vertices)
-            {
-                if (count < 3)
-                    vArray[count++] = v;
-                else
-                    break;
-            }
-
-            if (count != 3)
-                throw new ArgumentException("Face must have exactly 3 vertices.", nameof(face));
-
-            return IsPointInsideTriangle(p, vArray[0], vArray[1], vArray[2]);
-        }
-
-
-        #endregion
 
         #region Circumcircle
 
-        public static bool IsInsideOrOnCircumcircle(Vertex a, Vertex b, Vertex c, Vertex p)
+        public static bool InCircumcircle(Vertex a, Vertex b, Vertex c, Vertex p)
         {
             float ax = a.Position.X - p.Position.X;
             float ay = a.Position.Y - p.Position.Y;
@@ -111,11 +72,11 @@ namespace ClassLibrary2.MeshFolder.Else
                       - ay * (bx * cz2 - bz2 * cx)
                       + az2 * (bx * cy - by * cx);
 
-            return det >= -EPSILON;
+            return det > EPSILON;
         }
 
 
-        public static bool IsInsideOrOnCircumcircle(Face triangle, Vertex p)
+        public static bool InCircumcircle(Face triangle, Vertex p)
         {
             if (triangle == null)
                 throw new ArgumentNullException(nameof(triangle));
@@ -141,7 +102,7 @@ namespace ClassLibrary2.MeshFolder.Else
             if (count != 3)
                 throw new ArgumentException("Face must be a triangle with exactly 3 vertices.", nameof(triangle));
 
-            return IsInsideOrOnCircumcircle(vArray[0], vArray[1], vArray[2], p);
+            return InCircumcircle(vArray[0], vArray[1], vArray[2], p);
         }
 
         // Array version
@@ -174,22 +135,12 @@ namespace ClassLibrary2.MeshFolder.Else
         }
 
 
-        // Array version
-        public static Vector2 Circumcenter(Vertex[] triangle)
-        {
-            if (triangle == null || triangle.Length != 3)
-                throw new ArgumentException("Triangle array must have exactly 3 vertices.", nameof(triangle));
 
-            return Circumcenter(triangle[0], triangle[1], triangle[2]);
-        }
 
         #endregion
 
 
-       public static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
-        {
-            return IsOnSegment(a.Position, b.Position, p.Position);
-        }
+
 
         public static bool IsOnSegment(Vector2 a, Vector2 b, Vector2 p)
         {
@@ -205,7 +156,10 @@ namespace ClassLibrary2.MeshFolder.Else
             return true;
         }
 
-
+        public static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
+        {
+            return IsOnSegment(a.Position, b.Position, p.Position);
+        }
 
 
     }

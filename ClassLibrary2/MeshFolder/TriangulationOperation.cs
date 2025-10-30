@@ -33,10 +33,12 @@ public static class TriangulationOperation
     /// <summary>
     /// Prepares vertices and edge constraints for triangulation, including adding supertriangle and sorting.
     /// </summary>
-    public static void GetSuperTriangle(Vertex[] vertices, out Face superTriangle)
+    public static Face GetSuperTriangle(Vertex[] vertices)
     {
-        _supertriangleGenerator.GetSuperTriangle(vertices,out superTriangle);
+       return _supertriangleGenerator.GetSuperTriangle(vertices);
     }
+
+
 
 
 

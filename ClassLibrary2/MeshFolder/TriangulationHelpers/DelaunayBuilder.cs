@@ -149,7 +149,7 @@ public class DelaunayBuilder
 
 
 
-            if (twin!=null && GeometryUtils.IsInsideOrOnCircumcircle(twin.Face!, vertex))
+            if (twin!=null && GeometryUtils.InCircumcircle(twin.Face!, vertex))
             {
 
                 flipHandler(twin);

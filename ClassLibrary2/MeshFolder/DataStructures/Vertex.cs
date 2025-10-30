@@ -16,12 +16,18 @@ public class Vertex
         set => _outgoingHalfEdge = value;
     }
 
-    private readonly float Tolerance = GeometryUtils.GetEpsilon;
+    private readonly float Tolerance = GeometryUtils.EPSILON;
 
     public Vertex(float x, float y)
     {
         Position = new Vector2(x, y);
         OutgoingHalfEdge = null;
+    }
+
+    public Vertex(Vector2 position0)
+    {
+        Position =position0;
+
     }
 
     // ===========================================================

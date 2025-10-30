@@ -50,7 +50,7 @@ namespace TestProject1.TestFolder.Else
                 var v1 = twin.Origin;
                 var v2 = twin.Dest!;
                 var orientation = GeometryUtils.GetSignedArea(v1, v2, vertex);
-                Assert.IsTrue(orientation < -GeometryUtils.GetEpsilon,
+                Assert.IsTrue(orientation < -GeometryUtils.EPSILON,
                     $"Vertex {vertex} and {twin} orientation mismatch. Orientation={orientation}");
             }
         }

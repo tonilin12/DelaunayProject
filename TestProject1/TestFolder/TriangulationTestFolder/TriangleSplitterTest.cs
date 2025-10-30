@@ -1,8 +1,6 @@
 ﻿using ClassLibrary2.MeshFolder.Else;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace TestProject1.TestFolder.TriangulationOperations
@@ -11,31 +9,6 @@ namespace TestProject1.TestFolder.TriangulationOperations
     public class TriangleSplitterTest
     {
         private readonly TriangleSplitter splitter = new TriangleSplitter();
-
-        // 🔹 Common geometry assertions reused by all tests
-        private static void AssertAllFacesConsistent(Vertex vertex)
-        {
-            var areas = vertex.GetVertexEdges()
-                .Select(e => GeometryUtils.GetSignedArea(e.Face.GetVertices().ToArray()))
-                .Where(a => Math.Abs(a) > GeometryUtils.GetEpsilon)
-                .ToList();
-
-            Assert.IsTrue(areas.Count > 0, "No valid faces found with non-zero area.");
-
-            var firstSign = Math.Sign(areas[0]);
-            Assert.IsTrue(areas.All(a => Math.Sign(a) == firstSign),
-                "Not all faces around the vertex have the same oriented area sign.");
-        }
-
-        // 🔹 Removes expected edges that are replaced around a vertex after splitting
-        private static void AssertAllOriginalEdgesRemoved(Vertex vertex, HashSet<HalfEdge> originalEdges)
-        {
-            vertex.GetVertexEdges()
-                .ToList()
-                .ForEach(e => originalEdges.Remove(e.Next!));
-
-            Assert.AreEqual(0, originalEdges.Count, "Some original edges remain unprocessed.");
-        }
 
         [TestMethod]
         public void SplitTriangle_PointInsideFace()
@@ -47,14 +20,13 @@ namespace TestProject1.TestFolder.TriangulationOperations
             var face = new Face(vA, vB, vC);
 
             var vD = new Vertex(0.3f, 0.3f);
-            var originalEdges = new HashSet<HalfEdge>(face.GetEdges());
+            var originalEdges = new List<HalfEdge>(face.GetEdges()); // pre-split order
 
             // Act
             splitter.SplitTriangle(face, vD);
 
-            // Assert
-            AssertAllOriginalEdgesRemoved(vD, originalEdges);
-            AssertAllFacesConsistent(vD);
+            // Assert (shared)
+            AssertSplitFan(originalEdges, vD, "PointInsideFace");
         }
 
         [TestMethod]
@@ -73,10 +45,15 @@ namespace TestProject1.TestFolder.TriangulationOperations
             face1.Edge.Twin = face2.Edge;
             face2.Edge.Twin = face1.Edge;
 
+            // Midpoint on AB
             var edge = face1.Edge;
-            var vE = new Vertex((vA.Position.X + vB.Position.X) / 2f, (vA.Position.Y + vB.Position.Y) / 2f);
+            var vE = new Vertex(
+                (vA.Position.X + vB.Position.X) / 2f,
+                (vA.Position.Y + vB.Position.Y) / 2f
+            );
 
-            var originalEdges = new HashSet<HalfEdge>
+            // Pre-split ring of the four edges around the two adjacent faces (order matters)
+            var originalEdges = new List<HalfEdge>
             {
                 edge.Next!, edge.Next!.Next!,
                 edge.Twin!.Next!, edge.Twin!.Next!.Next!
@@ -85,9 +62,49 @@ namespace TestProject1.TestFolder.TriangulationOperations
             // Act
             splitter.SplitTriangle_VertexOnEdge(edge, vE);
 
-            // Assert
-            AssertAllOriginalEdgesRemoved(vE, originalEdges);
-            AssertAllFacesConsistent(vE);
+            // Assert (shared)
+            AssertSplitFan(originalEdges, vE, "PointOnEdge");
+        }
+
+        /// <summary>
+        /// Shared assertions for both split scenarios.
+        /// Validates the post-split "fan" wiring from each original edge:
+        ///   e1 = e.Next, e1.Dest == inserted
+        ///   e2 = e1.Next, e2.Dest == e.Origin
+        ///   e1.Twin.Next == originalEdges[i+1] (with wrap)
+        /// </summary>
+        private static void AssertSplitFan(IReadOnlyList<HalfEdge> originalEdges, Vertex inserted, string tag)
+        {
+            int n = originalEdges.Count;
+            for (int i = 0; i < n; i++)
+            {
+                var e = originalEdges[i];
+
+                var e1 = e.Next;
+                Assert.IsNotNull(e1, $"[{tag} | Edge {i}] e.Next is null after split. Original: {e}");
+
+                Assert.AreSame(
+                    inserted, e1!.Dest,
+                    $"[{tag} | Edge {i}] Expected e1.Dest == inserted ({inserted}), got {e1.Dest}. Original: {e}"
+                );
+
+                var e2 = e1.Next;
+                Assert.IsNotNull(e2, $"[{tag} | Edge {i}] e1.Next is null. e1: {e1}");
+
+                Assert.AreSame(
+                    e.Origin, e2!.Dest,
+                    $"[{tag} | Edge {i}] Expected e2.Dest == e.Origin ({e.Origin}), got {e2.Dest}. e1: {e1}, Original: {e}"
+                );
+
+                var expectedNextOriginal = originalEdges[(i + 1) % n];
+                Assert.IsNotNull(e1.Twin, $"[{tag} | Edge {i}] e1.Twin is null. e1: {e1}");
+
+                Assert.AreSame(
+                    expectedNextOriginal, e1.Twin!.Next,
+                    $"[{tag} | Edge {i}] Expected e1.Twin.Next == originalEdges[{(i + 1) % n}] ({expectedNextOriginal}), " +
+                    $"but got {e1.Twin.Next}. e1: {e1}, Original: {e}"
+                );
+            }
         }
     }
 }

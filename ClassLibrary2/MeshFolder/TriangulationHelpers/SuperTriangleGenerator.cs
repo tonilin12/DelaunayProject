@@ -4,7 +4,7 @@ using System.Numerics;
 
 public class SuperTriangleGenerator
 {
-    public void GetSuperTriangle(Vertex[] vertices, out Face superTriangle)
+    public Face GetSuperTriangle(Vertex[] vertices)
     {
         if (vertices == null || vertices.Length == 0)
             throw new ArgumentException("Vertex array cannot be null or empty", nameof(vertices));
@@ -40,7 +40,7 @@ public class SuperTriangleGenerator
         Vertex vB = new Vertex(center.X + a, center.Y - a / (float)Math.Sqrt(3));
         Vertex vC = new Vertex(center.X, center.Y + 2 * a / (float)Math.Sqrt(3));
 
-        // Create supertriangle face
-        superTriangle = new Face(vA, vB, vC);
+        // Return supertriangle
+        return new Face(vA, vB, vC);
     }
 }

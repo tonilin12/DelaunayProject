@@ -3,19 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 
 public static class RuntimeAnalyzer
 {
     public static void Run()
     {
-        int[] testSizes = { 100, 500, 1000, 5000, 10000,20000, 50000, 100000 };
+        int[] testSizes = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000 };
         int trialsPerSize = 3;
         string outputFile = "runtime_analysis.csv";
 
-        // CSV header
-        File.WriteAllText(outputFile, "n,trial,method,runtime_ms,runtime_s,num_points\n");
-
+        File.WriteAllText(outputFile, "n,trial,method,runtime_ms,runtime_s,triangle_count\n");
         Console.WriteLine("Starting runtime analysis...");
 
         foreach (int n in testSizes)
@@ -24,45 +23,46 @@ public static class RuntimeAnalyzer
             {
                 Console.WriteLine($"\n=== Test: n={n}, trial={trial} ===");
 
-                // Generate stable vertices efficiently
-                List<Vertex> verticesList = GenerateStableVerticesFast(n);
-                Console.WriteLine($"Generated {verticesList.Count} stable vertices");
-
-                // Convert list to array once
-                Vertex[] verticesArray = verticesList.ToArray();
-
-                // Create supertriangle
-                Vertex[] borderPoints = new Vertex[]
-                {
-                    new Vertex(0, 0),
-                    new Vertex(1000, 0),
-                    new Vertex(0, 1000)
-                };
-                Face superTriangle;
-                TriangulationOperation.GetSuperTriangle( borderPoints, out superTriangle);
+                // Generate stable Vector2 points ONCE
+                List<Vector2> pointsList = GenerateStablePointsFast(n);
+                Console.WriteLine($"Generated {pointsList.Count} stable points");
 
                 // ---------------------------
-                // SpatialGrid version (always tested)
+                // SpatialGrid case (separate Vertex[] + super-triangle)
                 // ---------------------------
+                var gridVertices = pointsList.Select(p => new Vertex(p)).ToArray();
+
+
                 var sw = Stopwatch.StartNew();
-                var grid = new SpatialGrid(verticesArray);        // Pass array directly
-                Vertex[] gridPoints = grid.Points;  // Direct access to internal array
+                Face superTriangleGrid = TriangulationOperation.GetSuperTriangle(gridVertices);
 
-                var triangulatorGrid = new DelaunayBuilder(superTriangle, gridPoints);
+                var grid = new SpatialGrid(gridVertices);
+                var triangulatorGrid = new DelaunayBuilder(superTriangleGrid, grid.Points);
+
                 triangulatorGrid.ProcessAllVertices();
                 sw.Stop();
-                Log(outputFile, n, trial, "SpatialGrid", sw.ElapsedMilliseconds, verticesArray.Length);
+
+                int gridTriangleCount = triangulatorGrid.GetInternalTriangles().Count();
+                Log(outputFile, n, trial, "SpatialGrid", sw.ElapsedMilliseconds, gridTriangleCount);
 
                 // ---------------------------
-                // Raw array version (only for n <= 10k)
+                // Raw case (separate Vertex[] + super-triangle)
                 // ---------------------------
                 if (n <= 20000)
                 {
+                    var rawVertices = pointsList.Select(p => new Vertex(p)).ToArray();
                     sw.Restart();
-                    var triangulatorRaw = new DelaunayBuilder(superTriangle, verticesArray);
+
+
+                    Face superTriangleRaw = TriangulationOperation.GetSuperTriangle(rawVertices);
+
+                    var triangulatorRaw = new DelaunayBuilder(superTriangleRaw, rawVertices);
+
                     triangulatorRaw.ProcessAllVertices();
                     sw.Stop();
-                    Log(outputFile, n, trial, "Raw", sw.ElapsedMilliseconds, verticesArray.Length);
+
+                    int rawTriangleCount = triangulatorRaw.GetInternalTriangles().Count();
+                    Log(outputFile, n, trial, "Raw", sw.ElapsedMilliseconds, rawTriangleCount);
                 }
             }
         }
@@ -70,67 +70,55 @@ public static class RuntimeAnalyzer
         Console.WriteLine($"\nRuntime analysis complete. Results saved to {outputFile}");
     }
 
-    private static void Log(string file, int n, int trial, string method, long runtimeMs, int numPoints)
+    private static void Log(string file, int n, int trial, string method, long runtimeMs, int triangleCount)
     {
         double runtimeSec = runtimeMs / 1000.0;
-
-        // Use period for decimal separator to ensure compatibility
         string line = string.Format(System.Globalization.CultureInfo.InvariantCulture,
-            "{0},{1},{2},{3},{4:F0},{5},{6}",
-            n, trial, method, runtimeMs, runtimeSec, numPoints, DateTime.Now);
-
+            "{0},{1},{2},{3},{4:F3},{5}",
+            n, trial, method, runtimeMs, runtimeSec, triangleCount);
         File.AppendAllText(file, line + Environment.NewLine);
-
-        Console.WriteLine($"[n={n} | trial={trial}] {method}: {runtimeMs} ms ({runtimeSec:F3} s) for {numPoints} points");
+        Console.WriteLine($"[n={n} | trial={trial}] {method}: {runtimeMs} ms ({runtimeSec:F3} s) | triangles={triangleCount}");
     }
 
-
-    /// <summary>
-    /// Fast stable vertex generator using a coarse grid to avoid O(n^2) checks.
-    /// Ensures minimum distance between points.
-    /// </summary>
-    private static List<Vertex> GenerateStableVerticesFast(int n)
+    // Same as before, but returns Vector2s
+    private static List<Vector2> GenerateStablePointsFast(int n)
     {
         const float minDist = 2f;
         const float maxCoord = 1000f;
-        const int gridCells = 100; // coarse grid for distance checking
+        const int gridCells = 100;
 
-        var list = new List<Vertex>(n);
+        var list = new List<Vector2>(n);
         var rand = new Random(42);
 
         float cellSize = maxCoord / gridCells;
-        var grid = new List<Vertex>[gridCells, gridCells];
+        var grid = new List<Vector2>[gridCells, gridCells];
         for (int i = 0; i < gridCells; i++)
             for (int j = 0; j < gridCells; j++)
-                grid[i, j] = new List<Vertex>();
+                grid[i, j] = new List<Vector2>();
 
         while (list.Count < n)
         {
             float x = (float)rand.NextDouble() * maxCoord;
             float y = (float)rand.NextDouble() * maxCoord;
-            var candidate = new Vertex(x, y);
+            var candidate = new Vector2(x, y);
 
             int gx = Math.Clamp((int)(x / cellSize), 0, gridCells - 1);
             int gy = Math.Clamp((int)(y / cellSize), 0, gridCells - 1);
 
             bool tooClose = false;
-
-            // Check neighboring 9 cells
-            for (int i = Math.Max(0, gx - 1); i <= Math.Min(gridCells - 1, gx + 1); i++)
+            for (int i = Math.Max(0, gx - 1); i <= Math.Min(gridCells - 1, gx + 1) && !tooClose; i++)
             {
-                for (int j = Math.Max(0, gy - 1); j <= Math.Min(gridCells - 1, gy + 1); j++)
+                for (int j = Math.Max(0, gy - 1); j <= Math.Min(gridCells - 1, gy + 1) && !tooClose; j++)
                 {
                     foreach (var v in grid[i, j])
                     {
-                        if (Vector2.DistanceSquared(v.Position, candidate.Position) < minDist * minDist)
+                        if (Vector2.DistanceSquared(v, candidate) < minDist * minDist)
                         {
                             tooClose = true;
                             break;
                         }
                     }
-                    if (tooClose) break;
                 }
-                if (tooClose) break;
             }
 
             if (!tooClose)

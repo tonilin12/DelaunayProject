@@ -37,7 +37,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 vertexArray[i] = new Vertex(points[i, 0], points[i, 1]);
             }
 
-            TriangulationOperation.GetSuperTriangle(vertexArray, out superTriangle!);
+            var superTriangle = TriangulationOperation.GetSuperTriangle(vertexArray);
             triangulator = new DelaunayBuilder(superTriangle!);
         }
 
@@ -60,7 +60,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 var twinEdge = edge.Twin!;
                 var twinFace = twinEdge.Face;
 
-                if (GeometryUtils.IsInsideOrOnCircumcircle(twinFace, vertex))
+                if (GeometryUtils.InCircumcircle(twinFace, vertex))
                 {
                     Assert.Fail(
                         $"Delaunay violation detected!\n" +
@@ -93,7 +93,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 HalfEdge? currentEdge = enumerator.Current;
 
                 // Update expected flip edge for validation
-                if (currentEdge != null && GeometryUtils.IsInsideOrOnCircumcircle(currentEdge.Face, vertex))
+                if (currentEdge != null && GeometryUtils.InCircumcircle(currentEdge.Face, vertex))
                 {
                     expectedFlipEdge = (currentEdge.Origin, currentEdge.Dest!);
                 }
@@ -138,7 +138,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 var currentedge = edgeList[j].Next?.Twin;
 
                 // Verify Delaunay condition
-                if (GeometryUtils.IsInsideOrOnCircumcircle(currentedge.Face, vertex))
+                if (GeometryUtils.InCircumcircle(currentedge.Face, vertex))
                 {
                     var vertexDesc = vertex?.ToString() ?? "UnknownVertex";
 
@@ -155,7 +155,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
             TriangulationOperation.FlipEdge(flippededge);
 
 
-            if (!GeometryUtils.IsInsideOrOnCircumcircle(flippededge.Face, vertex))
+            if (!GeometryUtils.InCircumcircle(flippededge.Face, vertex))
             {
                 Assert.Fail(
                     $"[Delaunay Flip Validation Failed] " +
