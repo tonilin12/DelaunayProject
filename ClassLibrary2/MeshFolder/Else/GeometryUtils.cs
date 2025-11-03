@@ -5,6 +5,7 @@ namespace ClassLibrary2.MeshFolder.Else
 {
     public static class GeometryUtils
     {
+
         public static readonly float EPSILON = 1e-6f;
 
 
@@ -20,17 +21,8 @@ namespace ClassLibrary2.MeshFolder.Else
         public static float GetSignedArea(Vertex v0, Vertex v1, Vertex v2)
             => GetSignedArea(v0.Position, v1.Position, v2.Position);
 
-        public static float GetSignedArea(HalfEdge h0, HalfEdge h1, HalfEdge h2)
-            => GetSignedArea(h0.Origin.Position, h1.Origin.Position, h2.Origin.Position);
 
-        // Array versions
-        public static float GetSignedArea(Vector2[] points)
-        {
-            if (points == null || points.Length != 3)
-                throw new ArgumentException("Array must contain exactly 3 Vector2 points.", nameof(points));
-
-            return GetSignedArea(points[0], points[1], points[2]);
-        }
+  
 
         public static float GetSignedArea(Vertex[] vertices)
         {
@@ -40,13 +32,7 @@ namespace ClassLibrary2.MeshFolder.Else
             return GetSignedArea(vertices[0].Position, vertices[1].Position, vertices[2].Position);
         }
 
-        public static float GetSignedArea(HalfEdge[] edges)
-        {
-            if (edges == null || edges.Length != 3)
-                throw new ArgumentException("Array must contain exactly 3 HalfEdge objects.", nameof(edges));
-
-            return GetSignedArea(edges[0].Origin.Position, edges[1].Origin.Position, edges[2].Origin.Position);
-        }
+ 
 
         #endregion
 
@@ -120,7 +106,7 @@ namespace ClassLibrary2.MeshFolder.Else
             float bx = b.Position.X, by = b.Position.Y;
             float cx = c.Position.X, cy = c.Position.Y;
 
-            float d = 2f * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
+            float d = 2f * GetSignedArea(a, b, c);
             if (Math.Abs(d) < EPSILON)
                 throw new InvalidOperationException("Triangle vertices are collinear, circumcenter undefined.");
 
@@ -142,19 +128,25 @@ namespace ClassLibrary2.MeshFolder.Else
 
 
 
+
+
         public static bool IsOnSegment(Vector2 a, Vector2 b, Vector2 p)
         {
-            Vector2 ap = p - a;
-            Vector2 ab = b - a;
-            float dot = Vector2.Dot(ap, ab);
+            // Check if the three points are collinear using the signed area
+            if (Math.Abs(GetSignedArea(a, b, p)) > EPSILON)
+                return false;
 
-            if (dot < 0) return false;
-
-            float lenSq = ab.LengthSquared();
-            if (dot > lenSq) return false;
+            // Check if p is within the bounding box of a and b
+            if (p.X < Math.Min(a.X, b.X) - EPSILON || p.X > Math.Max(a.X, b.X) + EPSILON)
+                return false;
+            if (p.Y < Math.Min(a.Y, b.Y) - EPSILON || p.Y > Math.Max(a.Y, b.Y) + EPSILON)
+                return false;
 
             return true;
         }
+
+
+
 
         public static bool IsOnSegment(Vertex a, Vertex b, Vertex p)
         {

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime;
 
 public static class RuntimeAnalyzer
 {
@@ -14,8 +15,14 @@ public static class RuntimeAnalyzer
         int trialsPerSize = 3;
         string outputFile = "runtime_analysis.csv";
 
-        File.WriteAllText(outputFile, "n,trial,method,runtime_ms,runtime_s,triangle_count\n");
+        File.WriteAllText(outputFile, "n,trial,method,runtime_ms,runtime_s,triangle_count,memory_mb,memory_bytes,gc_impact_percent\n");
         Console.WriteLine("Starting runtime analysis...");
+
+        // Force GC before starting for a clean baseline
+        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
 
         foreach (int n in testSizes)
         {
@@ -23,64 +30,134 @@ public static class RuntimeAnalyzer
             {
                 Console.WriteLine($"\n=== Test: n={n}, trial={trial} ===");
 
-                // Generate stable Vector2 points ONCE
+                long baselineMemory = GC.GetTotalMemory(true);
+
                 List<Vector2> pointsList = GenerateStablePointsFast(n);
                 Console.WriteLine($"Generated {pointsList.Count} stable points");
 
                 // ---------------------------
-                // SpatialGrid case (separate Vertex[] + super-triangle)
+                // SpatialGrid case
                 // ---------------------------
-                var gridVertices = pointsList.Select(p => new Vertex(p)).ToArray();
+                var gridVertices = new Vertex[pointsList.Count];
+                for (int i = 0; i < pointsList.Count; i++)
+                    gridVertices[i] = new Vertex(pointsList[i]);
 
+                long preTriMemory = GC.GetTotalMemory(false);
+
+                int gc0Before = GC.CollectionCount(0);
+                int gc1Before = GC.CollectionCount(1);
+                int gc2Before = GC.CollectionCount(2);
 
                 var sw = Stopwatch.StartNew();
-                Face superTriangleGrid = TriangulationOperation.GetSuperTriangle(gridVertices);
 
+                Face superTriangleGrid = TriangulationOperation.GetSuperTriangle(gridVertices);
                 var grid = new SpatialGrid(gridVertices);
                 var triangulatorGrid = new DelaunayBuilder(superTriangleGrid, grid.Points);
-
                 triangulatorGrid.ProcessAllVertices();
+
                 sw.Stop();
 
+                int gc0After = GC.CollectionCount(0);
+                int gc1After = GC.CollectionCount(1);
+                int gc2After = GC.CollectionCount(2);
+
+                long postTriMemory = GC.GetTotalMemory(false);
+
+                int deltaGc0 = gc0After - gc0Before;
+                int deltaGc1 = gc1After - gc1Before;
+                int deltaGc2 = gc2After - gc2Before;
+
+                // Rough weighted GC impact (ms)
+                double gcImpactMs = deltaGc0 * 0.1 + deltaGc1 * 1.0 + deltaGc2 * 10.0;
+                double gcImpactPercent = (gcImpactMs / sw.Elapsed.TotalMilliseconds) * 100.0;
+
                 int gridTriangleCount = triangulatorGrid.GetInternalTriangles().Count();
-                Log(outputFile, n, trial, "SpatialGrid", sw.ElapsedMilliseconds, gridTriangleCount);
+                long gridMemoryUsed = postTriMemory - preTriMemory;
+
+                Log(outputFile, n, trial, "SpatialGrid", sw.ElapsedMilliseconds,
+                    gridTriangleCount, gridMemoryUsed, gcImpactPercent);
+
+                // Cleanup
+                triangulatorGrid = null;
+                grid = null;
+                superTriangleGrid = null;
+                gridVertices = null;
 
                 // ---------------------------
-                // Raw case (separate Vertex[] + super-triangle)
+                // Raw case (up to 20k only to save memory)
                 // ---------------------------
                 if (n <= 20000)
                 {
-                    var rawVertices = pointsList.Select(p => new Vertex(p)).ToArray();
+                    var rawVertices = new Vertex[pointsList.Count];
+                    for (int i = 0; i < pointsList.Count; i++)
+                        rawVertices[i] = new Vertex(pointsList[i]);
+
+                    preTriMemory = GC.GetTotalMemory(false);
+
+                    gc0Before = GC.CollectionCount(0);
+                    gc1Before = GC.CollectionCount(1);
+                    gc2Before = GC.CollectionCount(2);
+
                     sw.Restart();
 
-
                     Face superTriangleRaw = TriangulationOperation.GetSuperTriangle(rawVertices);
-
                     var triangulatorRaw = new DelaunayBuilder(superTriangleRaw, rawVertices);
-
                     triangulatorRaw.ProcessAllVertices();
+
                     sw.Stop();
 
+                    gc0After = GC.CollectionCount(0);
+                    gc1After = GC.CollectionCount(1);
+                    gc2After = GC.CollectionCount(2);
+
+                    postTriMemory = GC.GetTotalMemory(false);
+
+                    deltaGc0 = gc0After - gc0Before;
+                    deltaGc1 = gc1After - gc1Before;
+                    deltaGc2 = gc2After - gc2Before;
+
+                    gcImpactMs = deltaGc0 * 0.1 + deltaGc1 * 1.0 + deltaGc2 * 10.0;
+                    gcImpactPercent = (gcImpactMs / sw.Elapsed.TotalMilliseconds) * 100.0;
+
                     int rawTriangleCount = triangulatorRaw.GetInternalTriangles().Count();
-                    Log(outputFile, n, trial, "Raw", sw.ElapsedMilliseconds, rawTriangleCount);
+                    long rawMemoryUsed = postTriMemory - preTriMemory;
+
+                    Log(outputFile, n, trial, "Raw", sw.ElapsedMilliseconds,
+                        rawTriangleCount, rawMemoryUsed, gcImpactPercent);
+
+                    // Cleanup
+                    triangulatorRaw = null;
+                    superTriangleRaw = null;
+                    rawVertices = null;
                 }
+
+                // Force cleanup between trials
+                pointsList.Clear();
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
             }
         }
 
         Console.WriteLine($"\nRuntime analysis complete. Results saved to {outputFile}");
     }
 
-    private static void Log(string file, int n, int trial, string method, long runtimeMs, int triangleCount)
+    private static void Log(string file, int n, int trial, string method, long runtimeMs,
+                            int triangleCount, long memoryBytes, double gcImpactPercent)
     {
         double runtimeSec = runtimeMs / 1000.0;
+        double memoryMB = memoryBytes / (1024.0 * 1024.0);
+
         string line = string.Format(System.Globalization.CultureInfo.InvariantCulture,
-            "{0},{1},{2},{3},{4:F3},{5}",
-            n, trial, method, runtimeMs, runtimeSec, triangleCount);
+            "{0},{1},{2},{3},{4:F3},{5},{6:F2},{7},{8:F2}",
+            n, trial, method, runtimeMs, runtimeSec, triangleCount, memoryMB, memoryBytes, gcImpactPercent);
+
         File.AppendAllText(file, line + Environment.NewLine);
-        Console.WriteLine($"[n={n} | trial={trial}] {method}: {runtimeMs} ms ({runtimeSec:F3} s) | triangles={triangleCount}");
+        Console.WriteLine($"[n={n} | trial={trial}] {method}: {runtimeMs} ms ({runtimeSec:F3} s) | " +
+                          $"triangles={triangleCount} | memory={memoryMB:F2} MB | GC impact ~{gcImpactPercent:F2}%");
     }
 
-    // Same as before, but returns Vector2s
     private static List<Vector2> GenerateStablePointsFast(int n)
     {
         const float minDist = 2f;

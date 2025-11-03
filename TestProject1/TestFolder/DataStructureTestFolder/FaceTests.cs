@@ -27,7 +27,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
 
 
             // Create vertex instances for testing
-                                vA = new Vertex(pA.X, pA.Y);
+            vA = new Vertex(pA.X, pA.Y);
             vB = new Vertex(pB.X, pB.Y);
             vC = new Vertex(pC.X, pC.Y);
             vD = new Vertex(pD.X, pD.Y);
@@ -51,6 +51,14 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
             // Attempt to create face should throw
             var face = new Face(vA, vB, vC);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void FaceConstructor_FromVertices_ClockwiseVertices_Throws()
+        {
+            _ = new Face(vA,vC,vB);
+        }
+
 
 
         [TestMethod]
@@ -187,10 +195,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
         [TestMethod]
         public void FaceToString_RoundTrip_VertexPositionsMatch()
         {
-            // Step 1: Create vertices
-            var vA = new Vertex(1.1f, 2.2f);
-            var vB = new Vertex(3.3f, 4.4f);
-            var vC = new Vertex(5.5f, 6.6f);
+
 
             // Step 2: Create face using vertex constructor
             var face = new Face(vA, vB, vC);

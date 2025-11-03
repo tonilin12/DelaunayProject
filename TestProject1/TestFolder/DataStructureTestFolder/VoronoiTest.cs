@@ -59,7 +59,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
 
 
                 var expectedPolygon = site
-                    .GetVertexEdges()                  // returns IEnumerable<HalfEdge>
+                    .GetEdges()                  // returns IEnumerable<HalfEdge>
                     .Select(e => e.Face.Circumcenter) // select the circumcenter of each edge’s face
                     .ToList();
 

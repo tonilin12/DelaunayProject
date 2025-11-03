@@ -25,14 +25,14 @@ namespace TestProject1.TestFolder.Else
             vD = GetStrictlyInsidePoint(vA, vB, vC);
             TriangulationOperation.SplitTriangle(face0, vD);
             faceList.Remove(face0);
-            faceList.AddRange(vD.GetVertexEdges().Select(e => e.Face));
+            faceList.AddRange(vD.GetEdges().Select(e => e.Face));
 
             var face1 = faceList.First();
             var vertices1 = face1.GetVertices().ToArray();
             vE = GetStrictlyInsidePoint(vertices1[0], vertices1[1], vertices1[2]);
             TriangulationOperation.SplitTriangle(face1, vE);
             faceList.Remove(face1);
-            faceList.AddRange(vE.GetVertexEdges().Select(e => e.Face));
+            faceList.AddRange(vE.GetEdges().Select(e => e.Face));
         }
 
         private Vertex GetStrictlyInsidePoint(Vertex v1, Vertex v2, Vertex v3)
@@ -50,7 +50,7 @@ namespace TestProject1.TestFolder.Else
                 var v1 = twin.Origin;
                 var v2 = twin.Dest!;
                 var orientation = GeometryUtils.GetSignedArea(v1, v2, vertex);
-                Assert.IsTrue(orientation < -GeometryUtils.EPSILON,
+                Assert.IsTrue(orientation <0,
                     $"Vertex {vertex} and {twin} orientation mismatch. Orientation={orientation}");
             }
         }

@@ -44,7 +44,7 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
                 .ToList();
 
             // vD incident edges from the vertex API
-            var vertexEdges = vD.GetVertexEdges().ToList();
+            var vertexEdges = vD.GetEdges().ToList();
 
             return (vD, originalEdges, allEdgesFromFaces, vertexEdges);
         }

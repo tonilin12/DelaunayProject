@@ -4,18 +4,17 @@ using System.Numerics;
 public static class MeshNavigator
 {
     private const int MAX_ITERATIONS = 10_000_000;
-    private static readonly float tolerance = GeometryUtils.EPSILON;
 
     // ===========================
     // Lightweight result wrapper
     // ===========================
-    public readonly struct PointLocation
+    public readonly struct MeshTraversalStep
     {
         public readonly bool IsOnEdge;
         public readonly HalfEdge? DestinationEdge;
         public readonly HalfEdge? NextHalfEdge;
 
-        public PointLocation( bool isOnEdge, HalfEdge? destinationEdge, HalfEdge? nextHalfEdge)
+        public MeshTraversalStep( bool isOnEdge, HalfEdge? destinationEdge, HalfEdge? nextHalfEdge)
         {
             IsOnEdge = isOnEdge;
             DestinationEdge = destinationEdge;
@@ -28,7 +27,7 @@ public static class MeshNavigator
     // ===========================
     // Core point location logic
     // ===========================
-    private static PointLocation ComputePointLocation(HalfEdge edge, Vertex point)
+    private static MeshTraversalStep ComputePointLocation(HalfEdge edge, Vertex point)
     {
         HalfEdge? destinationEdge = null;
         HalfEdge? nextHalfEdge = null;
@@ -42,14 +41,14 @@ public static class MeshNavigator
             float orientationValue = GeometryUtils.GetSignedArea(current.Origin, current.Dest!, point);
 
             // Determine next half-edge if point is on the "outside" of current edge
-            if (orientationValue < -tolerance && nextHalfEdge == null)
+            if (orientationValue <0 && nextHalfEdge == null)
             {
                 nextHalfEdge = current.Twin;
                 break;
             }
 
             // Check if point is on the current edge
-            bool onEdge = Math.Abs(orientationValue) < tolerance && GeometryUtils.IsOnSegment(current.Origin, current.Dest!, point);
+            bool onEdge = Math.Abs(orientationValue)==0 && GeometryUtils.IsOnSegment(current.Origin, current.Dest!, point);
 
             if (onEdge)
             {
@@ -72,7 +71,7 @@ public static class MeshNavigator
         if (nextHalfEdge == null && destinationEdge == null)
             destinationEdge = startEdge;
 
-        return new PointLocation(anyOnEdge, destinationEdge, nextHalfEdge);
+        return new MeshTraversalStep(anyOnEdge, destinationEdge, nextHalfEdge);
     }
 
 
@@ -80,7 +79,7 @@ public static class MeshNavigator
     // Locate point from edge
     // ===========================
     public static (HalfEdge destinationEdge, bool isOnEdge)
-    LocatePointInMesh(HalfEdge startEdge, Vertex point, Action<PointLocation>? onPointLocation = null)
+    LocatePointInMesh(HalfEdge startEdge, Vertex point, Action<MeshTraversalStep>? onPointLocation = null)
     {
         if (startEdge == null) throw new ArgumentNullException(nameof(startEdge));
         if (point == null) throw new ArgumentNullException(nameof(point));

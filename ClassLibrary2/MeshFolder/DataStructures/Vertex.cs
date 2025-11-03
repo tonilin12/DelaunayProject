@@ -34,10 +34,6 @@ public class Vertex
     //  EDGE ITERATION (USING NEW EDGEITERATOR)
     // ===========================================================
 
-    /// <summary>
-    /// Returns a lightweight iterator for traversing outgoing half-edges around this vertex.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public EdgeIterator GetEdgeIterator()
     {
         return EdgeIterator.AroundVertex(this);
@@ -47,7 +43,7 @@ public class Vertex
     /// Enumerates all outgoing half-edges around this vertex in CCW order.
     /// Uses the lightweight EdgeIterator internally.
     /// </summary>
-    public IEnumerable<HalfEdge> GetVertexEdges()
+    public IEnumerable<HalfEdge> GetEdges()
     {
         var iterator = GetEdgeIterator();
         while (iterator.MoveNext())

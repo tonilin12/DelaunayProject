@@ -51,7 +51,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
             Assert.IsNotNull(vertex, "Vertex cannot be null.");
 
             // Get all next edges that have a twin
-            var nextEdgesWithTwin = vertex.GetVertexEdges()
+            var nextEdgesWithTwin = vertex.GetEdges()
                                           .Where(e => e.Next?.Twin != null)
                                           .Select(e => e.Next!);  // select the Next edge
 
@@ -108,7 +108,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
 
         private void VerifyFlipEdge(Vertex vertex, (Vertex origin, Vertex dest) expectedFlipEdge)
         {
-            var edgeList = vertex.GetVertexEdges().Reverse().ToList();
+            var edgeList = vertex.GetEdges().Reverse().ToList();
             int count = edgeList.Count;
             int verifyIndex = -1;
 

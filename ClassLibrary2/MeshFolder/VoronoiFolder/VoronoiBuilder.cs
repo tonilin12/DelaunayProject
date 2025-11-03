@@ -18,7 +18,7 @@ namespace ClassLibrary2.HalfEdgeFolder.VoronoiFolder
 
             if (v.OutgoingHalfEdge != null)
             {
-                foreach (var edge in v.GetVertexEdges())
+                foreach (var edge in v.GetEdges())
                 {
                     // Assuming each edge has a Face with a Circumcenter property of type Vector2
                     if (edge?.Face != null)

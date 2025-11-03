@@ -1,6 +1,7 @@
 using ClassLibrary2.MeshFolder.Else;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -49,7 +50,7 @@ public class Face
         get
         {
             ComputeCircumcircle();
-            return _cachedCircumcenter.Value;
+            return _cachedCircumcenter!.Value;
         }
     }
 
@@ -63,19 +64,17 @@ public class Face
     // -----------------------------
     public Face(params Vertex[] vertices)
     {
-        if (vertices == null || vertices.Length != 3)
-            throw new ArgumentException("Exactly 3 vertices are required.");
 
         Edge = MakeCycle(vertices, this, v => new HalfEdge(v));
     }
 
     public Face(params HalfEdge[] halfEdges)
     {
-        if (halfEdges == null || halfEdges.Length != 3)
-            throw new ArgumentException("Exactly 3 half-edges are required.");
 
         Edge = MakeCycle(halfEdges, this, e => e);
     }
+
+
 
     // -----------------------------
     // Helper: create cycle of half-edges
@@ -90,8 +89,6 @@ public class Face
 
         foreach (var item in items)
         {
-            if (index >= 3)
-                throw new ArgumentException("Exactly 3 items required");
 
             var e = toHalfEdge(item);
             e.Face = face;
@@ -101,11 +98,39 @@ public class Face
         if (index != 3)
             throw new ArgumentException("Exactly 3 items required");
 
-        if (GeometryUtils.GetSignedArea(edges) == 0)
+        var signedArea = GeometryUtils.GetSignedArea(edges[0].Origin, edges[1].Origin, edges[2].Origin);
+        if ( Math.Abs(signedArea)==0)
             throw new ArgumentException("Degenerate face: the three vertices are collinear.");
+
+        if (signedArea<0)
+            throw new ArgumentException("Invalid orientation: face vertices must be CCW, but computed orientation is CW.");
 
         for (int i = 0; i < 3; i++)
             edges[i].Next = edges[(i + 1) % 3];
+
+
+        // 2) If input was HalfEdge[], verify twin-side consistency (only when a twin exists)
+        bool inputIsHalfEdges = typeof(T) == typeof(HalfEdge);
+        if (inputIsHalfEdges)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                var e = edges[i];
+                var t = e.Twin;
+
+                if (t == null) continue;
+
+                // Require: e.Twin.Origin == e_{i+1}.Origin
+                if (!ReferenceEquals(t.Origin,e.Dest))
+                    throw new InvalidOperationException("Invariant: e.Twin.Origin must equal next.Origin.");
+
+                // Require: e.Twin.Dest == e.Origin  (i.e., t.Next?.Origin == e.Origin)
+                // Only enforce when the neighbor face already wired t.Next
+                if (t.Dest != null && !ReferenceEquals(t.Dest, e.Origin))
+                    throw new InvalidOperationException("Invariant: e.Twin.Next.Origin must equal e.Origin.");
+            }
+        }
+
 
         InvalidateCircumcircle();
         Id = _nextFaceId++;
