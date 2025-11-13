@@ -1,17 +1,17 @@
-﻿using ClassLibrary2.MeshFolder.Else;
+﻿using ClassLibrary2.MeshFolder.DataStructures;
+using ClassLibrary2.MeshFolder.Else;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 public class DelaunayBuilder
 {
     private readonly Queue<Vertex> _vertexQueue;
     private readonly Vertex[] _superTriangleVertices;
-    private readonly Dictionary<int, Face> _meshTriangles; // ID-based
+    private readonly Dictionary<int, Face> _meshTriangles; // ID-based lookup
     private Face _lastInsertedTriangle;
-    private readonly Stack<HalfEdge> _reusableStack = new Stack<HalfEdge>();
-
-    private static readonly Action NoOpAction = () => { };
+    private readonly Stack<HalfEdge> _edgeStack = new Stack<HalfEdge>();
 
     public DelaunayBuilder(Face supertriangle, params Vertex[] initialVertices)
     {
@@ -58,13 +58,13 @@ public class DelaunayBuilder
     // -----------------------------------------------------------
     // Processing
     // -----------------------------------------------------------
+
     public void ProcessSingleVertex()
     {
         if (!HasMoreVerticesToProcess) return;
 
         Vertex vertex = _vertexQueue.Dequeue();
-
-        InsertSingleVertex(vertex);
+        AddVertexToMesh(vertex);
         LegalizeEdges(vertex);
     }
 
@@ -73,10 +73,10 @@ public class DelaunayBuilder
         if (!HasMoreVerticesToProcess) yield break;
 
         Vertex vertex = _vertexQueue.Dequeue();
-        InsertSingleVertex(vertex);
+        AddVertexToMesh(vertex);
 
-        foreach (var step in EnumerateFlips(vertex))
-            yield return step; // each step now returns the flipped HalfEdge
+        foreach (var step in LegalizeEdgeSTepBySTep(vertex))
+            yield return step;
     }
 
     public void ProcessAllVertices()
@@ -88,13 +88,16 @@ public class DelaunayBuilder
     // -----------------------------------------------------------
     // Insertion
     // -----------------------------------------------------------
-    private void InsertSingleVertex(Vertex vertex)
+
+    private void AddVertexToMesh(Vertex vertex)
     {
         var startingTriangle = _lastInsertedTriangle ?? _meshTriangles.Values.First();
         var pointData = MeshNavigator.LocatePointInMesh(startingTriangle, vertex);
+
         var edge = pointData.destinationEdge;
         bool isOnEdge = pointData.isOnEdge;
 
+        // Ignore duplicates
         if (edge.Origin.PositionsEqual(vertex) || edge.Dest!.PositionsEqual(vertex))
             return;
 
@@ -115,71 +118,99 @@ public class DelaunayBuilder
 
         _lastInsertedTriangle = vertex.OutgoingHalfEdge?.Face!;
 
-        // Fill the reusable stack for edge legalization
-        _reusableStack.Clear();
+        // Prepare edge stack for legalization
+        _edgeStack.Clear();
 
         var it = vertex.GetEdgeIterator();
         while (it.MoveNext())
         {
             var e = it.Current!;
             _meshTriangles[e.Face.Id] = e.Face; // Add or update
-            _reusableStack.Push(e.Next!);
-        }
-
-    }
-
-    #region EdgeLegalization
-
-    private delegate void EdgeFlipHandler(HalfEdge twin);
-
-    private IEnumerable<HalfEdge> ProcessEdges(Vertex vertex, EdgeFlipHandler flipHandler, bool stepwise)
-    {
-        const int iterationLimit = 1_000_000;
-        int iterationCount = 0;
-
-        while (_reusableStack.Count > 0 && iterationCount++ < iterationLimit)
-        {
-            var edge = _reusableStack.Pop();
-            var twin = edge.Twin;
-
-
-
-            if (stepwise)
-                yield return twin; // previously yielded 'true'; logic unchanged
-
-
-
-            if (twin!=null && GeometryUtils.InCircumcircle(twin.Face!, vertex))
-            {
-
-                flipHandler(twin);
-
-                _reusableStack.Push(edge.Next!);
-                _reusableStack.Push(twin.Next?.Next!);
-            }
-
+            _edgeStack.Push(e.Next!);
         }
     }
+
+    // -----------------------------------------------------------
+    // Edge Legalization
+    // -----------------------------------------------------------
 
     private void LegalizeEdges(Vertex vertex)
     {
-        EdgeFlipHandler immediateFlip = (HalfEdge twin) =>
-        {
-            TriangulationOperation.FlipEdge(twin);
-        };
-
-        foreach (var _ in ProcessEdges(vertex, immediateFlip, stepwise: false)) { }
+        foreach (var _ in ProcessEdges(vertex, stepwise: false)) { }
     }
 
-    private IEnumerable<HalfEdge> EnumerateFlips(Vertex vertex)
+    private IEnumerable<HalfEdge> LegalizeEdgeSTepBySTep(Vertex vertex)
     {
-        EdgeFlipHandler deferredFlip = (HalfEdge twin) =>
-        {
-            TriangulationOperation.FlipEdge(twin);
-        };
-
-        return ProcessEdges(vertex, deferredFlip, stepwise: true);
+        return ProcessEdges(vertex, stepwise: true);
     }
 
-    #endregion
+    private IEnumerable<HalfEdge> ProcessEdges(Vertex vertex, bool stepwise)
+    {
+        const int iterationLimit = 10_000_000;
+        int iterationCount = 0;
+
+        while (_edgeStack.Count > 0 && iterationCount++ < iterationLimit)
+        {
+            var edge = _edgeStack.Pop();
+            var twin = edge.Twin;
+
+            if (twin == null) continue;
+            if (stepwise) yield return twin;
+
+            // Check Delaunay condition
+            if (GeometryUtils.InCircumcircle(twin.Face!, vertex))
+            {
+                TriangulationOperation.FlipEdge(twin);
+
+                // Push newly affected edges for re-check
+                if (edge.Next != null)
+                    _edgeStack.Push(edge.Next);
+                if (twin.Next?.Next != null)
+                    _edgeStack.Push(twin.Next.Next);
+            }
+        }
+    }
+
+
+
+
+    /// <summary>
+    /// Build a Voronoi cell for a given vertex by traversing its incident faces CCW.
+    /// </summary>
+    private VoronoiCell BuildVoronoiCell(Vertex v)
+    {
+        var cellvertices = new List<Vector2>();
+
+        if (v.OutgoingHalfEdge != null)
+        {
+            foreach (var edge in v.GetEdges())
+            {
+                // Assuming each edge has a Face with a Circumcenter property of type Vector2
+                if (edge?.Face != null)
+                    cellvertices.Add(edge.Face.Circumcenter);
+            }
+        }
+
+        return new VoronoiCell(v.Position, cellvertices);
+    }
+
+    /// <summary>
+    /// Build full Voronoi diagram from triangulation.
+    /// Only internal vertices (excluding supertriangle vertices).
+    /// </summary>
+    public List<VoronoiCell> GetVoronoi()
+    {
+        var cells = new List<VoronoiCell>();
+
+        foreach (var v in GetInternalVertices())
+        {
+            var cell = BuildVoronoiCell(v);
+            if (cell.CellVertices.Count > 0)
+                cells.Add(cell);
+        }
+
+        return cells;
+    }
 }
+
+

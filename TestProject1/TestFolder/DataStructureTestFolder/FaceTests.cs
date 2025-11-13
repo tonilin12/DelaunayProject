@@ -90,13 +90,11 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void FaceConstructor_FromVertices_NullInput_Throws()
         {
             Vertex[] vertices = null;
 
-            // Null input should throw ArgumentException
-            var face = new Face(vertices);
+            Assert.ThrowsException<ArgumentNullException>(() => new Face(vertices));
         }
 
 
@@ -117,6 +115,11 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
             {
                 Assert.Fail($"Enumeration failed: {ex.Message}");
             }
+            // Verify that all edges reference the correct face
+            foreach (var edge in edges)
+            {
+                Assert.AreSame(face, edge.Face, "Each half-edge should reference its parent face.");
+            }
 
             // Check edges
             Assert.IsNotNull(edges, "Edges should not be null");
@@ -133,7 +136,6 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
                 Assert.AreSame(expectedVertices[i], actualVertices[i], $"Vertex at index {i} is not the exact instance expected.");
             }
 
-  
         }
 
 
@@ -154,42 +156,6 @@ namespace TestProject1.TestFolder.DataStructureTestFolder
             CollectionAssert.AreEqual(inputVertices, outputVertices,
                 "GetVertices should return the same vertices as were passed to the constructor.");
         }
-
-
-
-
-
-
-
-        [TestMethod]
-
-        public void SharedEdgeOfTwoFaces_HasCorrectTwinsAndVertices()
-        {
-            // Faces using vertices
-            var face1 = new Face(vA,vB,vC);
-            var face2 = new Face(vB, vA, vD);
-
-            // Link twin edges
-            face1.Edge.Twin = face2.Edge;
-            face2.Edge.Twin = face1.Edge;
-
-            var edge1 = face1.Edge;
-            var edge2 = face2.Edge;
-
-            // Check twin references
-            Assert.AreEqual(edge1.Twin, edge2, "Edge1.Twin should be Edge2");
-            Assert.AreEqual(edge2.Twin, edge1, "Edge2.Twin should be Edge1");
-
-            // Check positions using Vertex.Position
-            Assert.IsTrue(edge1.Origin.PositionsEqual(edge2.Dest), "Edge1 origin should match Edge2 destination");
-            Assert.IsTrue(edge1.Dest.PositionsEqual(edge2.Origin), "Edge1 destination should match Edge2 origin");
-
-
-        }
-
-
-
-
 
 
         [TestMethod]

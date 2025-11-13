@@ -9,7 +9,7 @@ public class FlipHelper
     /// After the flip, the two faces will have their opposite vertices swapped while preserving consistency.
     /// </summary>
     /// <param name="edge">The half-edge to flip (passed by reference).</param>
-    public void FlipEdge( HalfEdge edge)
+    public void FlipEdge(HalfEdge edge)
     {
 
         var twin = edge.Twin;
@@ -19,20 +19,20 @@ public class FlipHelper
             throw new InvalidOperationException("The provided half-edge must have a valid twin.");
         }
 
-        if (edge.Origin.OutgoingHalfEdge.Equals(edge))
+        if (edge.Origin!.OutgoingHalfEdge!.Equals(edge))
         {
             edge.Origin.OutgoingHalfEdge = twin.Next;
         }
-        if (twin.Origin.OutgoingHalfEdge.Equals(twin))
+        if (twin.Origin!.OutgoingHalfEdge!.Equals(twin))
         {
-            twin.Origin.OutgoingHalfEdge= edge.Next;
+            twin.Origin.OutgoingHalfEdge = edge.Next;
         }
 
 
 
         // Retrieve the two adjacent faces.
         Face face1 = edge.Face;
-        Face face2 = edge.Twin.Face;
+        Face face2 = edge.Twin!.Face!;
         if (face1 == null || face2 == null)
         {
             throw new InvalidOperationException("The edge must belong to two faces.");
@@ -41,10 +41,10 @@ public class FlipHelper
         // Retrieve adjacent half-edges.
         HalfEdge e0 = edge;          // Shared edge (to be flipped)
         HalfEdge f0 = edge.Twin;     // Twin of the shared edge
-        HalfEdge e1 = e0.Next;       // Next edge in face1
-        HalfEdge e2 = e1.Next;       // Third edge in face1
-        HalfEdge f1 = f0.Next;       // Next edge in face2
-        HalfEdge f2 = f1.Next;       // Third edge in face2
+        HalfEdge e1 = e0.Next!;       // Next edge in face1
+        HalfEdge e2 = e1.Next!;       // Third edge in face1
+        HalfEdge f1 = f0.Next!;       // Next edge in face2
+        HalfEdge f2 = f1.Next!;       // Third edge in face2
 
         // Get the original vertices.
         // Naming convention:
@@ -52,14 +52,14 @@ public class FlipHelper
         // - Face2 has vertex C (with C = f2.Origin)
         Vertex A = e0.Origin;
         Vertex B = e1.Origin;
-        Vertex D = e2.Origin;
-        Vertex C = f2.Origin;
+        Vertex C = e2.Origin;
+        Vertex D = f2.Origin;
 
         // Flip the shared edge:
         // After the flip, the new shared edge should connect vertex D (from face1) and vertex C (from face2).
         // So, we reassign the origins:
-        e0.Origin = D;  // e0 now goes from D -> (its destination determined by e0.Next)
-        f0.Origin = C;  // f0 now goes from C -> (its destination determined by f0.Next)
+        e0.Origin = C;  // e0 now goes from D -> (its destination determined by e0.Next)
+        f0.Origin = D;  // f0 now goes from C -> (its destination determined by f0.Next)
 
         // Reconnect half-edges to form the new face cycles.
         // For face1: the new cycle is: e0 -> f2 -> e1.
@@ -72,7 +72,7 @@ public class FlipHelper
         e2.Next = f1;
         f1.Next = f0;
 
-  
+
 
         // Update face references so that each half-edge points to the correct face.
         e0.Face = face1;

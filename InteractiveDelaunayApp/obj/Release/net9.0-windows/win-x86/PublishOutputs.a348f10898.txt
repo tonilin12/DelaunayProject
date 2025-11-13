@@ -1,0 +1,3 @@
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\InteractiveDelaunayApp\bin\publish\InteractiveDelaunayApp.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\InteractiveDelaunayApp\bin\publish\ClassLibrary2.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\InteractiveDelaunayApp\bin\publish\InteractiveDelaunayApp.exe

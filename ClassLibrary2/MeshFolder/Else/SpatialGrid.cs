@@ -19,16 +19,6 @@ namespace ClassLibrary2.MeshFolder.Else
         private const float ClampFactor = 0.99f;
         private const float Epsilon = 1e-6f;
 
-        public SpatialGrid(IEnumerable<Vertex> points)
-        {
-            if (points == null) throw new ArgumentNullException(nameof(points));
-
-            var arr = points as Vertex[] ?? new List<Vertex>(points).ToArray();
-            if (arr.Length == 0) throw new ArgumentException("Point set cannot be empty");
-
-            ConstructGrid(arr);
-        }
-
         public SpatialGrid(Vertex[] points)
         {
             if (points == null) throw new ArgumentNullException(nameof(points));

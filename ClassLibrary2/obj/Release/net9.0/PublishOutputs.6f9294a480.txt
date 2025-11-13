@@ -1,0 +1,6 @@
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\publish\ClassLibrary2.dll
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\publish\ClassLibrary2.deps.json
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\publish\ClassLibrary2.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\publish\DocumentFormat.OpenXml.dll
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\publish\DocumentFormat.OpenXml.Framework.dll
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\publish\System.IO.Packaging.dll

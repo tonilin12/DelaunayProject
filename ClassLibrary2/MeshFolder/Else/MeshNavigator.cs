@@ -27,7 +27,7 @@ public static class MeshNavigator
     // ===========================
     // Core point location logic
     // ===========================
-    private static MeshTraversalStep ComputePointLocation(HalfEdge edge, Vertex point)
+    private static MeshTraversalStep EvaluateNextStep(HalfEdge edge, Vertex point)
     {
         HalfEdge? destinationEdge = null;
         HalfEdge? nextHalfEdge = null;
@@ -57,8 +57,6 @@ public static class MeshNavigator
                 if (current.Dest!.PositionsEqual(point))
                     destinationEdge = current.Next;
 
-                if (destinationEdge == null)
-                    destinationEdge = current;
 
                 break;
             }
@@ -69,7 +67,7 @@ public static class MeshNavigator
 
         // Fallback if no destination or nextHalfEdge found
         if (nextHalfEdge == null && destinationEdge == null)
-            destinationEdge = startEdge;
+            destinationEdge =current;
 
         return new MeshTraversalStep(anyOnEdge, destinationEdge, nextHalfEdge);
     }
@@ -89,7 +87,7 @@ public static class MeshNavigator
 
         while (iterations++ < MAX_ITERATIONS)
         {
-            var loc = ComputePointLocation(current, point);
+            var loc = EvaluateNextStep(current, point);
 
 
             // Destination reached

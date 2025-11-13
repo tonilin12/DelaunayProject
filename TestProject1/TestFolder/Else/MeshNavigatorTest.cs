@@ -63,6 +63,11 @@ namespace TestProject1.TestFolder.Else
             Assert.AreEqual(expectOnEdge, isOnEdge,
                 $"Vertex {vertex} on-edge expectation {expectOnEdge}, got {isOnEdge}.");
 
+            var isOnEdge2 = GeometryUtils.IsOnSegment(locatorEdge.Origin, locatorEdge.Dest!, vertex);
+            Assert.AreEqual(isOnEdge, isOnEdge2,
+            $"Consistency check: GeometryUtils reports {isOnEdge2} but traversal reported {isOnEdge}.");
+
+
             AssertTraverseCorrect(vertex, allNextTwins);
 
             return locatorEdge;

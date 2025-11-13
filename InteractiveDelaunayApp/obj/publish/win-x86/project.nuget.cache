@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "5bszxzfno+A=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\InteractiveDelaunayApp\\InteractiveDelaunayApp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\documentformat.openxml\\3.3.0\\documentformat.openxml.3.3.0.nupkg.sha512",
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\documentformat.openxml.framework\\3.3.0\\documentformat.openxml.framework.3.3.0.nupkg.sha512",
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\microsoft.net.illink.tasks\\9.0.9\\microsoft.net.illink.tasks.9.0.9.nupkg.sha512",
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\system.io.packaging\\8.0.1\\system.io.packaging.8.0.1.nupkg.sha512",
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x86\\9.0.9\\microsoft.netcore.app.runtime.win-x86.9.0.9.nupkg.sha512",
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x86\\9.0.9\\microsoft.windowsdesktop.app.runtime.win-x86.9.0.9.nupkg.sha512",
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x86\\9.0.9\\microsoft.aspnetcore.app.runtime.win-x86.9.0.9.nupkg.sha512"
+  ],
+  "logs": []
+}

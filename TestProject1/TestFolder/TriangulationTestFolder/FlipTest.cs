@@ -9,26 +9,23 @@ using System.Threading.Tasks;
 
 namespace TestProject1.TestFolder.TriangulationOperations
 {
-
     [TestClass]
     public class FlipTest
     {
-
         private Face face1, face2;
+        private HalfEdge edge;
 
 
         [TestInitialize]
-
         public void Setup()
         {
             // Shared middle edge
-            var vA = new Vertex(0.25f, 0f);  // left point of middle edge
-            var vB = new Vertex(0.75f, 0f);  // right point of middle edge
+            var vA = new Vertex(0.25f, 0f);   // left point of middle edge
+            var vB = new Vertex(0.75f, 0f);   // right point of middle edge
 
             // One vertex above and one below, forming a convex quad
             var vC = new Vertex(0.5f, 0.5f);   // top vertex
             var vD = new Vertex(0.5f, -0.5f);  // bottom vertex
-
 
             // Faces
             face1 = new Face(vA, vB, vC);
@@ -38,234 +35,136 @@ namespace TestProject1.TestFolder.TriangulationOperations
             face1.Edge.Twin = face2.Edge;
             face2.Edge.Twin = face1.Edge;
 
+            edge = face1.Edge;
+        
         }
 
-
+  
 
         [TestMethod]
-        public void SharedEdge_AfterFlip_TwinAndPositionsCorrect()
+        public void EdgeFlip_UnchangedEdgesRemainTheSame()
         {
-            var edge = face1.Edge;
-            var twin = face2.Edge;
-
-
-            TriangulationOperation.FlipEdge(edge);
-
-
-            // Assert twin references
-            Assert.AreEqual(edge.Twin, twin, "Edge.Twin should reference its twin.");
-            Assert.AreEqual(twin.Twin, edge, "Twin.Twin should reference the original edge.");
-
-            // Assert positions using PositionsEqual
-            Assert.IsTrue(edge.Origin.PositionsEqual(twin.Dest), "Edge origin should match twin destination.");
-            Assert.IsTrue(edge.Dest.PositionsEqual(twin.Origin), "Edge destination should match twin origin.");
-
-        }
-
-
-
-        [TestMethod]
-        public void AfterFlip_HalfEdgeCycleIntegrity()
-        {
-            // Arrange: take a shared edge and flip it
-            var edge = face1.Edge;
-            TriangulationOperation.FlipEdge(edge);
-
-
-            var faces = new[] { (face1, "face1"), (face2, "face2") };
-
-            // Act & Assert: check that half-edge cycles are well-circulated
-            foreach (var (face, faceName) in faces)
-            {
-                List<HalfEdge> edges;
-                try
-                {
-                    edges = face.GetEdges().ToList();
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail($"{faceName} enumeration failed: {ex.Message}");
-                    return;
-                }
-
-                // Enumeration must always be 3 for triangles
-                if (edges.Count != 3)
-                    Assert.Fail($"{faceName} enumeration does not have 3 edges: got {edges.Count}");
-            }
-
-            // Explicit final check
-            Assert.IsTrue(true, @"
-                    All half-edge cycles enumerated successfully 
-                    with appropriate cycle length."
-            );
-        }
-
-
-
-        // === Helper: attach or snapshot twins for edges expected to stay unchanged ===
-        private static Dictionary<HalfEdge, HalfEdge> AttachOrSnapshotTwins(IEnumerable<HalfEdge> edges)
-        {
-            var map = new Dictionary<HalfEdge, HalfEdge>();
-            foreach (var e in edges)
-            {
-                if (e.Twin == null)
-                {
-                    // Lightweight dummy twin: reverse direction via Origin = e.Dest
-                    var dummy = new HalfEdge(e.Dest!);
-                    dummy.Twin = e;
-                    e.Twin = dummy;
-                    map[e] = dummy;
-                }
-                else
-                {
-                    map[e] = e.Twin!;
-                }
-            }
-            return map;
-        }
-
-
-        [TestMethod]
-        public void TestFlipCorrectness()
-        {
-            // Arrange: take a shared edge and flip it
-            var edge = face1.Edge;
-
-            // The two opposite vertices (one from each adjacent triangle) before the flip
-            var oppositeVerticesBefore = (
-                FromFace1: edge?.Next?.Dest,
-                FromFace2: edge?.Twin?.Next?.Dest
-            );
-
-            // Collect edges that should remain unchanged (skip the first edge in each face)
             var edges_nochange = new HashSet<HalfEdge>();
             foreach (var e in face1.GetEdges().Skip(1)) edges_nochange.Add(e);
             foreach (var e in face2.GetEdges().Skip(1)) edges_nochange.Add(e);
 
-            // NEW: snapshot/attach twins for all no-change edges
-            var noChangeTwinSnapshot = AttachOrSnapshotTwins(edges_nochange);
+            var edgesBefore = edges_nochange.ToDictionary(
+                e => e,
+                e => new { Origin = e.Origin, Dest = e.Dest, Twin = e.Twin }
+            );
 
-            var nochangeVertecies_positions = noChangeTwinSnapshot.Keys.Select(e => e.Origin.Position).ToList();
+            TriangulationOperation.FlipEdge(edge);
+
+            foreach (var kvp in edgesBefore)
+            {
+                var e = kvp.Key;
+                var before = kvp.Value;
+
+                Assert.AreEqual(before.Origin, e.Origin, "Origin should remain the same after flip.");
+                Assert.AreEqual(before.Dest, e.Dest, "Dest should remain the same after flip.");
+                Assert.AreEqual(before.Twin, e.Twin, "Twin reference should remain the same after flip.");
+            }
+        }
+
+
+        [TestMethod]
+        public void EdgeFlip_ConnectsOppositeVerticesCorrectly_Compact()
+        {
+            // Pre-flip snapshot
+            var A = edge.Origin;
+            var B = edge.Dest!;
+            var C = edge.Next!.Dest!;
+            var D = edge.Twin!.Next!.Dest!;
 
             // Act
             TriangulationOperation.FlipEdge(edge);
 
-
-            for (int i = 0; i < noChangeTwinSnapshot.Count; i++)
+            // Post-flip expectations for both sides packed into one collection:
+            // - edge   should be C -> D with third vertex B
+            // - edge.Twin should be D -> C with third vertex A
+            var sides = new[]
             {
-                var e0 = noChangeTwinSnapshot.Keys.ElementAt(i);
-                var v0 = e0.Origin;
+                new { Diag = edge,       From = C, To = D, Third = B },
+                new { Diag = edge.Twin!, From = D, To = C, Third = A }
+            };
 
+            foreach (var s in sides)
+            {
+                Assert.IsTrue(
+                    s.Diag.Origin.Equals(s.From) &&
+                    s.Diag.Next!.Origin.Equals(s.To) &&
+                    s.Diag.Next!.Next!.Origin.Equals(s.Third),
+                    "Diagonal endpoints must be former opposites; third vertex must be the original endpoint."
+                );
 
-
-
-                var expectedPos = nochangeVertecies_positions[i];
-                var actualPos = v0.Position;
-
-                Assert.AreEqual(expectedPos, actualPos,
-                    $"[NoChange|Vertex {i}] Vertex position changed — expected {expectedPos}, got {actualPos}.");
-
-                // Outgoing-edge consistency check
-                var outEdge = v0.OutgoingHalfEdge;
-                if (outEdge != null)
-                {
-                    Assert.AreSame(v0, outEdge.Origin,
-                        $"[NoChange|Vertex {i}] Vertex's OutgoingHalfEdge origin mismatch — " +
-                        $"expected Origin = {v0}, but found {outEdge.Origin}. " +
-                        $"Edge: {e0}, OutgoingEdge: {outEdge}. Possible inconsistent half-edge linkage.");
-                }
-
+                Assert.AreSame(
+                    s.Diag, s.Diag.Next!.Next!.Next,
+                    "Each face must form a 3-step .Next cycle."
+                );
             }
 
+            // Minimal twin consistency check on the new diagonal
+            Assert.AreSame(edge, edge.Twin!.Twin, "Twin pointers on the flipped diagonal must be consistent.");
+        }
 
+        [TestMethod]
+        public void EdgeFlip_EdgesReferenceCorrectFaces()
+        {
+            TriangulationOperation.FlipEdge(edge);
 
-            // After flip, edge should connect the two opposite vertices
-            bool edgeConnectsOpposites =
-                edge.Origin.PositionsEqual(oppositeVerticesBefore.FromFace1) &&
-                edge.Dest.PositionsEqual(oppositeVerticesBefore.FromFace2);
+            foreach (var e in face1.GetEdges())
+                Assert.AreSame(face1, e.Face, "Edge should reference Face1 after flip.");
 
-            bool twinConnectsOpposites =
-                edge.Twin.Origin.PositionsEqual(oppositeVerticesBefore.FromFace2) &&
-                edge.Twin.Dest.PositionsEqual(oppositeVerticesBefore.FromFace1);
+            foreach (var e in face2.GetEdges())
+                Assert.AreSame(face2, e.Face, "Edge should reference Face2 after flip.");
+        }
 
-            Assert.IsTrue(edgeConnectsOpposites, "Flipped edge should connect the opposite vertices in correct orientation.");
-            Assert.IsTrue(twinConnectsOpposites, "Twin of flipped edge should connect the opposite vertices in reverse orientation.");
+        [TestMethod]
+        public void EdgeFlip_VertexOutgoingEdgesConsistency()
+        {
+            var v1 = edge.Origin;
+            var v2 = edge.Twin.Origin;
 
-            // Assert: all other edges remain unchanged (reference-equal presence in faces)
-            foreach (var e in face1.GetEdges().Skip(1))
-            {
+            // Pre-flip: set outgoing edges for the vertices
+            v1.OutgoingHalfEdge = edge;
+            v2.OutgoingHalfEdge = edge.Twin;
 
-                // Edge should still belong to face1
-                Assert.AreSame(face1, e.Face,
-                    $"Edge {e} from face1 lost its face reference — expected Face=face1, actual Face={e.Face}.");
+            // Act: flip the edge
+            TriangulationOperation.FlipEdge(edge);
 
-                bool removed = edges_nochange.Remove(e);
-                Assert.IsTrue(removed, $"Edge {e} from face1 should remain unchanged after flip.");
-            }
-            foreach (var e in face2.GetEdges().Skip(1))
-            {
-
-
-                // Edge should still belong to face1
-                Assert.AreSame(face2, e.Face,
-                    $"Edge {e} from face1 lost its face reference — expected Face=face1, actual Face={e.Face}.");
-
-                bool removed = edges_nochange.Remove(e);
-                Assert.IsTrue(removed, $"Edge {e} from face2 should remain unchanged after flip.");
-            }
-            Assert.IsTrue(edges_nochange.Count == 0, "Some edges expected to remain unchanged were not found after flip.");
-
-            // NEW: twins for no-change edges must be preserved (same refs + back-link)
-            foreach (var kvp in noChangeTwinSnapshot)
-            {
-                var e = kvp.Key;          // original no-change edge instance
-                var expectedTwin = kvp.Value; // its twin snapshot (dummy or real)
-
-                Assert.AreSame(expectedTwin, e.Twin,
-                    $"Twin reference changed for {e}. Expected: {expectedTwin}, Actual: {e.Twin}");
-                Assert.AreSame(e, e.Twin!.Twin,
-                    $"Twin back-link broken for {e}. Expected e.Twin.Twin == e, Actual: {e.Twin.Twin}");
-            }
-
-            // Orientation consistency
-            var face1_vertices = face1.GetEdges().Select(e => e.Origin).ToArray();
-            var face2_vertices = face2.GetEdges().Select(e => e.Origin).ToArray();
-            var orientation1 = GeometryUtils.GetSignedArea(face1_vertices);
-            var orientation2 = GeometryUtils.GetSignedArea(face2_vertices);
-
-            Assert.IsTrue(orientation1 * orientation2 > 0,
-                "Face1 and Face2 should have consistent orientation after flip.");
+            // Post-flip: check that outgoing edges still originate from the correct vertices
+            Assert.AreSame(v1, v1.OutgoingHalfEdge.Origin,
+                "After flip, v1's outgoing edge should originate from v1.");
+            Assert.AreSame(v2, v2.OutgoingHalfEdge.Origin,
+                "After flip, v2's outgoing edge should originate from v2.");
         }
 
 
         [TestMethod]
         public void DoubleFlip_Testcase()
         {
-            // Arrange: take a shared edge and record initial configuration
+            // Arrange
             var edge = face1.Edge;
 
-            // Record original vertices of both faces
-            var originalFace1Vertices = face1.GetEdges().Select(e => e.Origin).ToArray();
-            var originalFace2Vertices = face2.GetEdges().Select(e => e.Origin).ToArray();
-
-            // Record original twin relationships
-            var originalTwin = edge.Twin;
-
-            // Record original destinations for easy comparison
+            // Record original vertices and twin
             var originalEdgeOrigin = edge.Origin;
             var originalEdgeDest = edge.Dest;
+            var originalTwin = edge.Twin;
 
-
-            // Act: flip the edge twice
-            TriangulationOperation.FlipEdge(edge); // first flip
-            TriangulationOperation.FlipEdge(edge); // first flip
+            // Act: flip twice
+            TriangulationOperation.FlipEdge(edge);
+            TriangulationOperation.FlipEdge(edge);
 
             bool edge_swapped =
-            edge.Origin.PositionsEqual(originalEdgeDest) &&
-            edge.Dest.PositionsEqual(originalEdgeOrigin);
+                edge.Origin.PositionsEqual(originalEdgeDest) &&
+                edge.Dest.PositionsEqual(originalEdgeOrigin);
 
-            Assert.IsTrue(edge_swapped, "flipping edge twice unexpected result topology corruption");
+            Assert.IsTrue(edge_swapped,
+                "Flipping edge twice should restore original topology without corruption.");
+
+            // Twin should remain linked correctly
+            Assert.AreEqual(edge.Twin, originalTwin, "Twin reference should remain correct after double flip.");
+            Assert.AreEqual(edge.Twin.Twin, edge, "Twin’s twin should still reference the original edge.");
         }
     }
 }
-

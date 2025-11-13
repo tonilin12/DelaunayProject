@@ -75,69 +75,93 @@ public class Face
     }
 
 
-
     // -----------------------------
-    // Helper: create cycle of half-edges
+    // Helper: create cycle of three half-edges
     // -----------------------------
-    private HalfEdge MakeCycle<T>(IEnumerable<T> items, Face face, Func<T, HalfEdge> toHalfEdge)
+    private HalfEdge MakeCycle<T>(
+        IEnumerable<T> items,
+        Face face,
+        Func<T, HalfEdge> toHalfEdge)
     {
-        if (items == null)
-            throw new ArgumentException("Input items cannot be null");
+        if (items is null)
+            throw new ArgumentNullException(nameof(items), "Input items cannot be null.");
 
+        // Materialize exactly three edges
         var edges = new HalfEdge[3];
-        int index = 0;
+        int count = 0;
 
         foreach (var item in items)
         {
+            if (count >= 3)
+                throw new ArgumentException("Exactly 3 items are required.", nameof(items));
 
-            var e = toHalfEdge(item);
-            e.Face = face;
-            edges[index++] = e;
+            var edge = toHalfEdge(item);
+            edge.Face = face;
+            edges[count++] = edge;
         }
 
-        if (index != 3)
-            throw new ArgumentException("Exactly 3 items required");
+        if (count != 3)
+            throw new ArgumentException("Exactly 3 items are required.", nameof(items));
 
-        var signedArea = GeometryUtils.GetSignedArea(edges[0].Origin, edges[1].Origin, edges[2].Origin);
-        if ( Math.Abs(signedArea)==0)
-            throw new ArgumentException("Degenerate face: the three vertices are collinear.");
+        // Geometry: check non-degeneracy and CCW orientation
+        float signedArea = GeometryUtils.GetSignedArea(
+            edges[0].Origin,
+            edges[1].Origin,
+            edges[2].Origin);
 
-        if (signedArea<0)
-            throw new ArgumentException("Invalid orientation: face vertices must be CCW, but computed orientation is CW.");
+        if (Math.Abs(signedArea) == 0f)
+            throw new ArgumentException("Degenerate face: the three vertices are collinear.", nameof(items));
 
+        if (signedArea < 0f)
+            throw new ArgumentException("Invalid orientation: face vertices must be CCW, but computed orientation is CW.", nameof(items));
+
+        // Wire Next pointers into a CCW cycle
         for (int i = 0; i < 3; i++)
             edges[i].Next = edges[(i + 1) % 3];
 
-
-        // 2) If input was HalfEdge[], verify twin-side consistency (only when a twin exists)
-        bool inputIsHalfEdges = typeof(T) == typeof(HalfEdge);
-        if (inputIsHalfEdges)
+        // If the input was already HalfEdge[], validate twin-side consistency
+        if (typeof(T) == typeof(HalfEdge))
         {
             for (int i = 0; i < 3; i++)
             {
                 var e = edges[i];
                 var t = e.Twin;
 
-                if (t == null) continue;
+                if (t == null)
+                    continue;
 
-                // Require: e.Twin.Origin == e_{i+1}.Origin
-                if (!ReferenceEquals(t.Origin,e.Dest))
-                    throw new InvalidOperationException("Invariant: e.Twin.Origin must equal next.Origin.");
+                bool originMismatch = !ReferenceEquals(t.Origin, e.Dest);
+                bool destMismatch = (t.Dest != null && !ReferenceEquals(t.Dest, e.Origin));
 
-                // Require: e.Twin.Dest == e.Origin  (i.e., t.Next?.Origin == e.Origin)
-                // Only enforce when the neighbor face already wired t.Next
-                if (t.Dest != null && !ReferenceEquals(t.Dest, e.Origin))
-                    throw new InvalidOperationException("Invariant: e.Twin.Next.Origin must equal e.Origin.");
+                if (originMismatch || destMismatch)
+                {
+                    string context =
+                        $"[Face {Id}] Edge {i}\n" +
+                        $" e: ({e.Origin} → {e.Dest}), Face={e.Face?.Id}\n" +
+                        $" t: ({t.Origin} → {t.Dest}), Face={t.Face?.Id}\n";
+
+                    string issues = "";
+                    if (originMismatch)
+                        issues += "- Twin.Origin ≠ e.Dest (twin edge not geometrically opposite)\n";
+                    if (destMismatch)
+                        issues += "- Twin.Dest ≠ e.Origin (inconsistent 'Next' linkage across faces)\n";
+
+                    string msg =
+                        context +
+                        "Invariant violation detected in twin–next consistency:\n" +
+                        issues +
+                        "This indicates a topological mismatch between adjacent faces sharing this edge.";
+
+                    throw new InvalidOperationException(msg);
+                }
             }
         }
-
 
         InvalidateCircumcircle();
         Id = _nextFaceId++;
 
         return edges[0];
     }
-
 
     public EdgeIterator GetEdgeIterator()
     {

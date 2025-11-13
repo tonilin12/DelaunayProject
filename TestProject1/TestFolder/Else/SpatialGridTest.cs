@@ -16,7 +16,6 @@ namespace TestProject1.TestFolder.Else
         public void EmptyInput_ThrowsException()
         {
             Assert.ThrowsException<ArgumentException>(() => new SpatialGrid(Array.Empty<Vertex>()));
-            Assert.ThrowsException<ArgumentException>(() => new SpatialGrid(new List<Vertex>()));
         }
 
         [TestMethod]
