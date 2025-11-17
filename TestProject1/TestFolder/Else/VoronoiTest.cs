@@ -38,16 +38,12 @@ namespace TestProject1.TestFolder.Else
             var superTriangle = TriangulationOperation.GetSuperTriangle(_vertices);
             var triangulator = new DelaunayBuilder(superTriangle);
 
-            foreach (var v in _vertices)
-            {
-                triangulator.AddVertices(v);
-                triangulator.ProcessSingleVertex();
-            }
+            triangulator.AddVertices(_vertices);
+            triangulator.ProcessAllVertices();
 
             var internalVertices = triangulator.GetInternalVertices().ToList();
             var voronoiCells =triangulator.GetVoronoi();
 
-            const float tolerance = 1e-5f;
 
             // Pair each vertex with its Voronoi cell using tuples
             var vertexCellPairs = new List<(Vertex vertex, VoronoiCell cell)>();
@@ -55,11 +51,11 @@ namespace TestProject1.TestFolder.Else
 
             foreach (var vertex in internalVertices)
             {
-                var cell = voronoiCells.FirstOrDefault(c => Vector2.Distance(c.Site, vertex.Position) < tolerance);
+                var cell = voronoiCells.FirstOrDefault(c => Vector2.Distance(c.Site, vertex.Position) <GeometryUtils.EPSILON);
                 Assert.IsNotNull(cell, $"No Voronoi cell found for vertex at position {vertex.Position}.");
 
                 // Ensure one-to-one mapping by checking previous sites
-                Assert.IsFalse(usedSites.Any(s => Vector2.Distance(s, cell.Site) < tolerance),
+                Assert.IsFalse(usedSites.Any(s => Vector2.Distance(s, cell.Site) < GeometryUtils.EPSILON),
                     $"Duplicate Voronoi cell found for site {cell.Site}.");
 
                 usedSites.Add(cell.Site);
@@ -75,15 +71,15 @@ namespace TestProject1.TestFolder.Else
                                           .Select(c => c.Value)
                                           .ToList();
 
-                var sortedCellPolygon = cell.CellVertices.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
-                var sortedCircumcenters = circumcenters.OrderBy(c => c.X).ThenBy(c => c.Y).ToList();
+                var sortedCellPolygon = cell.CellVertices.ToList();
+                var sortedCircumcenters = circumcenters.ToList();
 
                 Assert.AreEqual(sortedCircumcenters.Count, sortedCellPolygon.Count,
                     $"Vertex at {vertex.Position} has mismatched number of circumcenters and Voronoi polygon vertices.");
 
                 for (int i = 0; i < sortedCircumcenters.Count; i++)
                 {
-                    Assert.IsTrue(Vector2.Distance(sortedCircumcenters[i], sortedCellPolygon[i]) < tolerance,
+                    Assert.IsTrue(Vector2.Distance(sortedCircumcenters[i], sortedCellPolygon[i]) <GeometryUtils.EPSILON,
                         $"Vertex at {vertex.Position}: Voronoi polygon vertex {sortedCellPolygon[i]} does not match circumcenter {sortedCircumcenters[i]}.");
                 }
             }

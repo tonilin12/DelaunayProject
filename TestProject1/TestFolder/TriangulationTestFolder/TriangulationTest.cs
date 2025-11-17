@@ -74,38 +74,6 @@ namespace TestProject1.TestFolder.TriangulationFolder
         }
 
 
-        [TestMethod]
-        private void ProcessVertexFlipEdges(Vertex vertex)
-        {
-            var enumerator = triangulator!.ProcessSingleVertexStepByStep().GetEnumerator();
-            (Vertex origin, Vertex dest)? expectedFlipEdge = null;
-
-            while (true)
-            {
-                bool hasNext = enumerator.MoveNext();
-                if (!hasNext) break;
-
-                // Perform verification against previous expected edge
-                if (expectedFlipEdge.HasValue)
-                    VerifyFlipEdge(vertex, expectedFlipEdge.Value);
-
-                // Current edge being flipped
-                HalfEdge? currentEdge = enumerator.Current;
-
-                // Update expected flip edge for validation
-                if (currentEdge != null && GeometryUtils.InCircumcircle(currentEdge.Face, vertex))
-                {
-                    expectedFlipEdge = (currentEdge.Origin, currentEdge.Dest!);
-                }
-                else
-                {
-                    continue;
-                }
-            }
-        }
-
-
-
         private void VerifyFlipEdge(Vertex vertex, (Vertex origin, Vertex dest) expectedFlipEdge)
         {
             var edgeList = vertex.GetEdges().Reverse().ToList();
@@ -119,7 +87,7 @@ namespace TestProject1.TestFolder.TriangulationFolder
                 var currentEdge = edgeList[i];
                 var v2 = currentEdge.Twin?.Next?.Dest;
 
-                if (v1.PositionsEqual(expectedFlipEdge.origin) && v2.PositionsEqual(expectedFlipEdge.dest))
+                if (v1==expectedFlipEdge.origin && v2 == expectedFlipEdge.dest)
                 {
                     verifyIndex = i;
                     break;
@@ -168,6 +136,38 @@ namespace TestProject1.TestFolder.TriangulationFolder
 
 
         }
+
+
+        [TestMethod]
+        private void ProcessVertexFlipEdges(Vertex vertex)
+        {
+            var enumerator = triangulator!.ProcessSingleVertexStepByStep().GetEnumerator();
+            (Vertex origin, Vertex dest)? expectedFlipEdge = null;
+
+            while (true)
+            {
+                bool hasNext = enumerator.MoveNext();
+                if (!hasNext) break;
+
+                // Perform verification against previous expected edge
+                if (expectedFlipEdge.HasValue)
+                    VerifyFlipEdge(vertex, expectedFlipEdge.Value);
+
+                // Current edge being flipped
+                HalfEdge? currentEdge = enumerator.Current;
+
+                // Update expected flip edge for validation
+                if (currentEdge != null && GeometryUtils.InCircumcircle(currentEdge.Face, vertex))
+                {
+                    expectedFlipEdge = (currentEdge.Origin, currentEdge.Dest!);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+        }
+
 
         [TestMethod]
         public void TestDelaunay1()

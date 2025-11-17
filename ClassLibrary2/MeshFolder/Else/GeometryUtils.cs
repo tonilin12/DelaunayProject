@@ -15,24 +15,14 @@ namespace ClassLibrary2.MeshFolder.Else
         public static float GetSignedArea(Vector2 p0, Vector2 p1, Vector2 p2)
         {
             float det = (p1.X - p0.X) * (p2.Y - p0.Y) - (p1.Y - p0.Y) * (p2.X - p0.X);
-            return Math.Abs(det) < EPSILON ? 0f : det;
+            return det;
         }
 
         public static float GetSignedArea(Vertex v0, Vertex v1, Vertex v2)
             => GetSignedArea(v0.Position, v1.Position, v2.Position);
 
 
-  
-
-        public static float GetSignedArea(Vertex[] vertices)
-        {
-            if (vertices == null || vertices.Length != 3)
-                throw new ArgumentException("Array must contain exactly 3 Vertex objects.", nameof(vertices));
-
-            return GetSignedArea(vertices[0].Position, vertices[1].Position, vertices[2].Position);
-        }
-
- 
+   
 
         #endregion
 

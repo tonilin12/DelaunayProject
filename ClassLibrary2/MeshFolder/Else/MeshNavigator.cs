@@ -41,14 +41,15 @@ public static class MeshNavigator
             float orientationValue = GeometryUtils.GetSignedArea(current.Origin, current.Dest!, point);
 
             // Determine next half-edge if point is on the "outside" of current edge
-            if (orientationValue <0 && nextHalfEdge == null)
+            if (orientationValue <-GeometryUtils.EPSILON && nextHalfEdge == null)
             {
                 nextHalfEdge = current.Twin;
                 break;
             }
 
             // Check if point is on the current edge
-            bool onEdge = Math.Abs(orientationValue)==0 && GeometryUtils.IsOnSegment(current.Origin, current.Dest!, point);
+            bool onEdge = Math.Abs(orientationValue)<=Math.Abs(GeometryUtils.EPSILON) 
+                         && GeometryUtils.IsOnSegment(current.Origin, current.Dest!, point);
 
             if (onEdge)
             {

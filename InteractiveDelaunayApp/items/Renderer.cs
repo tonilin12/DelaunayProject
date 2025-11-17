@@ -23,6 +23,24 @@ namespace WinFormsApp2.items
 
         public Renderer() { }
 
+        // ---------------- Coordinate helpers ----------------
+
+        /// <summary>
+        /// Convert world coordinates (x right, y up) to screen coordinates (x right, y down).
+        /// </summary>
+        public static PointF WorldToScreen(Vector2 world, int formHeight)
+        {
+            return new PointF(world.X, formHeight - world.Y);
+        }
+
+        /// <summary>
+        /// Convert screen coordinates (x right, y down) to world coordinates (x right, y up).
+        /// </summary>
+        public static Vector2 ScreenToWorld(PointF screen, int formHeight)
+        {
+            return new Vector2(screen.X, formHeight - screen.Y);
+        }
+
         // ---------------- Triangles ----------------
         public void DrawTriangles(Graphics g, List<Face> triangles, int formHeight)
         {
@@ -32,7 +50,7 @@ namespace WinFormsApp2.items
             foreach (var face in triangles)
             {
                 var verts = face.GetVertices()
-                                .Select(v => new PointF(v.Position.X, formHeight - v.Position.Y))
+                                .Select(v => WorldToScreen(v.Position, formHeight))
                                 .ToArray();
                 if (verts.Length < 3) continue;
                 for (int i = 0; i < verts.Length; i++)
@@ -48,8 +66,9 @@ namespace WinFormsApp2.items
 
             foreach (var v in vertices)
             {
-                float x = v.Position.X;
-                float y = formHeight - v.Position.Y;
+                var screen = WorldToScreen(v.Position, formHeight);
+                float x = screen.X;
+                float y = screen.Y;
 
                 using (var glow = new SolidBrush(Color.FromArgb(100, VertexColor)))
                     g.FillEllipse(glow, x - r * 2, y - r * 2, r * 4, r * 4);
@@ -79,11 +98,8 @@ namespace WinFormsApp2.items
 
             var circle = flipHappened ? FlipHappenedCircleColor : FlipNormalCircleColor;
 
-
             // Highlight current edge
-
             DrawFaceOutline(g, edge.Face, formHeight, OutlineColor, 4f);
-
             DrawCircumcircle(g, edge.Face, formHeight, circle);
         }
 
@@ -98,11 +114,16 @@ namespace WinFormsApp2.items
             {
                 var poly = cell.CellVertices;
                 if (poly == null || poly.Count < 2) continue;
+
                 for (int i = 0; i < poly.Count; i++)
                 {
                     var a = poly[i];
                     var b = poly[(i + 1) % poly.Count];
-                    g.DrawLine(pen, new PointF(a.X, formHeight - a.Y), new PointF(b.X, formHeight - b.Y));
+
+                    var p1 = WorldToScreen(new Vector2(a.X, a.Y), formHeight);
+                    var p2 = WorldToScreen(new Vector2(b.X, b.Y), formHeight);
+
+                    g.DrawLine(pen, p1, p2);
                 }
             }
         }
@@ -117,8 +138,9 @@ namespace WinFormsApp2.items
 
             foreach (var e in vertex.GetEdges().Select(x => x.Next))
             {
-                var p1 = new PointF(e.Origin.Position.X, formHeight - e.Origin.Position.Y);
-                var p2 = new PointF(e.Dest.Position.X, formHeight - e.Dest.Position.Y);
+                var p1 = WorldToScreen(e.Origin.Position, formHeight);
+                var p2 = WorldToScreen(e.Dest.Position, formHeight);
+
                 g.DrawLine(glowPen, p1, p2);
                 g.DrawLine(mainPen, p1, p2);
             }
@@ -128,7 +150,7 @@ namespace WinFormsApp2.items
         private void DrawFaceOutline(Graphics g, Face face, int formHeight, Color color, float width)
         {
             var verts = face.GetVertices()
-                            .Select(v => new PointF(v.Position.X, formHeight - v.Position.Y))
+                            .Select(v => WorldToScreen(v.Position, formHeight))
                             .ToArray();
             if (verts.Length < 3) return;
 
@@ -143,8 +165,9 @@ namespace WinFormsApp2.items
             float r = Vector2.Distance(center, face.GetVertices().First().Position);
             if (r <= 0f) return;
 
-            float cx = center.X;
-            float cy = formHeight - center.Y;
+            var screenCenter = WorldToScreen(center, formHeight);
+            float cx = screenCenter.X;
+            float cy = screenCenter.Y;
 
             using var pen = MakePen(color, 4f);
             g.DrawEllipse(pen, cx - r, cy - r, r * 2, r * 2);
@@ -168,8 +191,8 @@ namespace WinFormsApp2.items
         {
             if (edge == null || edge.Origin == null || edge.Dest == null) return;
 
-            var p1 = new PointF(edge.Origin.Position.X, formHeight - edge.Origin.Position.Y);
-            var p2 = new PointF(edge.Dest.Position.X, formHeight - edge.Dest.Position.Y);
+            var p1 = WorldToScreen(edge.Origin.Position, formHeight);
+            var p2 = WorldToScreen(edge.Dest.Position, formHeight);
 
             using var pen = MakePen(color, width);
             g.DrawLine(pen, p1, p2);

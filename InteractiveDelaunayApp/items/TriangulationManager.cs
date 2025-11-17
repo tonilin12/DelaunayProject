@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ClassLibrary2.MeshFolder.Else;
@@ -11,192 +9,165 @@ namespace WinFormsApp2.items
 {
     public class TriangulationManager
     {
-        private readonly object _lock = new object();
-        private DelaunayBuilder? triangulator;
+        public DelaunayBuilder? Builder { get; private set; }
 
-        private bool isProcessingVertex = false;
-        public bool IsProcessingVertex
-        {
-            get { lock (_lock) { return isProcessingVertex; } }
-        }
+        private bool inserting = false;
 
-        public HalfEdge? CurrentEdge { get; private set; } = null;
-        public Vertex? CurrentVertex { get; private set; } = null;
-
-        public bool flip_happen = false;
-        public bool flip_finished = false;
-
-        public DelaunayBuilder? Triangulator
-        {
-            get { lock (_lock) { return triangulator; } }
-        }
-
-        public event Action? StateChanged;
+        public HalfEdge? ActiveEdge { get; private set; } = null;
+        public Vertex? ActiveVertex { get; private set; } = null;
 
         /// <summary>
-        /// Unified processing state event.
-        /// Fired both when processing starts and when it ends.
-        /// Subscribers must check IsProcessingVertex to know state.
+        /// FlipState values:
+        ///   0 = no flip
+        ///   1 = flip pending (circumcircle violation detected)
+        ///   2 = flip completed (for one-frame highlight)
         /// </summary>
+        public int FlipState { get; private set; } = 0;
+
+        public bool IsInserting => inserting;
+
+        public bool StepMode { get; set; } = false;
+
+        // Fast-forward flag: when true, step mode runs without delay
+        public bool FastForward { get; private set; } = false;
+
+        private const int StepDelayMs = 1000;
+
+        public event Action? VisualizationChanged;
         public event Action? ProcessingStateChanged;
 
-        // --- Step-by-step control ---
-        private const int StepDelayMs = 1000;
-        public bool IsStepByStepMode { get; set; } = false;
-
-        // --- Immediate (fast-forward) ---
-        private volatile bool immediateMode = false;
-        public bool ImmediateMode
+        public void RequestFastForward()
         {
-            get { lock (_lock) { return immediateMode; } }
-            set { lock (_lock) { immediateMode = value; } }
+            // Immediately switch to "no delay" mode for the current step sequence
+            FastForward = true;
         }
 
-        public void FastForward() => ImmediateMode = true;
-
-        // ---------------------
-        // --- Initialization ---
-        // ---------------------
         public void InitializeFromScreen(Screen screen)
         {
-            ImmediateMode = true;
+            FastForward = true;
 
-            lock (_lock)
+            Builder = null;
+            ActiveEdge = null;
+            ActiveVertex = null;
+            FlipState = 0;
+
+            int w = screen.Bounds.Width;
+            int h = screen.Bounds.Height;
+
+            var border = new[]
             {
-                triangulator = null;
-                CurrentEdge = null;
-                CurrentVertex = null;
+                new Vertex(0, 0),
+                new Vertex(w, 0),
+                new Vertex(0, h),
+                new Vertex(w, h)
+            };
 
-                int w = screen.Bounds.Width;
-                int h = screen.Bounds.Height;
+            var super = TriangulationOperation.GetSuperTriangle(border);
+            Builder = new DelaunayBuilder(super);
 
-                var borderPoints = new Vertex[]
-                {
-                    new Vertex(0, 0),
-                    new Vertex(w, 0),
-                    new Vertex(0, h),
-                    new Vertex(w, h)
-                };
-
-                var superTriangle = TriangulationOperation.GetSuperTriangle(borderPoints);
-                triangulator = new DelaunayBuilder(superTriangle);
-            }
-
-            StateChanged?.Invoke();
+            VisualizationChanged?.Invoke();
         }
 
-        // ---------------------
-        // --- Snapshot helper ---
-        // ---------------------
-        public (List<Face> triangles, List<Vertex> inserted) GetSnapshot()
+        public (List<Face> faces, List<Vertex> verts) GetSnapshot()
         {
-            lock (_lock)
-            {
-                var triCopy = triangulator?.GetInternalTriangles().ToList() ?? new List<Face>();
-                var vertCopy = triangulator?.GetInternalVertices()?.ToList() ?? new List<Vertex>();
-                return (triCopy, vertCopy);
-            }
+            var faces = Builder?.GetInternalTriangles().ToList() ?? new List<Face>();
+            var verts = Builder?.GetInternalVertices()?.ToList() ?? new List<Vertex>();
+            return (faces, verts);
         }
 
-        // ---------------------
-        // --- Vertex Insertion ---
-        // ---------------------
-        public async Task AddVertexAsync(Vertex vertex)
+        public async Task AddVertexAsync(Vertex v)
         {
-            if (triangulator == null) return;
+            if (Builder == null) return;
+            if (inserting) return;
 
-            lock (_lock)
-            {
-                if (isProcessingVertex) return;
-                isProcessingVertex = true;
-            }
-
-            // notify "processing started"
+            inserting = true;
             ProcessingStateChanged?.Invoke();
 
             try
             {
-                triangulator.AddVertices(vertex);
-                CurrentVertex = vertex;
+                Builder.AddVertices(v);
+                ActiveVertex = v;
 
-                if (IsStepByStepMode)
+                if (StepMode)
                 {
-                    var enumerator = triangulator
-                        .ProcessSingleVertexStepByStep()
-                        .GetEnumerator();
-
-                    while (true)
-                    {
-                        if (!enumerator.MoveNext())
-                            break;
-
-                        if (flip_happen)
-                        {
-                            flip_finished = true;
-                            await TryTriggerRepaintAsync();
-                            flip_finished = false;
-                        }
-
-                        CurrentEdge = enumerator.Current;
-
-                        flip_happen = CurrentEdge != null &&
-                                      GeometryUtils.InCircumcircle(CurrentEdge.Face, vertex);
-
-                        await TryTriggerRepaintAsync();
-
-                        if (ImmediateMode)
-                        {
-                            while (enumerator.MoveNext()) { }
-                            break;
-                        }
-                    }
-
-                    lock (_lock)
-                    {
-                        CurrentEdge = null;
-                        flip_happen = false;
-                        CurrentVertex = null;
-                    }
-
-                    StateChanged?.Invoke();
+                    await ProcessStepMode(v);
                 }
                 else
                 {
-                    await Task.Run(() =>
-                    {
-                        lock (_lock)
-                        {
-                            triangulator.ProcessSingleVertex();
-                        }
-                    });
-
-                    StateChanged?.Invoke();
+                    await Task.Run(() => { Builder.ProcessSingleVertex(); });
+                    VisualizationChanged?.Invoke();
                 }
             }
             finally
             {
-                lock (_lock)
-                {
-                    isProcessingVertex = false;
-                    ImmediateMode = false;
-                }
+                inserting = false;
+                FastForward = false;
 
-                // notify "processing finished"
-                ProcessingStateChanged?.Invoke();
+                ActiveEdge = null;
+                ActiveVertex = null;
+                FlipState = 0;
             }
         }
 
-        private async Task TryTriggerRepaintAsync()
+        private async Task ProcessStepMode(Vertex v)
         {
-            if (CurrentEdge == null && CurrentVertex == null)
+            if (Builder == null)
                 return;
 
-            StateChanged?.Invoke();
+            var enumerator = Builder.ProcessSingleVertexStepByStep().GetEnumerator();
 
-            int delay = (IsStepByStepMode && !ImmediateMode) ? StepDelayMs : 0;
+            while (true)
+            {
+                if (!enumerator.MoveNext())
+                    break;
 
-            if (delay > 0)
-                await Task.Delay(delay);
+                // If last step was pending, show "completed"
+                if (FlipState == 1)
+                {
+                    FlipState = 2;
+                    await StepModeTriggerRepaint();
+                    FlipState = 0;
+                }
+
+                ActiveEdge = enumerator.Current;
+
+                bool violation =
+                    ActiveEdge != null &&
+                    GeometryUtils.InCircumcircle(ActiveEdge.Face, v);
+
+                FlipState = violation ? 1 : 0;
+
+                await StepModeTriggerRepaint();
+
+                if (FastForward)
+                {
+                    // Consume remaining steps without delay / visual stepping
+                    while (enumerator.MoveNext()) { }
+                    break;
+                }
+            }
+
+            ActiveEdge = null;
+            FlipState = 0;
+
+            VisualizationChanged?.Invoke();
+            
+        }
+
+        private async Task StepModeTriggerRepaint()
+        {
+            if (ActiveEdge == null && ActiveVertex == null)
+                return;
+
+            VisualizationChanged?.Invoke();
+
+            bool doDelay =
+                StepMode &&
+                !FastForward &&
+                StepDelayMs > 0;
+
+            if (doDelay)
+                await Task.Delay(StepDelayMs);
             else
                 await Task.Yield();
         }

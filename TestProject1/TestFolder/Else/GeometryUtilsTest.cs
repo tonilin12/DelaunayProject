@@ -39,14 +39,14 @@ namespace TestProject1.TestFolder.Else
         public void TriangleOrientation_CCW_ReturnsPositive()
         {
             float area = GeometryUtils.GetSignedArea(vA, vB, vC);
-            Assert.IsTrue(area > 0, "Triangle should be counterclockwise (CCW).");
+            Assert.IsTrue(area > 0, "vvertecies should be counterclockwise (CCW).");
         }
 
         [TestMethod]
         public void TriangleOrientation_CW_ReturnsNegative()
         {
             float area = GeometryUtils.GetSignedArea(vA, vC, vB);
-            Assert.IsTrue(area < 0, "Triangle should be clockwise (CW).");
+            Assert.IsTrue(area <-GeometryUtils.EPSILON, "vertecies should be clockwise (CW).");
         }
 
         [TestMethod]
@@ -57,7 +57,7 @@ namespace TestProject1.TestFolder.Else
             var v3 = new Vertex(2, 2);
 
             float area = GeometryUtils.GetSignedArea(v1, v2, v3);
-            Assert.AreEqual(0, area, 1e-6, "Collinear points should return zero area.");
+            Assert.IsTrue(Math.Abs(area)<=GeometryUtils.EPSILON, "vertecies should be collienar.");
         }
 
         #endregion

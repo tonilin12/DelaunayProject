@@ -109,7 +109,7 @@ public class Face
             edges[1].Origin,
             edges[2].Origin);
 
-        if (Math.Abs(signedArea) == 0f)
+        if (Math.Abs(signedArea)<=GeometryUtils.EPSILON)
             throw new ArgumentException("Degenerate face: the three vertices are collinear.", nameof(items));
 
         if (signedArea < 0f)

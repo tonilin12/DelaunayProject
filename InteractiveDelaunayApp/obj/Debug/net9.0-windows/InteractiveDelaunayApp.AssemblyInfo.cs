@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InteractiveDelaunayApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b68d1283386431f68aab0b797de082a56acbc71e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+19daa17422ab24b2438167e1ce37e0f1ccb7839b")]
 [assembly: System.Reflection.AssemblyProductAttribute("InteractiveDelaunayApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InteractiveDelaunayApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
