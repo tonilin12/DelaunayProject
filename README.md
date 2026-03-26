@@ -18,4 +18,4 @@ The project includes:
 
 This thesis aims to demonstrate how Delaunay triangulation can be studied, implemented, validated, and visualized in a clear and practical way.
 
-[Open Thesis](thesis.pdf)
+[View the full thesis (PDF)](thesis.pdf)
