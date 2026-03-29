@@ -155,24 +155,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Toni Lin\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Toni Lin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\ConsoleApp1.csproj",
+      "projectUniqueName": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ConsoleApp1\\ConsoleApp1.csproj",
       "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\ConsoleApp1.csproj",
+      "projectPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ConsoleApp1\\ConsoleApp1.csproj",
       "packagesPath": "C:\\Users\\Toni Lin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ConsoleApp1\\obj\\",
+      "outputPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ConsoleApp1\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
         "C:\\Users\\Toni Lin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -186,8 +181,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj": {
-              "projectPath": "C:\\Users\\Toni Lin\\Desktop\\temp\\program00\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj"
+            "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj": {
+              "projectPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj"
             }
           }
         }
@@ -202,7 +197,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net9.0": {
@@ -223,7 +218,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
