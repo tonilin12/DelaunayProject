@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net9.0": {
       "DocumentFormat.OpenXml/3.3.0": {
@@ -137,19 +137,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Toni Lin\\.nuget\\packages\\": {}
+    "C:\\Users\\Tioni Lin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj",
+      "projectUniqueName": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj",
       "projectName": "ClassLibrary2",
-      "projectPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj",
-      "packagesPath": "C:\\Users\\Toni Lin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\obj\\",
+      "projectPath": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj",
+      "packagesPath": "C:\\Users\\Tioni Lin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Toni Lin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Tioni Lin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -161,6 +161,7 @@
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "projectReferences": {}
         }
@@ -175,10 +176,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net9.0": {
+        "framework": "net9.0",
         "targetAlias": "net9.0",
         "dependencies": {
           "DocumentFormat.OpenXml": {
@@ -197,12 +199,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
