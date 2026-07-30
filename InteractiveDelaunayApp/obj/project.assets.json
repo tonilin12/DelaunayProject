@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
-    "net9.0-windows7.0": {
+    "net9.0-windows": {
       "DocumentFormat.OpenXml/3.3.0": {
         "type": "package",
         "dependencies": {
@@ -150,24 +150,24 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net9.0-windows7.0": [
+    "net9.0-windows": [
       "ClassLibrary2 >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Toni Lin\\.nuget\\packages\\": {}
+    "C:\\Users\\Tioni Lin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\InteractiveDelaunayApp\\InteractiveDelaunayApp.csproj",
+      "projectUniqueName": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\InteractiveDelaunayApp\\InteractiveDelaunayApp.csproj",
       "projectName": "InteractiveDelaunayApp",
-      "projectPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\InteractiveDelaunayApp\\InteractiveDelaunayApp.csproj",
-      "packagesPath": "C:\\Users\\Toni Lin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\InteractiveDelaunayApp\\obj\\",
+      "projectPath": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\InteractiveDelaunayApp\\InteractiveDelaunayApp.csproj",
+      "packagesPath": "C:\\Users\\Tioni Lin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\InteractiveDelaunayApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Toni Lin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Tioni Lin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -178,11 +178,12 @@
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net9.0-windows7.0": {
+        "net9.0-windows": {
+          "framework": "net9.0-windows7.0",
           "targetAlias": "net9.0-windows",
           "projectReferences": {
-            "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj": {
-              "projectPath": "C:\\Users\\Toni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj"
+            "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj": {
+              "projectPath": "C:\\Users\\Tioni Lin\\Documents\\GitHub\\DelaunayProject\\ClassLibrary2\\ClassLibrary2.csproj"
             }
           }
         }
@@ -197,10 +198,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
-      "net9.0-windows7.0": {
+      "net9.0-windows": {
+        "framework": "net9.0-windows7.0",
         "targetAlias": "net9.0-windows",
         "imports": [
           "net461",
@@ -213,6 +215,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[9.0.18, 9.0.18]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
@@ -221,7 +241,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
