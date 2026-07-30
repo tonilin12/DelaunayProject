@@ -1,21 +1,28 @@
 # A Study and Implementation of Incremental Delaunay Triangulation
 
-This repository contains my bachelor thesis project completed at **Eötvös Loránd University, Faculty of Informatics, Department of Numerical Analysis**.
+This project implements **Delaunay triangulation**, a geometric algorithm that connects a set of 2D points into triangles.
 
-The work presents both the **theoretical background** and the **practical implementation** of **Incremental Delaunay Triangulation**, with a focus on the **Incremental Lawson Flip algorithm**. The project was developed in **C# with .NET 9** and includes an interactive Windows Forms application for visualizing the triangulation process.
+A triangulation can be created in many ways, but Delaunay triangulation tries to avoid thin and narrow triangles when possible. This usually produces a cleaner and more stable mesh, which is useful in computer graphics, simulations, maps, and geometric applications.
+
+The implementation builds the triangulation **incrementally**. Points are inserted one by one, and after each insertion the surrounding triangles are checked and adjusted. When two neighboring triangles do not satisfy the Delaunay condition, their shared edge is flipped to improve the local triangle structure.
+
+The project was developed in **C# with .NET 9**. It uses a **half-edge data structure** to store vertices, edges, and triangle relationships, making it easier to update the mesh during point insertion and edge flipping.
+
+A Windows Forms application is included to visualize the triangulation process step by step.
 
 ## Project Overview
 
 The project includes:
 
-- geometric utility functions for core computations,
-- half-edge based triangulation data structures,
-- triangle splitting and edge-flipping operations,
-- incremental Delaunay triangulation construction,
-- Voronoi diagram generation,
-- testing and validation of major components,
-- and an interactive desktop application for visualization.
+* 2D geometric utility functions,
+* half-edge based mesh representation,
+* incremental point insertion,
+* triangle splitting and edge flipping,
+* Delaunay triangulation construction,
+* Voronoi diagram visualization,
+* unit tests for core components,
+* and an interactive desktop visualizer.
 
-This thesis aims to demonstrate how Delaunay triangulation can be studied, implemented, validated, and visualized in a clear and practical way.
+## Thesis
 
 [View the full thesis (PDF)](thesis.pdf)
