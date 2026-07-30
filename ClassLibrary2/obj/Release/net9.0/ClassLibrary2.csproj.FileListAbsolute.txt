@@ -1,0 +1,13 @@
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\ClassLibrary2.deps.json
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\ClassLibrary2.dll
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\bin\Release\net9.0\ClassLibrary2.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.csproj.AssemblyReference.cache
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.AssemblyInfoInputs.cache
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.AssemblyInfo.cs
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.csproj.CoreCompileInputs.cache
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.sourcelink.json
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.dll
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\refint\ClassLibrary2.dll
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ClassLibrary2.pdb
+C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\ClassLibrary2\obj\Release\net9.0\ref\ClassLibrary2.dll

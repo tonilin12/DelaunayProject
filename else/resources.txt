@@ -1,0 +1,20 @@
+quadEdge triangulation
+https://ianthehenry.com/posts/delaunay/
+http://www.karlchenofhell.org/cppswp/lischinski.pdf
+
+
+halfEdge triangulation
+https://tchayen.com/constrained-delaunay-triangulation-from-a-paper
+https://www.habrador.com/tutorials/math/10-triangulation/
+https://www.jdxdev.com/blog/2021/07/06/rts-pathfinding-2-dynamic-navmesh-with-constrained-delaunay-triangles/
+https://www.geeksforgeeks.org/convex-hull-using-graham-scan/
+
+https://jailbrokengame.com/2023/03/30/constrained-delaunay-triangulation/
+
+
+
+
+
+reference 
+https://cartography-playground.gitlab.io/playgrounds/triangulation-delaunay-voronoi-diagram/
+
