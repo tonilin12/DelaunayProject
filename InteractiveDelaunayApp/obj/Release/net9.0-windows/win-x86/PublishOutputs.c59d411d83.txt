@@ -1,3 +1,0 @@
-C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\InteractiveDelaunayApp\bin\Release\net9.0-windows\win-x86\app.publish\InteractiveDelaunayApp.pdb
-C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\InteractiveDelaunayApp\bin\Release\net9.0-windows\win-x86\app.publish\ClassLibrary2.pdb
-C:\Users\Toni Lin\Desktop\temp\program00\DelaunayProject\InteractiveDelaunayApp\bin\Release\net9.0-windows\win-x86\app.publish\InteractiveDelaunayApp.exe
